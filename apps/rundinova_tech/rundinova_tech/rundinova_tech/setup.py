@@ -66,6 +66,7 @@ def ensure_rundinova_permissions():
         "RundiNova KPI Definition", "RundiNova KPI Snapshot", "RundiNova Risk",
         "RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact",
         "RundiNova Office",
+        "RundiNova Repository",
     ]
     for doctype in doctypes:
         if not frappe.db.exists("DocType", doctype):
