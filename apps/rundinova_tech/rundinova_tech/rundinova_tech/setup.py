@@ -23,8 +23,9 @@ def seed():
     transactions must be entered and approved by the RundiNova team.
     """
     roles = ensure_rundinova_roles()
+    permissions = ensure_rundinova_permissions()
     sync_dashboards()
-    return {"configured": True, "business_data_created": False, "roles": roles}
+    return {"configured": True, "business_data_created": False, "roles": roles, "permissions": list(permissions)}
 
 
 def ensure_rundinova_roles():
@@ -49,6 +50,37 @@ def ensure_rundinova_roles():
         created.append(role_name)
     frappe.db.commit()
     return created
+
+
+def ensure_rundinova_permissions():
+    """Apply least-privilege access to custom RundiNova DocTypes."""
+    matrix = {
+        "RundiNova Director": {"read": 1, "write": 1, "create": 1, "delete": 0},
+        "RundiNova Finance Manager": {"read": 1, "write": 1, "create": 1, "delete": 1},
+        "RundiNova Project Lead": {"read": 1, "write": 1, "create": 1, "delete": 0},
+        "RundiNova Team Member": {"read": 1, "write": 1, "create": 1, "delete": 0},
+        "RundiNova Communications": {"read": 1, "write": 1, "create": 1, "delete": 0},
+    }
+    doctypes = [
+        "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Budget Review",
+        "RundiNova KPI Definition", "RundiNova KPI Snapshot", "RundiNova Risk",
+        "RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact",
+        "RundiNova Office",
+    ]
+    for doctype in doctypes:
+        if not frappe.db.exists("DocType", doctype):
+            continue
+        doc = frappe.get_doc("DocType", doctype)
+        existing = {row.role: row for row in doc.permissions}
+        for role, permissions in matrix.items():
+            row = existing.get(role)
+            if not row:
+                row = doc.append("permissions", {"role": role, "permlevel": 0})
+            for permission, enabled in permissions.items():
+                setattr(row, permission, enabled)
+        doc.save(ignore_permissions=True)
+    frappe.clear_cache()
+    return matrix
 
 
 def _ensure_number_card(name, label, document_type, function="Count", report_field=None,
