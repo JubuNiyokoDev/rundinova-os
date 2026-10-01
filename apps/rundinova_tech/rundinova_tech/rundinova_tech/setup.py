@@ -150,6 +150,7 @@ def _dashboard(name, charts, cards):
 
 def _workspace_content():
     links = [
+        ("rundinova-onboarding", "Préparation au démarrage", "tool"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("RundiNova People Dashboard", "Équipe & RH", "users"),
@@ -158,7 +159,8 @@ def _workspace_content():
     ]
     content = [{"id": "rundinova-title", "type": "header", "data": {"text": "RundiNova Tech · Centre de pilotage", "col": 12}}]
     for idx, (target, label, icon) in enumerate(links):
-        content.append({"id": f"rundinova-dashboard-{idx}", "type": "shortcut", "data": {"type": "Dashboard", "link_to": target, "label": label, "icon": icon, "col": 4}})
+        target_type = "Page" if target == "rundinova-onboarding" else "Dashboard"
+        content.append({"id": f"rundinova-shortcut-{idx}", "type": "shortcut", "data": {"type": target_type, "link_to": target, "label": label, "icon": icon, "col": 4}})
     return json.dumps(content)
 
 

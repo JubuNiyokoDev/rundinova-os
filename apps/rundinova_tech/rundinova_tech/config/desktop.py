@@ -8,6 +8,6 @@ def get_data():
             "type": "module",
             "label": _("RundiNova Tech"),
             "icon": "organization",
-            "items": ["RundiNova Onboarding"],
+            "items": ["RundiNova Onboarding", "rundinova-onboarding"],
         }
     ]
