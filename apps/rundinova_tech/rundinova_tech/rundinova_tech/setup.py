@@ -17,55 +17,13 @@ def _insert(doctype, name, values):
 
 
 def seed():
-    company = "RundiNova Tech"
-    branch = "Gitega - Headquarters"
+    """Provision app configuration only; never create fictitious business data.
 
-    for name in ["Project Manager", "Communication Lead", "Community Lead", "Growth Lead", "Ecosystem Lead", "Housekeeping Support"]:
-        _insert("Designation", name, {"designation": name})
-    _insert("Gender", "Unspecified", {"gender": "Unspecified"})
-    _insert("UOM", "Nos", {"uom_name": "Nos", "must_be_whole_number": 0})
-    _insert("Item Group", "All Item Groups", {"item_group_name": "All Item Groups", "is_group": 1})
-    for group in ["Cereals", "Condiments", "Vegetables", "Proteins"]:
-        _insert("Item Group", group, {"item_group_name": group, "parent_item_group": "All Item Groups", "is_group": 0})
-
-    for department in ["Direction", "Engineering", "Communication", "Community", "Growth", "Ecosystem", "Administration"]:
-        if not frappe.db.exists("Department", {"department_name": department, "company": company}):
-            frappe.get_doc({"doctype": "Department", "department_name": department, "company": company}).insert(ignore_permissions=True)
-
-    root_cost_center = _insert("Cost Center", company, {"cost_center_name": company, "company": company, "is_group": 1})
-    office_cost_center = _insert("Cost Center", "RundiNova Tech - Gitega", {"cost_center_name": "RundiNova Tech - Gitega", "company": company, "parent_cost_center": root_cost_center.name, "is_group": 1})
-    for department in ["Direction", "Engineering", "Communication", "Community", "Growth", "Ecosystem", "Administration"]:
-        _insert("Cost Center", "RundiNova - " + department, {"cost_center_name": "RundiNova - " + department, "company": company, "parent_cost_center": office_cost_center.name, "is_group": 0})
-
-    people = [
-        ("NIYONDIKO Joffre", "NIYONDIKO", "Joffre", "Project Manager", "Engineering"),
-        ("IRAMBONA Elvis", "IRAMBONA", "Elvis", "Communication Lead", "Communication"),
-        ("Mandela KASUMBA Fanuel", "Mandela", "KASUMBA Fanuel", "Community Lead", "Community"),
-        ("MANIRANYIBUTSE Franck", "MANIRANYIBUTSE", "Franck", "Growth Lead", "Growth"),
-        ("NDABUBAHA Janvier", "NDABUBAHA", "Janvier", "Ecosystem Lead", "Ecosystem"),
-        ("Housekeeping Support", "Housekeeping", "Support", "Housekeeping Support", "Administration"),
-    ]
-    for name, first, last, designation, department in people:
-        if not frappe.db.exists("Employee", {"employee_name": name, "company": company}):
-            frappe.get_doc({"doctype": "Employee", "employee_name": name, "first_name": first, "last_name": last, "company": company, "branch": branch, "department": department + " - RNT", "designation": designation, "gender": "Unspecified", "status": "Active", "date_of_joining": "2026-01-01", "date_of_birth": "1990-01-01"}).insert(ignore_permissions=True, ignore_mandatory=True)
-
-    items = [("Riz", "Cereals", 145000), ("Pain", "Cereals", 90000), ("Ubugari", "Cereals", 33000), ("Spaghetti", "Cereals", 22000), ("Sucre", "Condiments", 22000), ("Sel", "Condiments", 4000), ("Tomates et condiments", "Condiments", 149000), ("Intore", "Condiments", 45000), ("Pomme de terre", "Vegetables", 112000), ("Igitoke", "Vegetables", 89000), ("Irengarenga", "Vegetables", 34000), ("Amakoto", "Vegetables", 45000), ("Amashu", "Vegetables", 34000), ("Haricot", "Proteins", 117000), ("Viande", "Proteins", 89000), ("Amakara", "Cereals", 120000)]
-    for name, group, amount in items:
-        _insert("Item", name, {"item_code": name, "item_name": name, "item_group": group, "stock_uom": "Nos", "is_stock_item": 0})
-
-    cost_center = frappe.db.get_value("Cost Center", {"company": company, "is_group": 0}, "name")
-    if not cost_center:
-        frappe.get_doc("Company", company).create_default_cost_center()
-        cost_center = frappe.db.get_value("Cost Center", {"company": company, "is_group": 0}, "name")
-    if not cost_center:
-        frappe.throw("Create the RundiNova cost-center hierarchy before seeding the budget.")
-    budget_name = "RundiNova Food Budget - Gitega - 2026-01"
-    if not frappe.db.exists("RundiNova Food Budget", budget_name):
-        budget = frappe.get_doc({"doctype": "RundiNova Food Budget", "name": budget_name, "period_start": "2026-01-01", "period_end": "2026-01-31", "branch": branch, "cost_center": cost_center, "covered_people": 6, "approved_ceiling": 1150000, "items": [{"item": name, "category": group, "monthly_amount": amount} for name, group, amount in items]})
-        budget.insert(ignore_permissions=True)
-    frappe.db.commit()
+    Companies, users, employees, items, budgets, opening balances, and
+    transactions must be entered and approved by the RundiNova team.
+    """
     sync_dashboards()
-    return {"employees": frappe.db.count("Employee", {"company": company}), "items": len(items), "budget": budget_name}
+    return {"configured": True, "business_data_created": False}
 
 
 def _ensure_number_card(name, label, document_type, function="Count", report_field=None,
