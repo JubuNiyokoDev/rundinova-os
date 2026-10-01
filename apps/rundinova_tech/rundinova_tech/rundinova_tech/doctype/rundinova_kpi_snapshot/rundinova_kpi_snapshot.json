@@ -1,0 +1,16 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova KPI Snapshot",
+  "module": "RundiNova Tech",
+  "fields": [
+    {"fieldname": "kpi_definition", "fieldtype": "Link", "options": "RundiNova KPI Definition", "label": "KPI Definition", "reqd": 1},
+    {"fieldname": "period_start", "fieldtype": "Date", "label": "Period Start", "reqd": 1},
+    {"fieldname": "period_end", "fieldtype": "Date", "label": "Period End", "reqd": 1},
+    {"fieldname": "target_value", "fieldtype": "Float", "label": "Target Value"},
+    {"fieldname": "actual_value", "fieldtype": "Float", "label": "Actual Value"},
+    {"fieldname": "target_achievement_percent", "fieldtype": "Percent", "label": "Target Achievement %", "read_only": 1},
+    {"fieldname": "evidence", "fieldtype": "Attach", "label": "Evidence"},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}]
+}

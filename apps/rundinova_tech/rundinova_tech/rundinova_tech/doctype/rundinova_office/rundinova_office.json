@@ -1,0 +1,15 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Office",
+  "module": "RundiNova Tech",
+  "fields": [
+    {"fieldname": "office_name", "fieldtype": "Data", "label": "Office Name", "reqd": 1},
+    {"fieldname": "branch", "fieldtype": "Link", "options": "Branch", "label": "ERPNext Branch", "reqd": 1},
+    {"fieldname": "cost_center", "fieldtype": "Link", "options": "Cost Center", "label": "Cost Center", "reqd": 1},
+    {"fieldname": "address", "fieldtype": "Small Text", "label": "Address"},
+    {"fieldname": "timezone", "fieldtype": "Data", "label": "Timezone", "default": "Africa/Bujumbura"},
+    {"fieldname": "manager", "fieldtype": "Link", "options": "Employee", "label": "Manager"},
+    {"fieldname": "active", "fieldtype": "Check", "label": "Active", "default": "1"}
+  ],
+  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}]
+}

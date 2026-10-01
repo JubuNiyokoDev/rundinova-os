@@ -1,0 +1,14 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Food Budget Item",
+  "module": "RundiNova Tech",
+  "istable": 1,
+  "fields": [
+    {"fieldname": "item", "fieldtype": "Link", "options": "Item", "label": "Item", "reqd": 1},
+    {"fieldname": "category", "fieldtype": "Link", "options": "Item Group", "label": "Category"},
+    {"fieldname": "quantity", "fieldtype": "Float", "label": "Quantity"},
+    {"fieldname": "unit", "fieldtype": "Data", "label": "Unit"},
+    {"fieldname": "monthly_amount", "fieldtype": "Currency", "label": "Monthly Amount", "reqd": 1},
+    {"fieldname": "supplier", "fieldtype": "Link", "options": "Supplier", "label": "Supplier"}
+  ]
+}

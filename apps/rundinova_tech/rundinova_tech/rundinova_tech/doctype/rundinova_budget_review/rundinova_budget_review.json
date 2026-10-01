@@ -1,0 +1,17 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Budget Review",
+  "module": "RundiNova Tech",
+  "is_submittable": 1,
+  "fields": [
+    {"fieldname": "review_period", "fieldtype": "Data", "label": "Review Period", "reqd": 1},
+    {"fieldname": "branch", "fieldtype": "Link", "options": "Branch", "label": "Office / Branch", "reqd": 1},
+    {"fieldname": "budget", "fieldtype": "Link", "options": "RundiNova Food Budget", "label": "Budget"},
+    {"fieldname": "planned_amount", "fieldtype": "Currency", "label": "Planned Amount"},
+    {"fieldname": "committed_amount", "fieldtype": "Currency", "label": "Committed Amount"},
+    {"fieldname": "actual_amount", "fieldtype": "Currency", "label": "Actual Amount"},
+    {"fieldname": "variance_amount", "fieldtype": "Currency", "label": "Variance", "read_only": 1},
+    {"fieldname": "review_notes", "fieldtype": "Long Text", "label": "Review Notes"}
+  ],
+  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1}]
+}

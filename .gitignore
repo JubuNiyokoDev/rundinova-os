@@ -1,6 +1,10 @@
 # Environment Variables
 .env
 
+# RundiNova deployment secrets and rendered Compose files
+rundinova.env
+compose.rundinova.yaml
+
 # mounted volume
 sites
 
