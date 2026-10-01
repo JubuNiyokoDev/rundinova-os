@@ -5,6 +5,8 @@ app_description = "Operations, budgets, impact and governance for RundiNova Tech
 app_email = "operations@rundinova.com"
 app_license = "MIT"
 
+api_version = 1
+
 required_apps = ["frappe", "erpnext", "hrms", "crm"]
 
 doc_events = {

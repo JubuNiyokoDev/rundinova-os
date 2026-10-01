@@ -1,0 +1,36 @@
+"""Read-only onboarding checks for the RundiNova production setup."""
+
+import frappe
+
+
+@frappe.whitelist()
+def get_onboarding_status():
+    """Return a safe, non-sensitive readiness summary.
+
+    This endpoint never creates or changes business data. It is intended for
+    the administrator's first-run checklist before production use.
+    """
+    checks = []
+
+    def check(key, label, ready, detail):
+        checks.append({"key": key, "label": label, "ready": bool(ready), "detail": detail})
+
+    company_count = frappe.db.count("Company")
+    check("company", "Company configured", company_count > 0, f"{company_count} company record(s)")
+
+    user_count = frappe.db.count("User", {"enabled": 1, "user_type": "System User"})
+    check("users", "Active system users", user_count >= 1, f"{user_count} active system user(s)")
+
+    employee_count = frappe.db.count("Employee", {"status": "Active"})
+    check("employees", "Active employees", employee_count >= 1, f"{employee_count} active employee(s)")
+
+    project_count = frappe.db.count("Project", {"status": ["!=", "Cancelled"]})
+    check("projects", "First project", project_count >= 1, f"{project_count} active project record(s)")
+
+    budget_count = frappe.db.count("RundiNova Food Budget")
+    check("food_budget", "Food budget", budget_count >= 1, f"{budget_count} budget record(s)")
+
+    check("roles", "RundiNova roles", frappe.db.count("Role", {"role_name": ["like", "RundiNova %"]}) >= 5, "Five named roles are expected")
+
+    ready = all(item["ready"] for item in checks)
+    return {"ready": ready, "checks": checks}
