@@ -73,6 +73,7 @@ is the custom product built on top of it.
 - [Architecture](docs/rundinova/01-architecture.md)
 - [Business model](docs/rundinova/02-business-model.md)
 - [Rollout plan](docs/rundinova/03-rollout.md)
+- [Approved V1 scope](docs/rundinova/04-v1-scope.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## License

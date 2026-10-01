@@ -13,6 +13,7 @@ static website and it does not store production secrets.
 - [Architecture](01-architecture.md)
 - [Business model](02-business-model.md)
 - [Rollout plan](03-rollout.md)
+- [Approved V1 scope and acceptance checklist](04-v1-scope.md)
 
 ## First deployment profile
 
