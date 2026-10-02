@@ -73,6 +73,7 @@ def ensure_rundinova_permissions():
         "RundiNova Cash Movement",
         "RundiNova Decision",
         "RundiNova Document",
+        "RundiNova Goal",
     ]
     for doctype in doctypes:
         if not frappe.db.exists("DocType", doctype):
@@ -165,6 +166,7 @@ def _workspace_content():
         ("RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
         ("RundiNova Decision", "Décisions & réunions", "note"),
         ("RundiNova Document", "Documents & fichiers", "file"),
+        ("RundiNova Goal", "Objectifs & KPI", "target"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("RundiNova People Dashboard", "Équipe & RH", "users"),
@@ -175,7 +177,7 @@ def _workspace_content():
     for idx, (target, label, icon) in enumerate(links):
         if target == "rundinova-onboarding":
             target_type = "Page"
-        elif target in ("RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement", "RundiNova Decision", "RundiNova Document"):
+        elif target in ("RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement", "RundiNova Decision", "RundiNova Document", "RundiNova Goal"):
             target_type = "DocType"
         else:
             target_type = "Dashboard"
@@ -207,6 +209,9 @@ def sync_dashboards():
         "open_tasks": _ensure_number_card("RundiNova Open Tasks", "Tâches ouvertes", "Task", filters=[["Task", "status", "not in", ["Completed", "Cancelled"]]], color="#D97706", background_color="#FFFBEB"),
         "completed_tasks": _ensure_number_card("RundiNova Completed Tasks", "Tâches terminées", "Task", filters=[["Task", "status", "=", "Completed"]], color="#059669", background_color="#ECFDF5"),
         "overdue_tasks": _ensure_number_card("RundiNova Overdue Tasks", "Tâches en retard", "Task", filters=[["Task", "status", "not in", ["Completed", "Cancelled"]], ["Task", "exp_end_date", "<", "Today"]], color="#DC2626", background_color="#FEF2F2"),
+        "goals": _ensure_number_card("RundiNova Active Goals", "Objectifs actifs", "RundiNova Goal", filters=[["RundiNova Goal", "status", "in", ["Planned", "Active", "At Risk"]]], color="#4F46E5", background_color="#EEF2FF"),
+        "goals_achieved": _ensure_number_card("RundiNova Achieved Goals", "Objectifs atteints", "RundiNova Goal", filters=[["RundiNova Goal", "status", "=", "Achieved"]], color="#059669", background_color="#ECFDF5"),
+        "goals_at_risk": _ensure_number_card("RundiNova Goals At Risk", "Objectifs à risque", "RundiNova Goal", filters=[["RundiNova Goal", "status", "=", "At Risk"]], color="#DC2626", background_color="#FEF2F2"),
     }
     charts = {
         "employees_branch": _ensure_chart("RundiNova Employees by Branch", "Employés par bureau", "Group By", "Employee", "Donut", group_by="branch", filters=[["Employee", "status", "=", "Active"]]),
@@ -222,9 +227,9 @@ def sync_dashboards():
         "partnership_status": _ensure_chart("RundiNova Partnerships by Status", "Partenariats par statut", "Group By", "RundiNova Partnership", "Donut", group_by="status"),
         "community_status": _ensure_chart("RundiNova Community Activities", "Activités communautaires", "Group By", "RundiNova Community Impact", "Bar", group_by="status"),
     }
-    _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["cash_balance"], cards["planned"], cards["risks"], cards["pipeline"]])
+    _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["cash_balance"], cards["goals"], cards["goals_at_risk"], cards["planned"], cards["risks"], cards["pipeline"]])
     _dashboard("RundiNova Finance Dashboard", [(charts["budget_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["expense_trend"], "Full"), (charts["expense_category"], "Half")], [cards["cash_accounts"], cards["cash_balance"], cards["cash_movements"], cards["budgets"], cards["planned"], cards["committed"], cards["actual"], cards["remaining"]])
-    _dashboard("RundiNova People Dashboard", [(charts["employees_branch"], "Half"), (charts["employees_department"], "Half"), (charts["opportunity_trend"], "Full")], [cards["employees"], cards["kpis"]])
+    _dashboard("RundiNova People Dashboard", [(charts["employees_branch"], "Half"), (charts["employees_department"], "Half"), (charts["opportunity_trend"], "Full")], [cards["employees"], cards["goals"], cards["goals_achieved"], cards["kpis"]])
     _dashboard("RundiNova Delivery Dashboard", [(charts["opportunity_stage"], "Half"), (charts["risk_impact"], "Half"), (charts["opportunity_trend"], "Full")], [cards["projects"], cards["open_tasks"], cards["completed_tasks"], cards["overdue_tasks"], cards["repositories"], cards["opportunities"], cards["risks"]])
     _dashboard("RundiNova Ecosystem Dashboard", [(charts["partnership_status"], "Half"), (charts["community_status"], "Half"), (charts["opportunity_stage"], "Full")], [cards["partnerships"], cards["opportunities"], cards["pipeline"]])
 

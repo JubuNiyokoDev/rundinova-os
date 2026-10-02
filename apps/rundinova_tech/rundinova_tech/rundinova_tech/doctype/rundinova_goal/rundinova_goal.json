@@ -1,0 +1,30 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Goal",
+  "module": "RundiNova Tech",
+  "custom": 0,
+  "title_field": "goal_title",
+  "fields": [
+    {"fieldname": "goal_title", "fieldtype": "Data", "label": "Goal Title", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "goal_type", "fieldtype": "Select", "label": "Type", "options": "Company\nProject\nFinance\nTeam\nImpact\nPersonal", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "description", "fieldtype": "Small Text", "label": "Description"},
+    {"fieldname": "owner", "fieldtype": "Link", "options": "User", "label": "Owner", "reqd": 1},
+    {"fieldname": "project", "fieldtype": "Link", "options": "Project", "label": "Project"},
+    {"fieldname": "period_start", "fieldtype": "Date", "label": "Period Start", "reqd": 1},
+    {"fieldname": "period_end", "fieldtype": "Date", "label": "Period End", "reqd": 1},
+    {"fieldname": "target_value", "fieldtype": "Float", "label": "Target Value", "reqd": 1},
+    {"fieldname": "current_value", "fieldtype": "Float", "label": "Current Value", "default": "0", "reqd": 1},
+    {"fieldname": "unit", "fieldtype": "Data", "label": "Unit", "reqd": 1},
+    {"fieldname": "achievement_percent", "fieldtype": "Percent", "label": "Achievement %", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Planned\nActive\nAt Risk\nAchieved\nCancelled", "default": "Planned", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "notes", "fieldtype": "Long Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1},
+    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1},
+    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1}
+  ],
+  "sort_field": "period_end",
+  "sort_order": "ASC"
+}

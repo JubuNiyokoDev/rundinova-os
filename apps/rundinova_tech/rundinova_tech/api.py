@@ -51,6 +51,9 @@ def get_onboarding_status():
     document_count = frappe.db.count("RundiNova Document", {"status": "Active"})
     check("documents", "Document register", document_count >= 1, f"{document_count} active document(s)")
 
+    goal_count = frappe.db.count("RundiNova Goal")
+    check("goals", "Goals and KPIs", goal_count >= 1, f"{goal_count} goal record(s)")
+
     budget_count = frappe.db.count("RundiNova Food Budget")
     check("food_budget", "Food budget", budget_count >= 1, f"{budget_count} budget record(s)")
 
