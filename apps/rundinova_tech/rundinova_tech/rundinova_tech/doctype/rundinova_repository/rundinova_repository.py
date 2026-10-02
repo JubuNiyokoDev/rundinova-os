@@ -19,10 +19,10 @@ class RundiNovaRepository(Document):
     @frappe.whitelist()
     def sync_from_github(self):
         """Pull public metadata from GitHub (read-only GET). Updates local fields."""
-        from rundinova_tech.github_sync import sync_repository_from_github
+        from rundinova_tech.github_sync import sync_repository
 
         try:
-            info = sync_repository_from_github(self.github_url)
+            info = sync_repository(self.github_url)
         except Exception as exc:
             frappe.throw(_("GitHub sync failed: {0}").format(str(exc)))
 
