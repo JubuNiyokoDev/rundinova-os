@@ -196,6 +196,9 @@ def sync_dashboards():
         "partnerships": _ensure_number_card("RundiNova Partnerships", "Partenariats actifs", "RundiNova Partnership", filters=[["RundiNova Partnership", "status", "=", "Active"]], color="#DB2777", background_color="#FDF2F8"),
         "kpis": _ensure_number_card("RundiNova KPI Snapshots", "Mesures KPI", "RundiNova KPI Snapshot", color="#4F46E5", background_color="#EEF2FF"),
         "repositories": _ensure_number_card("RundiNova Active Repositories", "Dépôts actifs", "RundiNova Repository", filters=[["RundiNova Repository", "status", "=", "Active"]], color="#111827", background_color="#F3F4F6"),
+        "cash_accounts": _ensure_number_card("RundiNova Active Cash Accounts", "Comptes actifs", "RundiNova Cash Account", filters=[["RundiNova Cash Account", "status", "=", "Active"]], color="#1D4ED8", background_color="#EFF6FF"),
+        "cash_balance": _ensure_number_card("RundiNova Cash Balance", "Solde de trésorerie", "RundiNova Cash Account", "Sum", "current_balance", filters=[["RundiNova Cash Account", "status", "=", "Active"]], color="#047857", background_color="#ECFDF5"),
+        "cash_movements": _ensure_number_card("RundiNova Approved Cash Movements", "Mouvements approuvés", "RundiNova Cash Movement", "Sum", "amount", filters=[["RundiNova Cash Movement", "status", "in", ["Approved", "Reconciled"]]], color="#7C3AED", background_color="#F5F3FF"),
     }
     charts = {
         "employees_branch": _ensure_chart("RundiNova Employees by Branch", "Employés par bureau", "Group By", "Employee", "Donut", group_by="branch", filters=[["Employee", "status", "=", "Active"]]),
@@ -211,8 +214,8 @@ def sync_dashboards():
         "partnership_status": _ensure_chart("RundiNova Partnerships by Status", "Partenariats par statut", "Group By", "RundiNova Partnership", "Donut", group_by="status"),
         "community_status": _ensure_chart("RundiNova Community Activities", "Activités communautaires", "Group By", "RundiNova Community Impact", "Bar", group_by="status"),
     }
-    _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["planned"], cards["risks"], cards["pipeline"]])
-    _dashboard("RundiNova Finance Dashboard", [(charts["budget_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["expense_trend"], "Full"), (charts["expense_category"], "Half")], [cards["budgets"], cards["planned"], cards["committed"], cards["actual"], cards["remaining"]])
+    _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["cash_balance"], cards["planned"], cards["risks"], cards["pipeline"]])
+    _dashboard("RundiNova Finance Dashboard", [(charts["budget_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["expense_trend"], "Full"), (charts["expense_category"], "Half")], [cards["cash_accounts"], cards["cash_balance"], cards["cash_movements"], cards["budgets"], cards["planned"], cards["committed"], cards["actual"], cards["remaining"]])
     _dashboard("RundiNova People Dashboard", [(charts["employees_branch"], "Half"), (charts["employees_department"], "Half"), (charts["opportunity_trend"], "Full")], [cards["employees"], cards["kpis"]])
     _dashboard("RundiNova Delivery Dashboard", [(charts["opportunity_stage"], "Half"), (charts["risk_impact"], "Half"), (charts["opportunity_trend"], "Full")], [cards["repositories"], cards["opportunities"], cards["risks"]])
     _dashboard("RundiNova Ecosystem Dashboard", [(charts["partnership_status"], "Half"), (charts["community_status"], "Half"), (charts["opportunity_stage"], "Full")], [cards["partnerships"], cards["opportunities"], cards["pipeline"]])
