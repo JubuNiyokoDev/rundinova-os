@@ -69,6 +69,8 @@ def ensure_rundinova_permissions():
         "RundiNova Repository",
         "RundiNova Expense",
         "RundiNova Asset",
+        "RundiNova Cash Account",
+        "RundiNova Cash Movement",
     ]
     for doctype in doctypes:
         if not frappe.db.exists("DocType", doctype):
@@ -157,6 +159,8 @@ def _workspace_content():
         ("RundiNova Repository", "Dépôts GitHub", "github"),
         ("RundiNova Expense", "Dépenses générales", "expense"),
         ("RundiNova Asset", "Biens & équipements", "asset"),
+        ("RundiNova Cash Account", "Comptes de trésorerie", "bank"),
+        ("RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("RundiNova People Dashboard", "Équipe & RH", "users"),
@@ -167,7 +171,7 @@ def _workspace_content():
     for idx, (target, label, icon) in enumerate(links):
         if target == "rundinova-onboarding":
             target_type = "Page"
-        elif target in ("RundiNova Repository", "RundiNova Expense", "RundiNova Asset"):
+        elif target in ("RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement"):
             target_type = "DocType"
         else:
             target_type = "Dashboard"

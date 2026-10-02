@@ -1,0 +1,25 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Cash Account",
+  "module": "RundiNova Tech",
+  "custom": 0,
+  "title_field": "account_name",
+  "fields": [
+    {"fieldname": "account_name", "fieldtype": "Data", "label": "Account Name", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "account_type", "fieldtype": "Select", "label": "Type", "options": "Cash\nBank\nMobile Money\nOther", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "currency", "fieldtype": "Link", "options": "Currency", "label": "Currency", "default": "BIF", "reqd": 1},
+    {"fieldname": "account_holder", "fieldtype": "Data", "label": "Account Holder"},
+    {"fieldname": "opening_balance", "fieldtype": "Currency", "label": "Opening Balance"},
+    {"fieldname": "opening_date", "fieldtype": "Date", "label": "Opening Date"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Active\nClosed", "default": "Active", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Team Member", "read": 1}
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC"
+}
