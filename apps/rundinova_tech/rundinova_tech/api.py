@@ -45,6 +45,9 @@ def get_onboarding_status():
     movement_count = frappe.db.count("RundiNova Cash Movement", {"status": ["in", ["Approved", "Reconciled"]]})
     check("cash_movements", "Approved cash movements", movement_count >= 1, f"{movement_count} approved movement(s)")
 
+    decision_count = frappe.db.count("RundiNova Decision")
+    check("decisions", "Internal decision log", decision_count >= 1, f"{decision_count} decision record(s)")
+
     budget_count = frappe.db.count("RundiNova Food Budget")
     check("food_budget", "Food budget", budget_count >= 1, f"{budget_count} budget record(s)")
 
