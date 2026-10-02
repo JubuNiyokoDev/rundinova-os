@@ -61,3 +61,25 @@ def get_onboarding_status():
 
     ready = all(item["ready"] for item in checks)
     return {"ready": ready, "checks": checks}
+
+
+@frappe.whitelist()
+def sync_repository(repository_name):
+    """Trigger a read-only GitHub sync for a single repository."""
+    doc = frappe.get_doc("RundiNova Repository", repository_name)
+    return doc.sync_from_github()
+
+
+@frappe.whitelist()
+def sync_all_repositories():
+    """Trigger a read-only GitHub sync for all active repositories."""
+    repos = frappe.get_all("RundiNova Repository", filters={"status": "Active"}, pluck="name")
+    results = []
+    for name in repos:
+        try:
+            doc = frappe.get_doc("RundiNova Repository", name)
+            info = doc.sync_from_github()
+            results.append({"repository": name, "status": "ok"})
+        except Exception as exc:
+            results.append({"repository": name, "status": "error", "message": str(exc)})
+    return results

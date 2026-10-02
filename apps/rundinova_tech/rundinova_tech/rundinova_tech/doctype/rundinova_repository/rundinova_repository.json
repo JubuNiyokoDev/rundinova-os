@@ -5,24 +5,155 @@
   "custom": 0,
   "title_field": "repository_name",
   "fields": [
-    {"fieldname": "repository_name", "fieldtype": "Data", "label": "Repository Name", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "github_url", "fieldtype": "Data", "label": "GitHub URL", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "repository_type", "fieldtype": "Select", "label": "Type", "options": "Product\nApplication\nWebsite\nInfrastructure\nLibrary\nOther", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Planned\nActive\nPaused\nArchived", "default": "Active", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "primary_owner", "fieldtype": "Link", "options": "User", "label": "Primary Owner"},
-    {"fieldname": "project", "fieldtype": "Link", "options": "Project", "label": "Project"},
-    {"fieldname": "progress_percent", "fieldtype": "Percent", "label": "Progress %", "default": "0"},
-    {"fieldname": "business_value", "fieldtype": "Currency", "label": "Business Value (BIF)"},
-    {"fieldname": "impact_summary", "fieldtype": "Small Text", "label": "Impact Summary"},
-    {"fieldname": "last_reviewed_on", "fieldtype": "Date", "label": "Last Reviewed"},
-    {"fieldname": "notes", "fieldtype": "Long Text", "label": "Notes"}
+    {
+      "fieldname": "repository_name",
+      "fieldtype": "Data",
+      "label": "Repository Name",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "github_url",
+      "fieldtype": "Data",
+      "label": "GitHub URL",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "repository_type",
+      "fieldtype": "Select",
+      "label": "Type",
+      "options": "Product\nApplication\nWebsite\nInfrastructure\nLibrary\nOther",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "Planned\nActive\nPaused\nArchived",
+      "default": "Active",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "primary_owner",
+      "fieldtype": "Link",
+      "options": "User",
+      "label": "Primary Owner"
+    },
+    {
+      "fieldname": "project",
+      "fieldtype": "Link",
+      "options": "Project",
+      "label": "Project"
+    },
+    {
+      "fieldname": "progress_percent",
+      "fieldtype": "Percent",
+      "label": "Progress %",
+      "default": "0"
+    },
+    {
+      "fieldname": "business_value",
+      "fieldtype": "Currency",
+      "label": "Business Value (BIF)"
+    },
+    {
+      "fieldname": "impact_summary",
+      "fieldtype": "Small Text",
+      "label": "Impact Summary"
+    },
+    {
+      "fieldname": "last_reviewed_on",
+      "fieldtype": "Date",
+      "label": "Last Reviewed"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Long Text",
+      "label": "Notes"
+    },
+    {
+      "fieldname": "github_section",
+      "fieldtype": "Section Break",
+      "label": "GitHub Sync"
+    },
+    {
+      "fieldname": "open_issues_count",
+      "fieldtype": "Int",
+      "label": "Open Issues",
+      "read_only": 1
+    },
+    {
+      "fieldname": "stargazers_count",
+      "fieldtype": "Int",
+      "label": "Stars",
+      "read_only": 1
+    },
+    {
+      "fieldname": "forks_count",
+      "fieldtype": "Int",
+      "label": "Forks",
+      "read_only": 1
+    },
+    {
+      "fieldname": "default_branch",
+      "fieldtype": "Data",
+      "label": "Default Branch",
+      "read_only": 1
+    },
+    {
+      "fieldname": "primary_language",
+      "fieldtype": "Data",
+      "label": "Primary Language",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_synced_on",
+      "fieldtype": "Datetime",
+      "label": "Last Synced",
+      "read_only": 1
+    },
+    {
+      "fieldname": "column_break_sync",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "last_push_date",
+      "fieldtype": "Datetime",
+      "label": "Last Push",
+      "read_only": 1
+    }
   ],
   "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1},
-    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1},
-    {"role": "RundiNova Team Member", "read": 1},
-    {"role": "RundiNova Communications", "read": 1}
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Director",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    },
+    {
+      "role": "RundiNova Project Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    },
+    {
+      "role": "RundiNova Team Member",
+      "read": 1
+    },
+    {
+      "role": "RundiNova Communications",
+      "read": 1
+    }
   ],
   "sort_field": "modified",
   "sort_order": "DESC"
