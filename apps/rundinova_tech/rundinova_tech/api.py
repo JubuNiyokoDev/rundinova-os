@@ -27,6 +27,9 @@ def get_onboarding_status():
     project_count = frappe.db.count("Project", {"status": ["!=", "Cancelled"]})
     check("projects", "First project", project_count >= 1, f"{project_count} active project record(s)")
 
+    repository_count = frappe.db.count("RundiNova Repository")
+    check("repositories", "GitHub repositories", repository_count >= 1, f"{repository_count} repository record(s)")
+
     budget_count = frappe.db.count("RundiNova Food Budget")
     check("food_budget", "Food budget", budget_count >= 1, f"{budget_count} budget record(s)")
 

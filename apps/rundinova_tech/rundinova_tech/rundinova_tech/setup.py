@@ -152,6 +152,7 @@ def _dashboard(name, charts, cards):
 def _workspace_content():
     links = [
         ("rundinova-onboarding", "Préparation au démarrage", "tool"),
+        ("RundiNova Repository", "Dépôts GitHub", "github"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("RundiNova People Dashboard", "Équipe & RH", "users"),
@@ -160,7 +161,12 @@ def _workspace_content():
     ]
     content = [{"id": "rundinova-title", "type": "header", "data": {"text": "RundiNova Tech · Centre de pilotage", "col": 12}}]
     for idx, (target, label, icon) in enumerate(links):
-        target_type = "Page" if target == "rundinova-onboarding" else "Dashboard"
+        if target == "rundinova-onboarding":
+            target_type = "Page"
+        elif target == "RundiNova Repository":
+            target_type = "DocType"
+        else:
+            target_type = "Dashboard"
         content.append({"id": f"rundinova-shortcut-{idx}", "type": "shortcut", "data": {"type": target_type, "link_to": target, "label": label, "icon": icon, "col": 4}})
     return json.dumps(content)
 
@@ -181,6 +187,7 @@ def sync_dashboards():
         "pipeline": _ensure_number_card("RundiNova Pipeline Value", "Valeur du pipeline", "RundiNova Growth Opportunity", "Sum", "expected_value", color="#0891B2", background_color="#ECFEFF"),
         "partnerships": _ensure_number_card("RundiNova Partnerships", "Partenariats actifs", "RundiNova Partnership", filters=[["RundiNova Partnership", "status", "=", "Active"]], color="#DB2777", background_color="#FDF2F8"),
         "kpis": _ensure_number_card("RundiNova KPI Snapshots", "Mesures KPI", "RundiNova KPI Snapshot", color="#4F46E5", background_color="#EEF2FF"),
+        "repositories": _ensure_number_card("RundiNova Active Repositories", "Dépôts actifs", "RundiNova Repository", filters=[["RundiNova Repository", "status", "=", "Active"]], color="#111827", background_color="#F3F4F6"),
     }
     charts = {
         "employees_branch": _ensure_chart("RundiNova Employees by Branch", "Employés par bureau", "Group By", "Employee", "Donut", group_by="branch", filters=[["Employee", "status", "=", "Active"]]),
@@ -199,7 +206,7 @@ def sync_dashboards():
     _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["planned"], cards["risks"], cards["pipeline"]])
     _dashboard("RundiNova Finance Dashboard", [(charts["budget_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["expense_trend"], "Full"), (charts["expense_category"], "Half")], [cards["budgets"], cards["planned"], cards["committed"], cards["actual"], cards["remaining"]])
     _dashboard("RundiNova People Dashboard", [(charts["employees_branch"], "Half"), (charts["employees_department"], "Half"), (charts["opportunity_trend"], "Full")], [cards["employees"], cards["kpis"]])
-    _dashboard("RundiNova Delivery Dashboard", [(charts["opportunity_stage"], "Half"), (charts["risk_impact"], "Half"), (charts["opportunity_trend"], "Full")], [cards["opportunities"], cards["risks"]])
+    _dashboard("RundiNova Delivery Dashboard", [(charts["opportunity_stage"], "Half"), (charts["risk_impact"], "Half"), (charts["opportunity_trend"], "Full")], [cards["repositories"], cards["opportunities"], cards["risks"]])
     _dashboard("RundiNova Ecosystem Dashboard", [(charts["partnership_status"], "Half"), (charts["community_status"], "Half"), (charts["opportunity_stage"], "Full")], [cards["partnerships"], cards["opportunities"], cards["pipeline"]])
 
     workspace = frappe.get_doc("Workspace", "RundiNova Tech") if frappe.db.exists("Workspace", "RundiNova Tech") else frappe.new_doc("Workspace")
