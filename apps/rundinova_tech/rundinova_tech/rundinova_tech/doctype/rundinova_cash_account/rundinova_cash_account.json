@@ -10,6 +10,7 @@
     {"fieldname": "currency", "fieldtype": "Link", "options": "Currency", "label": "Currency", "default": "BIF", "reqd": 1},
     {"fieldname": "account_holder", "fieldtype": "Data", "label": "Account Holder"},
     {"fieldname": "opening_balance", "fieldtype": "Currency", "label": "Opening Balance"},
+    {"fieldname": "current_balance", "fieldtype": "Currency", "label": "Current Balance", "read_only": 1, "in_list_view": 1},
     {"fieldname": "opening_date", "fieldtype": "Date", "label": "Opening Date"},
     {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Active\nClosed", "default": "Active", "reqd": 1, "in_list_view": 1},
     {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}

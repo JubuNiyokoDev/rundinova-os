@@ -20,7 +20,19 @@ class RundiNovaCashMovement(Document):
         if self.status in ("Approved", "Reconciled") and not self.approved_by:
             self.approved_by = frappe.session.user
 
+    def on_update(self):
+        refresh_accounts(self)
+
+    def on_trash(self):
+        refresh_accounts(self)
+
 
 def set_movement_title(doc):
     if doc.movement_date and doc.movement_type and doc.category:
         doc.movement_title = f"{doc.movement_date} - {doc.movement_type} - {doc.category}"
+
+
+def refresh_accounts(doc):
+    from rundinova_tech.rundinova_tech.rundinova_tech.doctype.rundinova_cash_account.rundinova_cash_account import refresh_account_balance
+    for account in {doc.account, doc.destination_account}:
+        refresh_account_balance(account)
