@@ -30,6 +30,9 @@ def get_onboarding_status():
     repository_count = frappe.db.count("RundiNova Repository")
     check("repositories", "GitHub repositories", repository_count >= 1, f"{repository_count} repository record(s)")
 
+    expense_count = frappe.db.count("RundiNova Expense")
+    check("expenses", "General expense tracking", expense_count >= 1, f"{expense_count} expense record(s)")
+
     budget_count = frappe.db.count("RundiNova Food Budget")
     check("food_budget", "Food budget", budget_count >= 1, f"{budget_count} budget record(s)")
 

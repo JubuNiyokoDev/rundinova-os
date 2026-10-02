@@ -1,0 +1,32 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Expense",
+  "module": "RundiNova Tech",
+  "custom": 0,
+  "is_submittable": 1,
+  "title_field": "expense_title",
+  "fields": [
+    {"fieldname": "expense_title", "fieldtype": "Data", "label": "Expense Name", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "expense_date", "fieldtype": "Date", "label": "Expense Date", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "category", "fieldtype": "Select", "label": "Category", "options": "Hub / Housing\nInternet & Utilities\nTransport\nSoftware & Tools\nHosting & Infrastructure\nSalaries & Allowances\nOffice Supplies\nProfessional Services\nOther", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "description", "fieldtype": "Small Text", "label": "Description", "reqd": 1},
+    {"fieldname": "amount", "fieldtype": "Currency", "label": "Amount (BIF)", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "paid_by", "fieldtype": "Link", "options": "User", "label": "Paid By", "reqd": 1},
+    {"fieldname": "payment_method", "fieldtype": "Select", "label": "Payment Method", "options": "Cash\nMobile Money\nBank Transfer\nCard\nOther", "reqd": 1},
+    {"fieldname": "supplier", "fieldtype": "Link", "options": "Supplier", "label": "Supplier"},
+    {"fieldname": "project", "fieldtype": "Link", "options": "Project", "label": "Project"},
+    {"fieldname": "cost_center", "fieldtype": "Link", "options": "Cost Center", "label": "Cost Center"},
+    {"fieldname": "receipt", "fieldtype": "Attach", "label": "Receipt / Evidence"},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\nSubmitted\nApproved\nPaid\nRejected\nCancelled", "default": "Draft", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "approved_by", "fieldtype": "Link", "options": "User", "label": "Approved By", "read_only": 1},
+    {"fieldname": "approval_notes", "fieldtype": "Small Text", "label": "Approval Notes"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "submit": 1, "cancel": 1},
+    {"role": "RundiNova Team Member", "read": 1, "create": 1, "write": 1, "submit": 1}
+  ],
+  "sort_field": "expense_date",
+  "sort_order": "DESC"
+}

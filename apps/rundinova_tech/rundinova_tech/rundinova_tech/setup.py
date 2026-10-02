@@ -67,6 +67,7 @@ def ensure_rundinova_permissions():
         "RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact",
         "RundiNova Office",
         "RundiNova Repository",
+        "RundiNova Expense",
     ]
     for doctype in doctypes:
         if not frappe.db.exists("DocType", doctype):
@@ -153,6 +154,7 @@ def _workspace_content():
     links = [
         ("rundinova-onboarding", "Préparation au démarrage", "tool"),
         ("RundiNova Repository", "Dépôts GitHub", "github"),
+        ("RundiNova Expense", "Dépenses générales", "expense"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("RundiNova People Dashboard", "Équipe & RH", "users"),
@@ -163,7 +165,7 @@ def _workspace_content():
     for idx, (target, label, icon) in enumerate(links):
         if target == "rundinova-onboarding":
             target_type = "Page"
-        elif target == "RundiNova Repository":
+        elif target in ("RundiNova Repository", "RundiNova Expense"):
             target_type = "DocType"
         else:
             target_type = "Dashboard"
