@@ -7,7 +7,7 @@ def get_data():
             "module_name": "RundiNova Tech",
             "type": "module",
             "label": _("RundiNova Tech"),
-            "icon": "organization",
+            "icon": "briefcase",
             "items": ["RundiNova Onboarding", "rundinova-onboarding"],
         }
     ]

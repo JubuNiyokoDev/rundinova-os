@@ -1,0 +1,21 @@
+# Local development only. Mount the custom app into the running services so
+# Python/template changes do not require rebuilding the Docker image.
+services:
+  backend:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech
+  frontend:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech
+  queue-short:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech
+  queue-long:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech
+  scheduler:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech
+  websocket:
+    volumes:
+      - ./apps/rundinova_tech:/home/frappe/frappe-bench/apps/rundinova_tech

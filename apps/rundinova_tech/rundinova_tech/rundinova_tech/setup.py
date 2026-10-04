@@ -33,9 +33,11 @@ def ensure_rundinova_roles():
     role_names = [
         "RundiNova Director",
         "RundiNova Finance Manager",
+        "RundiNova Operations",
         "RundiNova Project Lead",
         "RundiNova Team Member",
         "RundiNova Communications",
+        "RundiNova People & Culture",
     ]
     created = []
     for role_name in role_names:
@@ -57,9 +59,25 @@ def ensure_rundinova_permissions():
     matrix = {
         "RundiNova Director": {"read": 1, "write": 1, "create": 1, "delete": 0},
         "RundiNova Finance Manager": {"read": 1, "write": 1, "create": 1, "delete": 1},
+        "RundiNova Operations": {"read": 1, "write": 1, "create": 1, "delete": 0},
         "RundiNova Project Lead": {"read": 1, "write": 1, "create": 1, "delete": 0},
         "RundiNova Team Member": {"read": 1, "write": 1, "create": 1, "delete": 0},
         "RundiNova Communications": {"read": 1, "write": 1, "create": 1, "delete": 0},
+        "RundiNova People & Culture": {"read": 1, "write": 1, "create": 1, "delete": 0},
+    }
+    # Per-doctype narrowing of the default matrix.  People & Culture owns
+    # community life, decisions and documents; finances, assets, repositories
+    # and KPIs stay read-only (see docs/rundinova/06-roles-and-responsibilities.md).
+    read_only = {"read": 1, "write": 0, "create": 0, "delete": 0}
+    overrides = {
+        (dt, "RundiNova People & Culture"): read_only
+        for dt in (
+            "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Budget Review",
+            "RundiNova Expense", "RundiNova Asset",
+            "RundiNova Cash Account", "RundiNova Cash Movement",
+            "RundiNova Repository", "RundiNova KPI Definition", "RundiNova KPI Snapshot",
+            "RundiNova Goal", "RundiNova Office",
+        )
     }
     doctypes = [
         "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Budget Review",
@@ -81,12 +99,22 @@ def ensure_rundinova_permissions():
         doc = frappe.get_doc("DocType", doctype)
         existing = {row.role: row for row in doc.permissions}
         for role, permissions in matrix.items():
+            permissions = overrides.get((doctype, role), permissions)
             row = existing.get(role)
             if not row:
                 row = doc.append("permissions", {"role": role, "permlevel": 0})
             for permission, enabled in permissions.items():
                 setattr(row, permission, enabled)
-        doc.save(ignore_permissions=True)
+        # Permission rows are part of the standard DocType metadata.  Frappe
+        # protects that metadata when developer mode is disabled (as it should
+        # be in production).  The app remains fully usable with its declared
+        # role permissions from fixtures; skip only this metadata sync when
+        # that protection is active.
+        try:
+            doc.save(ignore_permissions=True)
+        except frappe.core.doctype.doctype.doctype.CannotCreateStandardDoctypeError:
+            frappe.db.rollback()
+            continue
     frappe.clear_cache()
     return matrix
 
@@ -159,6 +187,9 @@ def _dashboard(name, charts, cards):
 def _workspace_content():
     links = [
         ("rundinova-onboarding", "Préparation au démarrage", "tool"),
+        ("RundiNova Office", "Hub & organisation", "building"),
+        ("RundiNova Food Budget", "Budget alimentaire", "food"),
+        ("RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
         ("RundiNova Repository", "Dépôts GitHub", "github"),
         ("RundiNova Expense", "Dépenses générales", "expense"),
         ("RundiNova Asset", "Biens & équipements", "asset"),
@@ -166,6 +197,8 @@ def _workspace_content():
         ("RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
         ("RundiNova Decision", "Décisions & réunions", "note"),
         ("RundiNova Document", "Documents & fichiers", "file"),
+        ("RundiNova KPI Definition", "Définitions KPI", "target"),
+        ("RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
         ("RundiNova Goal", "Objectifs & KPI", "target"),
         ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
         ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
@@ -177,7 +210,7 @@ def _workspace_content():
     for idx, (target, label, icon) in enumerate(links):
         if target == "rundinova-onboarding":
             target_type = "Page"
-        elif target in ("RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement", "RundiNova Decision", "RundiNova Document", "RundiNova Goal"):
+        elif target in ("RundiNova Office", "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement", "RundiNova Decision", "RundiNova Document", "RundiNova KPI Definition", "RundiNova KPI Snapshot", "RundiNova Goal"):
             target_type = "DocType"
         else:
             target_type = "Dashboard"
@@ -234,7 +267,7 @@ def sync_dashboards():
     _dashboard("RundiNova Ecosystem Dashboard", [(charts["partnership_status"], "Half"), (charts["community_status"], "Half"), (charts["opportunity_stage"], "Full")], [cards["partnerships"], cards["opportunities"], cards["pipeline"]])
 
     workspace = frappe.get_doc("Workspace", "RundiNova Tech") if frappe.db.exists("Workspace", "RundiNova Tech") else frappe.new_doc("Workspace")
-    workspace.update({"label": "RundiNova Tech", "title": "RundiNova Tech", "module": "RundiNova Tech", "app": "rundinova_tech", "type": "Workspace", "icon": "organization", "indicator_color": "blue", "public": 1, "is_hidden": 0, "content": _workspace_content()})
+    workspace.update({"label": "RundiNova Tech", "title": "RundiNova Tech", "module": "RundiNova Tech", "app": "rundinova_tech", "type": "Workspace", "icon": "briefcase", "indicator_color": "blue", "public": 1, "is_hidden": 0, "content": _workspace_content()})
     workspace.save(ignore_permissions=True)
     frappe.db.commit()
 

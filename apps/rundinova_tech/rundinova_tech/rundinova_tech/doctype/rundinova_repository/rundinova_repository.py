@@ -19,6 +19,9 @@ class RundiNovaRepository(Document):
     @frappe.whitelist()
     def sync_from_github(self):
         """Pull public metadata from GitHub (read-only GET). Updates local fields."""
+        if not frappe.has_permission("RundiNova Repository", "write", self):
+            frappe.throw(_("You need write access to sync this repository."), frappe.PermissionError)
+
         from rundinova_tech.github_sync import sync_repository
 
         try:
@@ -30,9 +33,9 @@ class RundiNovaRepository(Document):
         self.stargazers_count = info.get("stargazers_count", 0)
         self.forks_count = info.get("forks_count", 0)
         self.default_branch = info.get("default_branch", "")
-        self.primary_language = info.get("primary_language", "")
-        self.last_push_date = info.get("last_push_date", "")
+        self.primary_language = info.get("language", "")
+        self.last_push_date = info.get("pushed_at", "")
         self.last_synced_on = now_datetime()
-        self.save(ignore_permissions=True)
+        self.save()
         frappe.msgprint(_("Repository synced from GitHub successfully."))
         return info

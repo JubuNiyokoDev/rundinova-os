@@ -5,6 +5,10 @@ app_description = "Operations, budgets, impact and governance for RundiNova Tech
 app_email = "operations@rundinova.com"
 app_license = "MIT"
 
+# RundiNova branding used by the Desk sidebar, login page and app switcher.
+# The image is shipped with this app so it is available in every deployment.
+app_logo_url = "/assets/rundinova_tech/images/rundinova-logo.png"
+
 api_version = 1
 
 required_apps = ["frappe", "erpnext", "hrms", "crm"]
