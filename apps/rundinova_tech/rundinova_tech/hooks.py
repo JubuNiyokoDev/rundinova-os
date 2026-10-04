@@ -35,4 +35,10 @@ fixtures = [
 ]
 
 after_install = "rundinova_tech.rundinova_tech.setup.seed"
-after_migrate = "rundinova_tech.rundinova_tech.setup.sync_dashboards"
+
+# `bench migrate` re-syncs standard workspaces and resets is_hidden, so the
+# module hiding must be re-applied after every migrate to stay effective.
+after_migrate = [
+    "rundinova_tech.rundinova_tech.setup.sync_dashboards",
+    "rundinova_tech.rundinova_tech.bootstrap.hide_unused_workspaces",
+]

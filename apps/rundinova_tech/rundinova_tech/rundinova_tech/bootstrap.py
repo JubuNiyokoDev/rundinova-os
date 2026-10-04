@@ -40,7 +40,7 @@ TEAM_USERS = [
         "email": "janvier.ndabubaha@rundinova.com",
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
-        "designation": "Co-Founder & COO",
+        "designation": "COO",
         "roles": ["RundiNova Operations", "RundiNova Team Member"],
     },
     {
@@ -66,15 +66,39 @@ TEAM_USERS = [
     },
 ]
 
-# ERPNext workspaces behind modules the hub does not use.  Hiding them
+# Workspaces behind modules the 5-person dev hub does not use.  Hiding them
 # removes the modules from the Desk sidebar for every user; the doctypes
 # stay installed but unreachable from the UI.
+#
+# Kept visible: Home, RundiNova Tech, Frappe CRM, Users, ERPNext Settings.
 UNUSED_WORKSPACES = [
+    # ERPNext core modules not needed by a dev hub
+    "Assets",
+    "Build",
+    "Buying",
+    "Expenses",
+    "Financial Reports",
+    "Integrations",
+    "Invoicing",
     "Manufacturing",
+    "Projects",
     "Quality",
+    "Selling",
+    "Stock",
     "Subcontracting",
     "Support",
     "Website",
+    # HRMS modules (no formal HR processes for 5 co-founders)
+    "HR Setup",
+    "Leaves",
+    "Payroll",
+    "Performance",
+    "Recruitment",
+    "Shift & Attendance",
+    "Tax & Benefits",
+    "Tenure",
+    # Misc
+    "Welcome Workspace",
 ]
 
 

@@ -16,7 +16,7 @@ qu'elle fait chaque jour.
 | Personne | Titre | Rôles dans l'application | Mission en une phrase |
 | --- | --- | --- | --- |
 | Joffre Niyondiko | **Co-Founder & CEO** | RundiNova Director, RundiNova Finance Manager, RundiNova Team Member | Décide de la direction, contrôle les finances, tranche en dernier |
-| Janvier Ndabubaha | **Co-Founder & COO** | RundiNova Operations, RundiNova Team Member | Fait exécuter la direction : suit les 3 leads et garantit la livraison |
+| Janvier Ndabubaha | **COO** | RundiNova Operations, RundiNova Team Member | Fait exécuter la direction : suit les 3 leads et garantit la livraison |
 | Franck Maniranyibutse | **Head of Engineering** | RundiNova Project Lead, RundiNova Team Member | Dirige les projets de développement et la livraison technique |
 | Elvis Irambona | **Head of Communications** | RundiNova Communications, RundiNova Team Member | Porte la voix de l'entreprise : communication, image, CRM |
 | Fanuel Kasumba Mandela | **Head of People & Culture** | RundiNova People & Culture, RundiNova Team Member | Garde les règles, la discipline et la culture de l'équipe |
@@ -49,7 +49,7 @@ représentation externe (partenaires, investisseurs, administration).
 **Ne fait PAS** : le suivi quotidien des tâches de l'équipe — c'est le rôle du
 COO. Le CEO regarde les tableaux de bord, pas chaque ticket.
 
-## 2. Janvier Ndabubaha — Co-Founder & COO
+## 2. Janvier Ndabubaha — COO
 
 **Possède** : l'exécution. Il transforme la direction du CEO en résultats
 concrets : projets livrés, délais tenus, obstacles levés.
@@ -180,3 +180,4 @@ restent au CEO.
 - **Founder & Chairman** : fondateur (ici basé en Suède) qui garde un rôle de
   supervision stratégique, sans gérer l'opération quotidienne du hub.
 - **Co-Founder** : membre de l'équipe fondatrice. Un Co-Founder peut être CEO.
+  Janvier Ndabubaha n'est pas co-fondateur ; il est COO.
