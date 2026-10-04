@@ -230,6 +230,30 @@ def current_state():
     }
 
 
+def check_page_access(page_name="rundinova-onboarding"):
+    """Verify that every founding-team member can load the given page.
+
+    Read-only verification helper:
+
+        bench --site <site> execute rundinova_tech.rundinova_tech.bootstrap.check_page_access
+    """
+    from frappe.desk.desk_page import get
+
+    results = {}
+    for spec in TEAM_USERS + [{"email": "Administrator"}]:
+        email = spec["email"]
+        try:
+            frappe.set_user(email)
+            docs = get(page_name)
+            results[email] = "OK (script=%d)" % len(docs.get("script") or "")
+        except frappe.PermissionError:
+            results[email] = "DENIED"
+        except Exception as exc:
+            results[email] = "ERROR: %s" % repr(exc)[:80]
+    frappe.set_user("Administrator")
+    return results
+
+
 def permission_report():
     """Summarise the effective DocPerm matrix of RundiNova doctypes per role.
 
