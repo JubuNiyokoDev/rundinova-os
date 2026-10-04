@@ -55,7 +55,12 @@ def ensure_rundinova_roles():
 
 
 def ensure_rundinova_permissions():
-    """Apply least-privilege access to custom RundiNova DocTypes."""
+    """Apply least-privilege access to custom RundiNova DocTypes.
+
+    Writes DocPerm rows directly instead of saving the parent DocType,
+    because Frappe protects standard-doctype metadata when developer mode
+    is disabled.  Idempotent: existing rows are updated in place.
+    """
     matrix = {
         "RundiNova Director": {"read": 1, "write": 1, "create": 1, "delete": 0},
         "RundiNova Finance Manager": {"read": 1, "write": 1, "create": 1, "delete": 1},
@@ -96,25 +101,25 @@ def ensure_rundinova_permissions():
     for doctype in doctypes:
         if not frappe.db.exists("DocType", doctype):
             continue
-        doc = frappe.get_doc("DocType", doctype)
-        existing = {row.role: row for row in doc.permissions}
         for role, permissions in matrix.items():
             permissions = overrides.get((doctype, role), permissions)
-            row = existing.get(role)
-            if not row:
-                row = doc.append("permissions", {"role": role, "permlevel": 0})
-            for permission, enabled in permissions.items():
-                setattr(row, permission, enabled)
-        # Permission rows are part of the standard DocType metadata.  Frappe
-        # protects that metadata when developer mode is disabled (as it should
-        # be in production).  The app remains fully usable with its declared
-        # role permissions from fixtures; skip only this metadata sync when
-        # that protection is active.
-        try:
-            doc.save(ignore_permissions=True)
-        except frappe.core.doctype.doctype.doctype.CannotCreateStandardDoctypeError:
-            frappe.db.rollback()
-            continue
+            existing = frappe.db.get_value(
+                "DocPerm",
+                {"parent": doctype, "parenttype": "DocType", "role": role, "permlevel": 0},
+                "name",
+            )
+            if existing:
+                frappe.db.set_value("DocPerm", existing, permissions)
+            else:
+                frappe.get_doc({
+                    "doctype": "DocPerm",
+                    "parent": doctype,
+                    "parenttype": "DocType",
+                    "parentfield": "permissions",
+                    "role": role,
+                    "permlevel": 0,
+                    **permissions,
+                }).insert(ignore_permissions=True)
     frappe.clear_cache()
     return matrix
 
