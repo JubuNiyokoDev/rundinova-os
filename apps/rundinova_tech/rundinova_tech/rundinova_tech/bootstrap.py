@@ -230,6 +230,37 @@ def current_state():
     }
 
 
+def check_sidebar():
+    """Report what the Desk sidebar actually shows for each founding member.
+
+    Calls the same server-side function the browser uses to build the
+    sidebar (frappe.desk.desktop.get_workspaces), so a mismatch between
+    this report and the UI points to browser caching.
+
+    Read-only verification helper:
+
+        bench --site <site> execute rundinova_tech.rundinova_tech.bootstrap.check_sidebar
+    """
+    from frappe.desk.desktop import get_workspaces
+
+    results = {}
+    for spec in TEAM_USERS + [{"email": "Administrator"}]:
+        email = spec["email"]
+        try:
+            frappe.set_user(email)
+            data = get_workspaces()
+            titles = [p.title for p in data.get("pages") or []]
+            results[email] = {
+                "titles": titles,
+                "count": len(titles),
+                "has_workspace_manager": "Workspace Manager" in (frappe.get_roles() or []),
+            }
+        except Exception as exc:
+            results[email] = "ERROR: %s" % repr(exc)[:80]
+    frappe.set_user("Administrator")
+    return results
+
+
 def check_page_access(page_name="rundinova-onboarding"):
     """Verify that every founding-team member can load the given page.
 
