@@ -120,6 +120,36 @@ def ensure_rundinova_permissions():
                     "permlevel": 0,
                     **permissions,
                 }).insert(ignore_permissions=True)
+    # Standard ERPNext doctypes that RundiNova forms link to or that the
+    # dashboards report on.  Read-only for every RundiNova role so link
+    # fields resolve and number-card / report queries run without errors.
+    linked_standard_doctypes = [
+        "Branch", "Cost Center", "Company", "Department", "Designation",
+        "Employee", "Supplier", "Item", "Warehouse", "UOM",
+        "Project", "Task", "Account", "GL Entry", "Mode of Payment",
+    ]
+    standard_read_only = {"read": 1, "write": 0, "create": 0, "delete": 0}
+    for doctype in linked_standard_doctypes:
+        if not frappe.db.exists("DocType", doctype):
+            continue
+        for role in matrix:
+            existing = frappe.db.get_value(
+                "DocPerm",
+                {"parent": doctype, "parenttype": "DocType", "role": role, "permlevel": 0},
+                "name",
+            )
+            if existing:
+                frappe.db.set_value("DocPerm", existing, standard_read_only)
+            else:
+                frappe.get_doc({
+                    "doctype": "DocPerm",
+                    "parent": doctype,
+                    "parenttype": "DocType",
+                    "parentfield": "permissions",
+                    "role": role,
+                    "permlevel": 0,
+                    **standard_read_only,
+                }).insert(ignore_permissions=True)
     frappe.clear_cache()
     return matrix
 
