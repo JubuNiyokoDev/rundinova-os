@@ -41,6 +41,9 @@ jobs:
         with:
           python-version: "3.14"
 
+      - name: Install RundiNova package dependencies
+        run: python -m pip install ./apps/rundinova_tech
+
       - name: Test framework-independent business rules
         run: >-
           python -m unittest discover
