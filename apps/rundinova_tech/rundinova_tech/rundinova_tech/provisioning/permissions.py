@@ -16,9 +16,11 @@ def ensure_rundinova_permissions():
     """
     custom_policy = get_custom_doctype_permissions()
     standard_policy = get_standard_doctype_permissions()
-    tables = set(frappe.get_all(
-        "DocType", filters={"module": "RundiNova Tech", "istable": 1}, pluck="name"
-    ))
+    tables = set(
+        frappe.get_all(
+            "DocType", filters={"module": "RundiNova Tech", "istable": 1}, pluck="name"
+        )
+    )
 
     def upsert_permission(doctype, role, values, custom=False):
         table = "Custom DocPerm" if custom else "DocPerm"
@@ -29,8 +31,13 @@ def ensure_rundinova_permissions():
         if existing:
             frappe.db.set_value(table, existing, values)
         else:
-            row = {"doctype": table, "parent": doctype, "role": role,
-                   "permlevel": 0, **values}
+            row = {
+                "doctype": table,
+                "parent": doctype,
+                "role": role,
+                "permlevel": 0,
+                **values,
+            }
             if not custom:
                 row.update(parenttype="DocType", parentfield="permissions")
             frappe.get_doc(row).insert(ignore_permissions=True)
@@ -40,8 +47,13 @@ def ensure_rundinova_permissions():
         "DocType", filters={"module": "RundiNova Tech"}, pluck="name"
     )
     for doctype in module_doctypes:
-        frappe.db.delete("Custom DocPerm", {"parent": doctype, "role": ["in", list(ROLES)]})
-        frappe.db.delete("DocPerm", {"parent": doctype, "parenttype": "DocType", "role": ["in", list(ROLES)]})
+        frappe.db.delete(
+            "Custom DocPerm", {"parent": doctype, "role": ["in", list(ROLES)]}
+        )
+        frappe.db.delete(
+            "DocPerm",
+            {"parent": doctype, "parenttype": "DocType", "role": ["in", list(ROLES)]},
+        )
 
     for (doctype, role), values in custom_policy.items():
         if frappe.db.exists("DocType", doctype):
@@ -51,8 +63,11 @@ def ensure_rundinova_permissions():
     for child in tables:
         parents = frappe.get_all(
             "DocField",
-            filters={"fieldtype": "Table", "options": child,
-                     "parent": ["in", list(module_doctypes)]},
+            filters={
+                "fieldtype": "Table",
+                "options": child,
+                "parent": ["in", list(module_doctypes)],
+            },
             pluck="parent",
         )
         for parent in parents:
@@ -70,35 +85,79 @@ def ensure_rundinova_permissions():
             continue
         # Remove stale app and generic grants before installing the explicit
         # matrix; otherwise Desk User/All can bypass the intended boundary.
-        frappe.db.delete("Custom DocPerm", {
-            "parent": doctype,
-            "role": ["in", [*ROLES, "All", "Guest", "Desk User"]],
-        })
-        frappe.db.delete("DocPerm", {
-            "parent": doctype, "parenttype": "DocType", "role": ["in", list(ROLES)]
-        })
+        frappe.db.delete(
+            "Custom DocPerm",
+            {
+                "parent": doctype,
+                "role": ["in", [*ROLES, "All", "Guest", "Desk User"]],
+            },
+        )
+        frappe.db.delete(
+            "DocPerm",
+            {"parent": doctype, "parenttype": "DocType", "role": ["in", list(ROLES)]},
+        )
     for (doctype, role), values in standard_policy.items():
         if frappe.db.exists("DocType", doctype):
             upsert_permission(doctype, role, values, custom=True)
     for doctype in standard_doctypes:
         if not frappe.db.exists("DocType", doctype):
             continue
-        custom_roles = frappe.get_all("Custom DocPerm", filters={"parent": doctype}, pluck="role")
+        custom_roles = frappe.get_all(
+            "Custom DocPerm", filters={"parent": doctype}, pluck="role"
+        )
         if custom_roles:
-            for role in frappe.get_all("DocPerm", filters={
-                "parent": doctype, "parenttype": "DocType", "role": ["not in", custom_roles]
-            }, fields=["role", "read", "write", "create", "delete", "submit", "cancel",
-                       "amend", "report", "export", "share", "print", "email", "if_owner"]):
+            for role in frappe.get_all(
+                "DocPerm",
+                filters={
+                    "parent": doctype,
+                    "parenttype": "DocType",
+                    "role": ["not in", custom_roles],
+                },
+                fields=[
+                    "role",
+                    "read",
+                    "write",
+                    "create",
+                    "delete",
+                    "submit",
+                    "cancel",
+                    "amend",
+                    "report",
+                    "export",
+                    "share",
+                    "print",
+                    "email",
+                    "if_owner",
+                ],
+            ):
                 if role.role in ("All", "Guest", "Desk User") or frappe.db.exists(
-                    "Custom DocPerm", {"parent": doctype, "role": role.role, "permlevel": 0}
+                    "Custom DocPerm",
+                    {"parent": doctype, "role": role.role, "permlevel": 0},
                 ):
                     continue
-                upsert_permission(doctype, role.role, {
-                    key: role.get(key) for key in (
-                        "read", "write", "create", "delete", "submit", "cancel", "amend",
-                        "report", "export", "share", "print", "email", "if_owner"
-                    )
-                }, custom=True)
+                upsert_permission(
+                    doctype,
+                    role.role,
+                    {
+                        key: role.get(key)
+                        for key in (
+                            "read",
+                            "write",
+                            "create",
+                            "delete",
+                            "submit",
+                            "cancel",
+                            "amend",
+                            "report",
+                            "export",
+                            "share",
+                            "print",
+                            "email",
+                            "if_owner",
+                        )
+                    },
+                    custom=True,
+                )
 
     frappe.clear_cache()
     return {"custom": custom_policy, "standard": standard_policy}

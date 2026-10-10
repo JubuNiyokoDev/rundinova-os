@@ -2,22 +2,21 @@
 
 from collections.abc import Iterable
 
-
 MOVEMENTS_REQUIRING_EVIDENCE = frozenset(("Submitted", "Approved", "Reconciled"))
 BALANCE_STATUSES = ("Approved", "Reconciled")
 FOOD_EXPENSE_CASH_PROTECTED_FIELDS = (
-	"expense_date",
-	"budget",
-	"item",
-	"category",
-	"quantity",
-	"unit",
-	"amount",
-	"supplier",
-	"receipt",
-	"status",
-	"purchase_invoice",
-	"purchase_invoice_item",
+    "expense_date",
+    "budget",
+    "item",
+    "category",
+    "quantity",
+    "unit",
+    "amount",
+    "supplier",
+    "receipt",
+    "status",
+    "purchase_invoice",
+    "purchase_invoice_item",
 )
 
 
@@ -57,22 +56,26 @@ def food_expense_cash_link_violation(*, expense_status, duplicate_movement=False
 
 
 def food_expense_cash_mutation_violation(
-	*, has_active_cash_movement, deleting=False, previous_values=None, current_values=None
+    *,
+    has_active_cash_movement,
+    deleting=False,
+    previous_values=None,
+    current_values=None,
 ):
-	"""Require cancellation before deleting or changing cash-linked purchase data."""
-	if not has_active_cash_movement:
-		return None
-	if deleting:
-		return "cash_movement_must_be_cancelled_before_delete"
-	if previous_values is None:
-		return None
-	current_values = current_values or {}
-	if any(
-		current_values.get(field) != previous_values.get(field)
-		for field in FOOD_EXPENSE_CASH_PROTECTED_FIELDS
-	):
-		return "cash_movement_must_be_cancelled_before_change"
-	return None
+    """Require cancellation before deleting or changing cash-linked purchase data."""
+    if not has_active_cash_movement:
+        return None
+    if deleting:
+        return "cash_movement_must_be_cancelled_before_delete"
+    if previous_values is None:
+        return None
+    current_values = current_values or {}
+    if any(
+        current_values.get(field) != previous_values.get(field)
+        for field in FOOD_EXPENSE_CASH_PROTECTED_FIELDS
+    ):
+        return "cash_movement_must_be_cancelled_before_change"
+    return None
 
 
 def food_expense_movement_fields(expense):
@@ -100,7 +103,9 @@ def food_expense_movement_fields(expense):
     }
 
 
-def calculate_cash_account_balance(opening_balance, account_name, movements: Iterable[tuple]):
+def calculate_cash_account_balance(
+    opening_balance, account_name, movements: Iterable[tuple]
+):
     """Apply approved movement rows to an account's opening balance."""
     balance = opening_balance
     for movement_type, source_account, destination_account, amount in movements:

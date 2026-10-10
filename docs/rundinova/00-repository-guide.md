@@ -7,10 +7,10 @@ intentional release update.
 
 ## Two code layers
 
-| Layer | Owns | Main locations |
-| --- | --- | --- |
-| Self-hosted platform | Images, services, databases, Redis, proxy and deployment profiles | `compose.yaml`, `overrides/`, `images/` |
-| RundiNova product | Business records, workflows, permissions, workspace and dashboards | `apps/rundinova_tech/` |
+| Layer                | Owns                                                               | Main locations                          |
+| -------------------- | ------------------------------------------------------------------ | --------------------------------------- |
+| Self-hosted platform | Images, services, databases, Redis, proxy and deployment profiles  | `compose.yaml`, `overrides/`, `images/` |
+| RundiNova product    | Business records, workflows, permissions, workspace and dashboards | `apps/rundinova_tech/`                  |
 
 The platform starts the app. The app does not own infrastructure lifecycle, and
 the platform does not define RundiNova business rules. Keep changes in the

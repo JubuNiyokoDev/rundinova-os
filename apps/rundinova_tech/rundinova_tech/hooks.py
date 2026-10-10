@@ -38,13 +38,25 @@ doctype_js = {
 doctype_list_js = {
     doctype: "public/js/rundinova_list_view.js"
     for doctype in (
-        "RundiNova Decision", "RundiNova Repository", "RundiNova Growth Opportunity",
-        "RundiNova KPI Definition", "RundiNova Goal", "RundiNova KPI Snapshot",
-        "RundiNova Partnership", "RundiNova Food Progress", "RundiNova Food Budget",
-        "RundiNova Risk", "RundiNova Office", "RundiNova Asset",
-        "RundiNova Community Impact", "RundiNova Cash Movement",
-        "RundiNova Food Expense", "RundiNova Budget Review", "RundiNova Expense",
-        "RundiNova Cash Account", "RundiNova Document",
+        "RundiNova Decision",
+        "RundiNova Repository",
+        "RundiNova Growth Opportunity",
+        "RundiNova KPI Definition",
+        "RundiNova Goal",
+        "RundiNova KPI Snapshot",
+        "RundiNova Partnership",
+        "RundiNova Food Progress",
+        "RundiNova Food Budget",
+        "RundiNova Risk",
+        "RundiNova Office",
+        "RundiNova Asset",
+        "RundiNova Community Impact",
+        "RundiNova Cash Movement",
+        "RundiNova Food Expense",
+        "RundiNova Budget Review",
+        "RundiNova Expense",
+        "RundiNova Cash Account",
+        "RundiNova Document",
     )
 }
 doctype_list_js["RundiNova Food Progress"] = "public/js/rundinova_food_purchase.js"
@@ -98,4 +110,7 @@ permission_query_conditions = {
     "RundiNova Expense": _access_control + "expense_query",
     "RundiNova Food Budget Item": _access_control + "food_budget_item_query",
 }
-has_permission = {doctype: _access_control + "has_permission" for doctype in permission_query_conditions}
+has_permission = {
+    doctype: _access_control + "has_permission"
+    for doctype in permission_query_conditions
+}

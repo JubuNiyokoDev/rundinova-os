@@ -442,8 +442,7 @@ downgraded by changing only the image tag.
   running. On the live site, `add_home_page()` returned `rundinova-home` for
   both Joffre and housekeeping; their assigned workspaces were respectively
   `RundiNova Tech` and `RundiNova Team`, and Frappe returned the redirect script
-  for both users. `/api/method/ping` and the built home JS asset returned HTTP
-  200. An authenticated browser-session visual test was not performed.
+  for both users. `/api/method/ping` and the built home JS asset returned HTTP 200. An authenticated browser-session visual test was not performed.
 - Data protection: `bench backup --with-files` completed at `20261008_074240`
   before migration and includes the database, public/private files and site
   configuration. Restore rehearsal and encrypted off-host copy remain deferred,

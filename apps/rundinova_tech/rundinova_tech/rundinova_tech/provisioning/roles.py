@@ -16,12 +16,14 @@ def ensure_rundinova_roles():
     for role_name in role_names:
         if frappe.db.exists("Role", role_name):
             continue
-        frappe.get_doc({
-            "doctype": "Role",
-            "role_name": role_name,
-            "desk_access": 1,
-            "is_custom": 1,
-        }).insert(ignore_permissions=True)
+        frappe.get_doc(
+            {
+                "doctype": "Role",
+                "role_name": role_name,
+                "desk_access": 1,
+                "is_custom": 1,
+            }
+        ).insert(ignore_permissions=True)
         created.append(role_name)
     frappe.db.commit()
     return created

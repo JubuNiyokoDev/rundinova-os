@@ -12,7 +12,11 @@ def ensure_transit_warehouse_type():
     if frappe.db.exists("Warehouse Type", "Transit"):
         return "already-exists"
     doc = frappe.get_doc(
-        {"doctype": "Warehouse Type", "name": "Transit", "description": "Goods in transit"}
+        {
+            "doctype": "Warehouse Type",
+            "name": "Transit",
+            "description": "Goods in transit",
+        }
     )
     doc.flags.name_set = True
     doc.insert(ignore_permissions=True)

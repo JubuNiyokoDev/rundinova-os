@@ -3,23 +3,106 @@
   "name": "RundiNova Growth Opportunity",
   "module": "RundiNova Tech",
   "fields": [
-    {"fieldname": "title", "fieldtype": "Data", "label": "Opportunity", "reqd": 1},
-    {"fieldname": "source", "fieldtype": "Data", "label": "Source"},
-    {"fieldname": "customer", "fieldtype": "Link", "options": "Customer", "label": "Customer"},
-    {"fieldname": "opportunity_owner", "fieldtype": "Link", "options": "Employee", "label": "Owner", "reqd": 1},
-    {"fieldname": "stage", "fieldtype": "Select", "options": "Identified\nQualified\nProposal\nNegotiation\nWon\nLost", "label": "Stage", "default": "Identified", "reqd": 1},
-    {"fieldname": "expected_value", "fieldtype": "Currency", "label": "Expected Value"},
-    {"fieldname": "next_action", "fieldtype": "Small Text", "label": "Next Action"},
-    {"fieldname": "next_action_date", "fieldtype": "Date", "label": "Next Action Date"}
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Opportunity",
+      "reqd": 1
+    },
+    { "fieldname": "source", "fieldtype": "Data", "label": "Source" },
+    {
+      "fieldname": "customer",
+      "fieldtype": "Link",
+      "options": "Customer",
+      "label": "Customer"
+    },
+    {
+      "fieldname": "opportunity_owner",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "label": "Owner",
+      "reqd": 1
+    },
+    {
+      "fieldname": "stage",
+      "fieldtype": "Select",
+      "options": "Identified\nQualified\nProposal\nNegotiation\nWon\nLost",
+      "label": "Stage",
+      "default": "Identified",
+      "reqd": 1
+    },
+    {
+      "fieldname": "expected_value",
+      "fieldtype": "Currency",
+      "label": "Expected Value"
+    },
+    {
+      "fieldname": "next_action",
+      "fieldtype": "Small Text",
+      "label": "Next Action"
+    },
+    {
+      "fieldname": "next_action_date",
+      "fieldtype": "Date",
+      "label": "Next Action Date"
+    }
   ],
   "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "delete": 0},
-    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "RundiNova Operations", "read": 1, "write": 1, "create": 1, "delete": 0},
-    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1, "delete": 0},
-    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1, "delete": 0},
-    {"role": "RundiNova Communications", "read": 1, "write": 1, "create": 1, "delete": 0},
-    {"role": "RundiNova People & Culture", "read": 1, "write": 1, "create": 1, "delete": 0}
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Director",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Finance Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Operations",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Project Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Team Member",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Communications",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova People & Culture",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    }
   ]
 }

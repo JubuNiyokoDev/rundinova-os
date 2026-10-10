@@ -4,6 +4,8 @@ import frappe
 
 from .company import COMPANY_NAME
 from .team import TEAM_USERS
+
+
 def current_state():
     return {
         "companies": frappe.db.count("Company"),
@@ -11,7 +13,9 @@ def current_state():
         "cost_centers": frappe.db.count("Cost Center", {"company": COMPANY_NAME}),
         "accounts": frappe.db.count("Account", {"company": COMPANY_NAME}),
         "departments": frappe.db.count("Department", {"company": COMPANY_NAME}),
-        "rundinova_roles": frappe.db.count("Role", {"role_name": ["like", "RundiNova %"]}),
+        "rundinova_roles": frappe.db.count(
+            "Role", {"role_name": ["like", "RundiNova %"]}
+        ),
     }
 
 
@@ -29,7 +33,8 @@ def check_sidebar():
             results[email] = {
                 "titles": titles,
                 "count": len(titles),
-                "has_workspace_manager": "Workspace Manager" in (frappe.get_roles() or []),
+                "has_workspace_manager": "Workspace Manager"
+                in (frappe.get_roles() or []),
             }
         except Exception as exc:
             results[email] = "ERROR: %s" % repr(exc)[:80]
@@ -61,7 +66,9 @@ def permission_report():
     doctypes = [
         doc.name
         for doc in frappe.get_all(
-            "DocType", filters={"module": "RundiNova Tech", "istable": 0}, fields=["name"]
+            "DocType",
+            filters={"module": "RundiNova Tech", "istable": 0},
+            fields=["name"],
         )
     ]
     by_role = {}

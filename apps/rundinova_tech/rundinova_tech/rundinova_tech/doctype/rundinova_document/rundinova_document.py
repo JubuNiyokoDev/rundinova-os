@@ -1,7 +1,6 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-
 from rundinova_core.governance import document_validation_actions
 
 

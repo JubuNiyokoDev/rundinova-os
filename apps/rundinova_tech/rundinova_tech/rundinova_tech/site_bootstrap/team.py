@@ -3,11 +3,45 @@
 import frappe
 
 TEAM_USERS = [
-    {"email": "joffre.niyondiko@rundinova.com", "first_name": "Joffre", "last_name": "Niyondiko", "designation": "Co-Founder & CEO", "roles": ["RundiNova Director", "RundiNova Finance Manager", "RundiNova Team Member"]},
-    {"email": "janvier.ndabubaha@rundinova.com", "first_name": "Janvier", "last_name": "Ndabubaha", "designation": "COO", "roles": ["RundiNova Operations", "RundiNova Team Member"]},
-    {"email": "franck.maniranyibutse@rundinova.com", "first_name": "Franck", "last_name": "Maniranyibutse", "designation": "Head of Engineering", "roles": ["RundiNova Project Lead", "RundiNova Team Member"]},
-    {"email": "elvis.irambona@rundinova.com", "first_name": "Elvis", "last_name": "Irambona", "designation": "Head of Communications", "roles": ["RundiNova Communications", "RundiNova Team Member"]},
-    {"email": "fanuel.kasumba@rundinova.com", "first_name": "Fanuel", "last_name": "Kasumba Mandela", "designation": "Head of People & Culture", "roles": ["RundiNova People & Culture", "RundiNova Team Member"]},
+    {
+        "email": "joffre.niyondiko@rundinova.com",
+        "first_name": "Joffre",
+        "last_name": "Niyondiko",
+        "designation": "Co-Founder & CEO",
+        "roles": [
+            "RundiNova Director",
+            "RundiNova Finance Manager",
+            "RundiNova Team Member",
+        ],
+    },
+    {
+        "email": "janvier.ndabubaha@rundinova.com",
+        "first_name": "Janvier",
+        "last_name": "Ndabubaha",
+        "designation": "COO",
+        "roles": ["RundiNova Operations", "RundiNova Team Member"],
+    },
+    {
+        "email": "franck.maniranyibutse@rundinova.com",
+        "first_name": "Franck",
+        "last_name": "Maniranyibutse",
+        "designation": "Head of Engineering",
+        "roles": ["RundiNova Project Lead", "RundiNova Team Member"],
+    },
+    {
+        "email": "elvis.irambona@rundinova.com",
+        "first_name": "Elvis",
+        "last_name": "Irambona",
+        "designation": "Head of Communications",
+        "roles": ["RundiNova Communications", "RundiNova Team Member"],
+    },
+    {
+        "email": "fanuel.kasumba@rundinova.com",
+        "first_name": "Fanuel",
+        "last_name": "Kasumba Mandela",
+        "designation": "Head of People & Culture",
+        "roles": ["RundiNova People & Culture", "RundiNova Team Member"],
+    },
 ]
 
 

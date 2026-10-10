@@ -30,18 +30,22 @@ def fix_company_currency():
 def ensure_purchase_invoice_budget_field():
     """Add the optional budget selector to ERPNext Purchase Invoice once."""
     fieldname = "rundinova_food_budget"
-    if frappe.db.exists("Custom Field", {"dt": "Purchase Invoice", "fieldname": fieldname}):
+    if frappe.db.exists(
+        "Custom Field", {"dt": "Purchase Invoice", "fieldname": fieldname}
+    ):
         return
-    frappe.get_doc({
-        "doctype": "Custom Field",
-        "dt": "Purchase Invoice",
-        "fieldname": fieldname,
-        "label": "RundiNova Food Budget",
-        "fieldtype": "Link",
-        "options": "RundiNova Food Budget",
-        "insert_after": "supplier",
-        "module": "RundiNova Tech",
-    }).insert(ignore_permissions=True, ignore_if_duplicate=True)
+    frappe.get_doc(
+        {
+            "doctype": "Custom Field",
+            "dt": "Purchase Invoice",
+            "fieldname": fieldname,
+            "label": "RundiNova Food Budget",
+            "fieldtype": "Link",
+            "options": "RundiNova Food Budget",
+            "insert_after": "supplier",
+            "module": "RundiNova Tech",
+        }
+    ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
 
 def ensure_task_repository_field():
@@ -49,16 +53,18 @@ def ensure_task_repository_field():
     fieldname = "rundinova_repository"
     if frappe.db.exists("Custom Field", {"dt": "Task", "fieldname": fieldname}):
         return
-    frappe.get_doc({
-        "doctype": "Custom Field",
-        "dt": "Task",
-        "fieldname": fieldname,
-        "label": "RundiNova Repository",
-        "fieldtype": "Link",
-        "options": "RundiNova Repository",
-        "insert_after": "project",
-        "module": "RundiNova Tech",
-    }).insert(ignore_permissions=True, ignore_if_duplicate=True)
+    frappe.get_doc(
+        {
+            "doctype": "Custom Field",
+            "dt": "Task",
+            "fieldname": fieldname,
+            "label": "RundiNova Repository",
+            "fieldtype": "Link",
+            "options": "RundiNova Repository",
+            "insert_after": "project",
+            "module": "RundiNova Tech",
+        }
+    ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
 
 def ensure_project_repository_field():
@@ -66,13 +72,15 @@ def ensure_project_repository_field():
     fieldname = "rundinova_repository"
     if frappe.db.exists("Custom Field", {"dt": "Project", "fieldname": fieldname}):
         return
-    frappe.get_doc({
-        "doctype": "Custom Field",
-        "dt": "Project",
-        "fieldname": fieldname,
-        "label": "RundiNova Repository",
-        "fieldtype": "Link",
-        "options": "RundiNova Repository",
-        "insert_after": "project_name",
-        "module": "RundiNova Tech",
-    }).insert(ignore_permissions=True, ignore_if_duplicate=True)
+    frappe.get_doc(
+        {
+            "doctype": "Custom Field",
+            "dt": "Project",
+            "fieldname": fieldname,
+            "label": "RundiNova Repository",
+            "fieldtype": "Link",
+            "options": "RundiNova Repository",
+            "insert_after": "project_name",
+            "module": "RundiNova Tech",
+        }
+    ).insert(ignore_permissions=True, ignore_if_duplicate=True)

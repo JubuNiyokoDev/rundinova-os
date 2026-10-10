@@ -7,30 +7,142 @@
   "title_field": "expense_title",
   "show_title_field_in_link": 1,
   "fields": [
-    {"fieldname": "expense_title", "fieldtype": "Data", "label": "Achat", "read_only": 1, "in_list_view": 1},
-    {"fieldname": "purchase_section", "fieldtype": "Section Break", "label": "Détails de l’achat"},
-    {"fieldname": "expense_date", "fieldtype": "Date", "label": "Date d’achat", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "item", "fieldtype": "Link", "options": "Item", "label": "Article acheté", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "quantity", "fieldtype": "Float", "label": "Quantité", "reqd": 1},
-    {"fieldname": "unit", "fieldtype": "Data", "label": "Unité", "read_only": 1},
-    {"fieldname": "amount", "fieldtype": "Currency", "label": "Montant total (FBu)", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "column_break_purchase", "fieldtype": "Column Break"},
-    {"fieldname": "payment_method", "fieldtype": "Select", "label": "Mode de paiement", "options": "Cash\nMobile Money\nBank Transfer\nCard\nOther"},
-    {"fieldname": "supplier", "fieldtype": "Link", "options": "Supplier", "label": "Fournisseur"},
-    {"fieldname": "receipt", "fieldtype": "Attach", "label": "Reçu / justificatif"},
-    {"fieldname": "notes", "fieldtype": "Small Text", "label": "Note ou justificatif complémentaire"},
-    {"fieldname": "tracking_section", "fieldtype": "Section Break", "label": "Suivi et budget", "collapsible": 1},
-    {"fieldname": "budget", "fieldtype": "Link", "options": "RundiNova Food Budget", "label": "Budget alimentaire", "reqd": 1},
-    {"fieldname": "food_progress", "fieldtype": "Link", "options": "RundiNova Food Progress", "label": "Suivi de l’article", "hidden": 1},
-    {"fieldname": "category", "fieldtype": "Link", "options": "Item Group", "label": "Catégorie", "read_only": 1},
-    {"fieldname": "status", "fieldtype": "Select", "label": "Statut du traitement", "options": "Draft\nSubmitted\nApproved\nPaid\nRejected\nCancelled", "default": "Draft", "reqd": 1},
-    {"fieldname": "purchase_invoice", "fieldtype": "Link", "options": "Purchase Invoice", "label": "Facture d’achat", "read_only": 1, "hidden": 1},
-    {"fieldname": "purchase_invoice_item", "fieldtype": "Data", "label": "Ligne de facture", "read_only": 1, "hidden": 1}
+    {
+      "fieldname": "expense_title",
+      "fieldtype": "Data",
+      "label": "Achat",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "purchase_section",
+      "fieldtype": "Section Break",
+      "label": "Détails de l’achat"
+    },
+    {
+      "fieldname": "expense_date",
+      "fieldtype": "Date",
+      "label": "Date d’achat",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "item",
+      "fieldtype": "Link",
+      "options": "Item",
+      "label": "Article acheté",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "quantity",
+      "fieldtype": "Float",
+      "label": "Quantité",
+      "reqd": 1
+    },
+    {
+      "fieldname": "unit",
+      "fieldtype": "Data",
+      "label": "Unité",
+      "read_only": 1
+    },
+    {
+      "fieldname": "amount",
+      "fieldtype": "Currency",
+      "label": "Montant total (FBu)",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    { "fieldname": "column_break_purchase", "fieldtype": "Column Break" },
+    {
+      "fieldname": "payment_method",
+      "fieldtype": "Select",
+      "label": "Mode de paiement",
+      "options": "Cash\nMobile Money\nBank Transfer\nCard\nOther"
+    },
+    {
+      "fieldname": "supplier",
+      "fieldtype": "Link",
+      "options": "Supplier",
+      "label": "Fournisseur"
+    },
+    {
+      "fieldname": "receipt",
+      "fieldtype": "Attach",
+      "label": "Reçu / justificatif"
+    },
+    {
+      "fieldname": "notes",
+      "fieldtype": "Small Text",
+      "label": "Note ou justificatif complémentaire"
+    },
+    {
+      "fieldname": "tracking_section",
+      "fieldtype": "Section Break",
+      "label": "Suivi et budget",
+      "collapsible": 1
+    },
+    {
+      "fieldname": "budget",
+      "fieldtype": "Link",
+      "options": "RundiNova Food Budget",
+      "label": "Budget alimentaire",
+      "reqd": 1
+    },
+    {
+      "fieldname": "food_progress",
+      "fieldtype": "Link",
+      "options": "RundiNova Food Progress",
+      "label": "Suivi de l’article",
+      "hidden": 1
+    },
+    {
+      "fieldname": "category",
+      "fieldtype": "Link",
+      "options": "Item Group",
+      "label": "Catégorie",
+      "read_only": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Statut du traitement",
+      "options": "Draft\nSubmitted\nApproved\nPaid\nRejected\nCancelled",
+      "default": "Draft",
+      "reqd": 1
+    },
+    {
+      "fieldname": "purchase_invoice",
+      "fieldtype": "Link",
+      "options": "Purchase Invoice",
+      "label": "Facture d’achat",
+      "read_only": 1,
+      "hidden": 1
+    },
+    {
+      "fieldname": "purchase_invoice_item",
+      "fieldtype": "Data",
+      "label": "Ligne de facture",
+      "read_only": 1,
+      "hidden": 1
+    }
   ],
   "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
-    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1}
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Finance Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    { "role": "RundiNova Director", "read": 1, "write": 1, "create": 1 }
   ],
   "sort_field": "expense_date",
   "sort_order": "DESC"

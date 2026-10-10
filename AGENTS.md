@@ -9,27 +9,33 @@ Analyze/count/filter/compare/search/parse/transform data: **write code** via `ct
 ## BLOCKED — do NOT use
 
 ### curl / wget — FORBIDDEN
+
 Do NOT use `curl`/`wget` in shell. Dumps raw HTTP into context.
 Use: `ctx_fetch_and_index(url, source)` or `ctx_execute(language: "javascript", code: "const r = await fetch(...)")`
 
 ### Inline HTTP — FORBIDDEN
+
 No `node -e "fetch(..."`, `python -c "requests.get(..."`. Bypasses sandbox.
 Use: `ctx_execute(language, code)` — only stdout enters context
 
 ### Direct web fetching — FORBIDDEN
+
 Raw HTML can exceed 100 KB.
 Use: `ctx_fetch_and_index(url, source)` then `ctx_search(queries)`
 
 ## REDIRECTED — use sandbox
 
 ### Shell (>20 lines output)
+
 Shell ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`.
 Otherwise: `ctx_batch_execute(commands, queries)` or `ctx_execute(language: "javascript", code: "...")`. Use `language: "shell"` only when code matches the host shell.
 
 ### File reading (for analysis)
+
 Reading to **edit** → reading correct. Reading to **analyze/explore/summarize** → `ctx_execute_file(path, language, code)`.
 
 ### grep / search (large results)
+
 Use `ctx_execute(language: "javascript", code: "...")` in sandbox for portable filtering/counting.
 
 ## Tool selection
@@ -65,12 +71,12 @@ Skills, roles, and decisions persist for the entire session. Do not abandon them
 
 Session history is persistent and searchable. On resume, search BEFORE asking the user:
 
-| Need | Command |
-|------|---------|
+| Need                     | Command                                                                    |
+| ------------------------ | -------------------------------------------------------------------------- |
 | What were we working on? | `ctx_search(queries: ["summary"], source: "compaction", sort: "timeline")` |
-| What did we decide? | `ctx_search(queries: ["decision"], source: "decision", sort: "timeline")` |
-| What NOT to repeat? | `ctx_search(queries: ["rejected"], source: "rejected-approach")` |
-| What constraints exist? | `ctx_search(queries: ["constraint"], source: "constraint")` |
+| What did we decide?      | `ctx_search(queries: ["decision"], source: "decision", sort: "timeline")`  |
+| What NOT to repeat?      | `ctx_search(queries: ["rejected"], source: "rejected-approach")`           |
+| What constraints exist?  | `ctx_search(queries: ["constraint"], source: "constraint")`                |
 
 Note: user-prompt history not available.
 
@@ -79,12 +85,12 @@ If search returns 0 results, proceed as a fresh session.
 
 ## ctx commands
 
-| Command | Action |
-|---------|--------|
-| `ctx stats` | Call `stats` MCP tool, display full output verbatim |
-| `ctx doctor` | Call `doctor` MCP tool, run returned shell command, display as checklist |
-| `ctx upgrade` | Call `upgrade` MCP tool, run returned shell command, display as checklist |
-| `ctx purge` | Call `purge` MCP tool with confirm: true. Warns before wiping knowledge base. |
+| Command       | Action                                                                        |
+| ------------- | ----------------------------------------------------------------------------- |
+| `ctx stats`   | Call `stats` MCP tool, display full output verbatim                           |
+| `ctx doctor`  | Call `doctor` MCP tool, run returned shell command, display as checklist      |
+| `ctx upgrade` | Call `upgrade` MCP tool, run returned shell command, display as checklist     |
+| `ctx purge`   | Call `purge` MCP tool with confirm: true. Warns before wiping knowledge base. |
 
 After /clear or /compact: knowledge base and session stats preserved. Use `ctx purge` to start fresh.
 

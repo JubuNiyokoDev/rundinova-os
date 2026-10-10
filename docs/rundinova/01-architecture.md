@@ -10,15 +10,15 @@ one or more subdomains such as `erp.rundinova.com`.
 
 ## Platform layers
 
-| Layer | Responsibility | Initial implementation |
-| --- | --- | --- |
-| Docker infrastructure | Containers, networking, persistence, TLS | This repository |
-| Frappe Framework | Users, permissions, workflows, audit, REST API | Custom image |
-| ERPNext | Accounting, selling, buying, projects, assets, stock | Installed app |
-| HRMS | Employees, leave, attendance, payroll, appraisals | Installed app |
-| CRM | Leads, opportunities, activities and sales pipeline | Installed app |
-| RundiNova application | Company-specific data, dashboards and controls | `apps/rundinova_tech/` in this same self-hosted repository |
-| Static website | Marketing and public content | Existing website repository |
+| Layer                 | Responsibility                                       | Initial implementation                                     |
+| --------------------- | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Docker infrastructure | Containers, networking, persistence, TLS             | This repository                                            |
+| Frappe Framework      | Users, permissions, workflows, audit, REST API       | Custom image                                               |
+| ERPNext               | Accounting, selling, buying, projects, assets, stock | Installed app                                              |
+| HRMS                  | Employees, leave, attendance, payroll, appraisals    | Installed app                                              |
+| CRM                   | Leads, opportunities, activities and sales pipeline  | Installed app                                              |
+| RundiNova application | Company-specific data, dashboards and controls       | `apps/rundinova_tech/` in this same self-hosted repository |
+| Static website        | Marketing and public content                         | Existing website repository                                |
 
 ## Sites and offices
 

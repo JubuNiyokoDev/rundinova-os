@@ -2,7 +2,6 @@
 
 from collections.abc import Iterable
 
-
 ACTIVE_EXPENSE_STATUSES = frozenset(("Submitted", "Approved", "Paid"))
 
 
@@ -48,7 +47,9 @@ def calculate_food_budget_usage(approved_ceiling, expenses):
         "committed_amount": committed,
         "actual_amount": actual,
         "balance_amount": approved_ceiling - committed,
-        "consumed_percent": committed / approved_ceiling * 100 if approved_ceiling else 0,
+        "consumed_percent": (
+            committed / approved_ceiling * 100 if approved_ceiling else 0
+        ),
     }
 
 

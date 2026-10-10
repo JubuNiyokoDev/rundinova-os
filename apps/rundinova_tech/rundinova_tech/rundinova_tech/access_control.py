@@ -2,7 +2,6 @@
 
 import frappe
 
-
 ROLES = (
     "RundiNova Director",
     "RundiNova Finance Manager",
@@ -84,8 +83,18 @@ def get_custom_doctype_permissions():
 
     # Budget and expense records are assigned to individual team members;
     # the access hooks below filter those records by owner or active ToDo.
-    grant(FINANCIAL_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Operations"), WRITE)
-    grant(FINANCIAL_DOCTYPES, ("RundiNova Project Lead", "RundiNova Communications", "RundiNova People & Culture"), READ)
+    grant(
+        FINANCIAL_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Operations"), WRITE
+    )
+    grant(
+        FINANCIAL_DOCTYPES,
+        (
+            "RundiNova Project Lead",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+        ),
+        READ,
+    )
     grant(FINANCIAL_DOCTYPES, ("RundiNova Team Member",), ASSIGNED_READ)
     for doctype in TEAM_MEMBER_CREATE_DOCTYPES:
         permissions[(doctype, "RundiNova Team Member")] = dict(CREATE_EXPENSE)
@@ -93,26 +102,82 @@ def get_custom_doctype_permissions():
     grant(CASH_DOCTYPES, ("RundiNova Finance Manager",), WRITE)
     grant(CASH_DOCTYPES, ("RundiNova Operations",), READ)
 
-    grant(ASSET_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Project Lead"), WRITE)
-    grant(ASSET_DOCTYPES, ("RundiNova Operations", "RundiNova Communications", "RundiNova People & Culture", "RundiNova Team Member"), READ)
+    grant(
+        ASSET_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Project Lead"), WRITE
+    )
+    grant(
+        ASSET_DOCTYPES,
+        (
+            "RundiNova Operations",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+            "RundiNova Team Member",
+        ),
+        READ,
+    )
 
     grant(PROJECT_DOCTYPES, ("RundiNova Project Lead",), WRITE)
-    grant(PROJECT_DOCTYPES, ("RundiNova Operations", "RundiNova Communications", "RundiNova People & Culture", "RundiNova Team Member"), READ)
+    grant(
+        PROJECT_DOCTYPES,
+        (
+            "RundiNova Operations",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+            "RundiNova Team Member",
+        ),
+        READ,
+    )
 
-    grant(DECISION_DOCTYPES, ("RundiNova Operations", "RundiNova Project Lead", "RundiNova Communications", "RundiNova People & Culture"), WRITE)
+    grant(
+        DECISION_DOCTYPES,
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+        ),
+        WRITE,
+    )
     grant(DECISION_DOCTYPES, ("RundiNova Team Member",), READ)
 
     # The role table marks shared documents as available to the full team.
     grant(DOCUMENT_DOCTYPES, ROLES[1:], WRITE)
 
     grant(KPI_DOCTYPES, ("RundiNova Project Lead",), WRITE)
-    grant(KPI_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Operations", "RundiNova Team Member", "RundiNova Communications", "RundiNova People & Culture"), READ)
+    grant(
+        KPI_DOCTYPES,
+        (
+            "RundiNova Finance Manager",
+            "RundiNova Operations",
+            "RundiNova Team Member",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+        ),
+        READ,
+    )
 
     grant(CRM_DOCTYPES, ("RundiNova Communications",), WRITE)
-    grant(CRM_DOCTYPES, ("RundiNova Operations", "RundiNova Project Lead", "RundiNova People & Culture"), READ)
+    grant(
+        CRM_DOCTYPES,
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova People & Culture",
+        ),
+        READ,
+    )
 
     grant(OFFICE_DOCTYPES, ("RundiNova People & Culture",), WRITE)
-    grant(OFFICE_DOCTYPES, ("RundiNova Operations", "RundiNova Project Lead", "RundiNova Team Member", "RundiNova Communications"), READ)
+    grant(
+        OFFICE_DOCTYPES,
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova Team Member",
+            "RundiNova Communications",
+        ),
+        READ,
+    )
 
     return permissions
 
@@ -127,22 +192,57 @@ def get_standard_doctype_permissions():
                 permissions[(doctype, role)] = dict(rule)
 
     grant(
-        ("Branch", "Cost Center", "Company", "Department", "Designation", "Item", "Warehouse", "UOM"),
+        (
+            "Branch",
+            "Cost Center",
+            "Company",
+            "Department",
+            "Designation",
+            "Item",
+            "Warehouse",
+            "UOM",
+        ),
         ROLES,
     )
-    grant(("Project", "Task"), ("RundiNova Director", "RundiNova Operations", "RundiNova Project Lead", "RundiNova Communications", "RundiNova People & Culture", "RundiNova Team Member"))
-    grant(("Supplier",), ("RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"))
+    grant(
+        ("Project", "Task"),
+        (
+            "RundiNova Director",
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova Communications",
+            "RundiNova People & Culture",
+            "RundiNova Team Member",
+        ),
+    )
+    grant(
+        ("Supplier",),
+        ("RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"),
+    )
     grant(("Employee",), ("RundiNova Director", "RundiNova People & Culture"))
     grant(("HR Settings",), ("RundiNova Director", "RundiNova People & Culture"))
-    grant(CRM_OPERATIONAL_DOCTYPES, ("RundiNova Director", "RundiNova Communications"), WRITE)
+    grant(
+        CRM_OPERATIONAL_DOCTYPES,
+        ("RundiNova Director", "RundiNova Communications"),
+        WRITE,
+    )
     grant(
         CRM_OPERATIONAL_DOCTYPES + CRM_LOOKUP_DOCTYPES,
         ("RundiNova Operations", "RundiNova Project Lead"),
     )
     grant(CRM_LOOKUP_DOCTYPES, ("RundiNova Director", "RundiNova Communications"))
-    grant(("Account", "GL Entry", "Mode of Payment"), ("RundiNova Director", "RundiNova Finance Manager"))
+    grant(
+        ("Account", "GL Entry", "Mode of Payment"),
+        ("RundiNova Director", "RundiNova Finance Manager"),
+    )
     for role in ROLES:
-        permissions[("Page", role)] = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 0}
+        permissions[("Page", role)] = {
+            "read": 1,
+            "write": 0,
+            "create": 0,
+            "delete": 0,
+            "report": 0,
+        }
     return permissions
 
 
@@ -206,7 +306,9 @@ def get_permission_query_conditions(user=None, doctype=None):
             "AND assigned_task.status != 'Cancelled'))"
         )
 
-    parents = _assigned_parent_tables(doctype) if doctype in ASSIGNED_CHILD_DOCTYPES else []
+    parents = (
+        _assigned_parent_tables(doctype) if doctype in ASSIGNED_CHILD_DOCTYPES else []
+    )
     conditions = []
     for parent in parents:
         parent_table = f"`tab{parent}`"

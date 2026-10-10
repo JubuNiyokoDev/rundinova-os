@@ -5,14 +5,17 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import now_datetime
 
-
 GITHUB_URL = re.compile(r"^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?$")
 
 
 class RundiNovaRepository(Document):
     def validate(self):
         if not GITHUB_URL.fullmatch((self.github_url or "").strip()):
-            frappe.throw(_("Use a public GitHub repository URL, for example https://github.com/org/repository."))
+            frappe.throw(
+                _(
+                    "Use a public GitHub repository URL, for example https://github.com/org/repository."
+                )
+            )
         if not 0 <= frappe.utils.flt(self.progress_percent) <= 100:
             frappe.throw(_("Progress must be between 0 and 100 percent."))
 
@@ -24,7 +27,9 @@ class RundiNovaRepository(Document):
         """Count tasks linked to this repository."""
         if self.name:
             total_tasks = frappe.db.count("Task", {"rundinova_repository": self.name})
-            completed_tasks = frappe.db.count("Task", {"rundinova_repository": self.name, "status": "Completed"})
+            completed_tasks = frappe.db.count(
+                "Task", {"rundinova_repository": self.name, "status": "Completed"}
+            )
             self.tasks_count = total_tasks
             self.completed_tasks_count = completed_tasks
 
@@ -32,7 +37,10 @@ class RundiNovaRepository(Document):
     def sync_from_github(self):
         """Pull public metadata from GitHub (read-only GET). Updates local fields."""
         if not frappe.has_permission("RundiNova Repository", "write", self):
-            frappe.throw(_("You need write access to sync this repository."), frappe.PermissionError)
+            frappe.throw(
+                _("You need write access to sync this repository."),
+                frappe.PermissionError,
+            )
 
         from rundinova_tech.github_sync import sync_repository
 
@@ -56,4 +64,4 @@ class RundiNovaRepository(Document):
     def view_tasks(self):
         """Redirect to Task list filtered by this repository."""
         frappe.response.type = "redirect"
-        frappe.response.location = "/app/task?rundinova_repository={0}".format(self.name)
+        frappe.response.location = f"/app/task?rundinova_repository={self.name}"

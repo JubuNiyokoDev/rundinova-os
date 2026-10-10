@@ -11,11 +11,11 @@ const vitePressOptions: UserConfig = {
   mermaid: {
     securityLevel: "strict",
   },
+  srcExclude: ["INDEX.md"],
   themeConfig: {
     logo: "/frappe-docker.png",
     // https://vitepress.dev/reference/default-theme-config
     nav: [{ text: "Home", link: "/" }],
-
     socialLinks: [
       { icon: "github", link: "https://github.com/frappe/frappe_docker/" },
     ],

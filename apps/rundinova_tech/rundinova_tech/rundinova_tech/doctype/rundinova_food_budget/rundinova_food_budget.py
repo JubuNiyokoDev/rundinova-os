@@ -1,7 +1,6 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-
 from rundinova_core.food import (
     calculate_food_budget_plan,
     calculate_food_budget_usage,
@@ -60,11 +59,18 @@ def set_budget_title(doc):
 
 def update_budget_totals(doc):
     """Refresh committed, paid and remaining amounts from daily expenses."""
-    expenses = frappe.get_all(
-        "RundiNova Food Expense",
-        filters={"budget": doc.name, "status": ["in", ["Submitted", "Approved", "Paid"]]},
-        fields=["amount", "status"],
-    ) if doc.name and frappe.db.exists("RundiNova Food Expense", {"budget": doc.name}) else []
+    expenses = (
+        frappe.get_all(
+            "RundiNova Food Expense",
+            filters={
+                "budget": doc.name,
+                "status": ["in", ["Submitted", "Approved", "Paid"]],
+            },
+            fields=["amount", "status"],
+        )
+        if doc.name and frappe.db.exists("RundiNova Food Expense", {"budget": doc.name})
+        else []
+    )
     usage = calculate_food_budget_usage(
         frappe.utils.flt(doc.approved_ceiling),
         [(frappe.utils.flt(row.amount), row.status) for row in expenses],

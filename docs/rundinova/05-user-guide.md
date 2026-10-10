@@ -33,10 +33,10 @@ bas du menu latéral. **Mon profil** ouvre sa propre fiche utilisateur. Le champ
 personnelles modifiables y sont disponibles. Les rôles et accès restent gérés
 par l’administration.
 
-| Espace | Qui le voit | Usage |
-| --- | --- | --- |
-| **RundiNova Tech** | Tous les rôles RundiNova | Accueil commun; dashboards et raccourcis filtrés selon les autorisations |
-| **Configuration RundiNova** | Direction, Finance, Operations, Project Lead | Page dédiée aux paramètres de base; accessible depuis Administration |
+| Espace                      | Qui le voit                                  | Usage                                                                    |
+| --------------------------- | -------------------------------------------- | ------------------------------------------------------------------------ |
+| **RundiNova Tech**          | Tous les rôles RundiNova                     | Accueil commun; dashboards et raccourcis filtrés selon les autorisations |
+| **Configuration RundiNova** | Direction, Finance, Operations, Project Lead | Page dédiée aux paramètres de base; accessible depuis Administration     |
 
 Les espaces internes Finance, Dashboards et Équipe ne sont pas affichés comme
 des destinations supplémentaires. Les paramètres restent groupés dans

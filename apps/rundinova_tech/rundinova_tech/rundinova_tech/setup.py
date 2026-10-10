@@ -4,6 +4,7 @@ Implementation is split by responsibility under the provisioning package.
 Keep these re-exports so installed hooks and integrations retain their paths.
 """
 
+from .provisioning.branding import sync_branding
 from .provisioning.dashboards import sync_dashboards
 from .provisioning.fields import (
     backfill_budget_titles,
@@ -12,10 +13,9 @@ from .provisioning.fields import (
     ensure_task_repository_field,
     fix_company_currency,
 )
+from .provisioning.form_layouts import sync_form_layouts
 from .provisioning.permissions import ensure_rundinova_permissions
 from .provisioning.roles import ensure_rundinova_roles
-from .provisioning.branding import sync_branding
-from .provisioning.form_layouts import sync_form_layouts
 from .provisioning.workspaces import hide_unused_desktop_icons, hide_unused_workspaces
 
 

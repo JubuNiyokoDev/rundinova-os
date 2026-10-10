@@ -45,9 +45,21 @@ VISIBLE_DESKTOP_ICONS = {
     "Frappe CRM",
 }
 
+
 def _sync_workspace(
-    name, title, module, app, sequence, icon, links, block_prefix, roles,
-    charts=(), number_cards=(), hidden=False, public=1,
+    name,
+    title,
+    module,
+    app,
+    sequence,
+    icon,
+    links,
+    block_prefix,
+    roles,
+    charts=(),
+    number_cards=(),
+    hidden=False,
+    public=1,
 ):
     workspace = (
         frappe.get_doc("Workspace", name)
@@ -93,7 +105,11 @@ def _sync_workspace(
     workspace.save(ignore_permissions=True)
     workspace.reload()
     workspace.content = _workspace_content(
-        title, workspace.shortcuts, block_prefix, workspace.charts, workspace.number_cards
+        title,
+        workspace.shortcuts,
+        block_prefix,
+        workspace.charts,
+        workspace.number_cards,
     )
     workspace.save(ignore_permissions=True)
     return workspace
@@ -156,11 +172,21 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
     frappe.db.set_default("desktop:home_page", "rundinova-home")
 
     operations_links = [
-        ("Dashboard", "RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
+        (
+            "Dashboard",
+            "RundiNova Executive Dashboard",
+            "Pilotage exécutif",
+            "dashboard",
+        ),
         ("Dashboard", "RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("Dashboard", "RundiNova People Dashboard", "Équipe & RH", "users"),
         ("Dashboard", "RundiNova Delivery Dashboard", "Projets & livraison", "project"),
-        ("Dashboard", "RundiNova Ecosystem Dashboard", "Écosystème & croissance", "crm"),
+        (
+            "Dashboard",
+            "RundiNova Ecosystem Dashboard",
+            "Écosystème & croissance",
+            "crm",
+        ),
         ("Page", "rundinova-onboarding", "Préparation au démarrage", "tool"),
         ("DocType", "RundiNova Office", "Hub & organisation", "building"),
         ("DocType", "Project", "Projets", "project"),
@@ -197,18 +223,30 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
     ]
     dashboard_links = [
-        ("Dashboard", "RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
+        (
+            "Dashboard",
+            "RundiNova Executive Dashboard",
+            "Pilotage exécutif",
+            "dashboard",
+        ),
         ("Dashboard", "RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
         ("Dashboard", "RundiNova People Dashboard", "Équipe & RH", "users"),
         ("Dashboard", "RundiNova Delivery Dashboard", "Projets & livraison", "project"),
-        ("Dashboard", "RundiNova Ecosystem Dashboard", "Écosystème & croissance", "crm"),
+        (
+            "Dashboard",
+            "RundiNova Ecosystem Dashboard",
+            "Écosystème & croissance",
+            "crm",
+        ),
     ]
     finance_links = [
         ("DocType", "RundiNova Cash Account", "Comptes de trésorerie", "bank"),
         ("DocType", "RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
     ]
     finance_workspace_roles = (
-        "RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"
+        "RundiNova Director",
+        "RundiNova Finance Manager",
+        "RundiNova Operations",
     )
     privileged_roles = tuple(role for role in ROLES if role != "RundiNova Team Member")
     dashboard_workspace_roles = privileged_roles
@@ -230,7 +268,13 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "RundiNova Tech",
         "briefcase",
         [
-            {"type": "Link", "label": "Accueil RundiNova", "link_type": "Workspace", "link_to": "RundiNova Tech", "icon": "home"},
+            {
+                "type": "Link",
+                "label": "Accueil RundiNova",
+                "link_type": "Workspace",
+                "link_to": "RundiNova Tech",
+                "icon": "home",
+            },
             {"type": "Section Break", "label": "Tableaux de bord", "collapsible": 0},
             *[
                 {
@@ -282,10 +326,22 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "RundiNova Team",
         "users",
         [
-            {"type": "Link", "label": "Accueil équipe", "link_type": "Workspace", "link_to": "RundiNova Team", "icon": "home"},
+            {
+                "type": "Link",
+                "label": "Accueil équipe",
+                "link_type": "Workspace",
+                "link_to": "RundiNova Team",
+                "icon": "home",
+            },
             {"type": "Section Break", "label": "Travail quotidien", "collapsible": 0},
             *[
-                {"type": "Link", "label": label, "link_type": link_type, "link_to": target, "icon": icon}
+                {
+                    "type": "Link",
+                    "label": label,
+                    "link_type": link_type,
+                    "link_to": target,
+                    "icon": icon,
+                }
                 for link_type, target, label, icon in team_links
             ],
         ],
@@ -320,14 +376,56 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "RundiNova Finance",
         "bank",
         [
-            {"type": "Link", "label": "Accueil Finance", "link_type": "Workspace", "link_to": "RundiNova Finance", "icon": "home"},
+            {
+                "type": "Link",
+                "label": "Accueil Finance",
+                "link_type": "Workspace",
+                "link_to": "RundiNova Finance",
+                "icon": "home",
+            },
             {"type": "Section Break", "label": "Trésorerie", "collapsible": 0},
-            {"type": "Link", "label": "Comptes de trésorerie", "link_type": "DocType", "link_to": "RundiNova Cash Account", "icon": "bank"},
-            {"type": "Link", "label": "Mouvements de trésorerie", "link_type": "DocType", "link_to": "RundiNova Cash Movement", "icon": "money"},
-            {"type": "Link", "label": "Budgets alimentaires", "link_type": "DocType", "link_to": "RundiNova Food Budget", "icon": "food"},
-            {"type": "Link", "label": "Achats alimentaires", "link_type": "DocType", "link_to": "RundiNova Food Expense", "icon": "shopping-cart"},
-            {"type": "Link", "label": "Dépenses générales", "link_type": "DocType", "link_to": "RundiNova Expense", "icon": "expense"},
-            {"type": "Link", "label": "Fournisseurs", "link_type": "DocType", "link_to": "Supplier", "icon": "truck"},
+            {
+                "type": "Link",
+                "label": "Comptes de trésorerie",
+                "link_type": "DocType",
+                "link_to": "RundiNova Cash Account",
+                "icon": "bank",
+            },
+            {
+                "type": "Link",
+                "label": "Mouvements de trésorerie",
+                "link_type": "DocType",
+                "link_to": "RundiNova Cash Movement",
+                "icon": "money",
+            },
+            {
+                "type": "Link",
+                "label": "Budgets alimentaires",
+                "link_type": "DocType",
+                "link_to": "RundiNova Food Budget",
+                "icon": "food",
+            },
+            {
+                "type": "Link",
+                "label": "Achats alimentaires",
+                "link_type": "DocType",
+                "link_to": "RundiNova Food Expense",
+                "icon": "shopping-cart",
+            },
+            {
+                "type": "Link",
+                "label": "Dépenses générales",
+                "link_type": "DocType",
+                "link_to": "RundiNova Expense",
+                "icon": "expense",
+            },
+            {
+                "type": "Link",
+                "label": "Fournisseurs",
+                "link_type": "DocType",
+                "link_to": "Supplier",
+                "icon": "truck",
+            },
             {"type": "Section Break", "label": "Indicateurs", "collapsible": 0},
             {
                 "type": "Link",
@@ -342,7 +440,13 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "RundiNova Dashboards",
         "chart",
         [
-            {"type": "Link", "label": "Accueil Dashboards", "link_type": "Workspace", "link_to": "RundiNova Dashboards", "icon": "home"},
+            {
+                "type": "Link",
+                "label": "Accueil Dashboards",
+                "link_type": "Workspace",
+                "link_to": "RundiNova Dashboards",
+                "icon": "home",
+            },
             {"type": "Section Break", "label": "Pilotage", "collapsible": 0},
             *[
                 {
@@ -357,22 +461,51 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ],
     )
     for title, icon, roles, visible, label in [
-        ("RundiNova Tech", "briefcase", product_workspace_roles, True, "RundiNova Tech"),
-        ("RundiNova Team", "users", ("RundiNova Team Member",), False, "RundiNova Team"),
+        (
+            "RundiNova Tech",
+            "briefcase",
+            product_workspace_roles,
+            True,
+            "RundiNova Tech",
+        ),
+        (
+            "RundiNova Team",
+            "users",
+            ("RundiNova Team Member",),
+            False,
+            "RundiNova Team",
+        ),
         # Finance and dashboard destinations already live in the main app
         # sidebar. Keep their workspaces addressable, but avoid duplicate
         # tiles on the main launcher.
-        ("RundiNova Finance", "bank", finance_workspace_roles, False, "RundiNova Finance"),
-        ("RundiNova Dashboards", "chart", dashboard_workspace_roles, False, "RundiNova Dashboards"),
+        (
+            "RundiNova Finance",
+            "bank",
+            finance_workspace_roles,
+            False,
+            "RundiNova Finance",
+        ),
+        (
+            "RundiNova Dashboards",
+            "chart",
+            dashboard_workspace_roles,
+            False,
+            "RundiNova Dashboards",
+        ),
     ]:
         _ensure_workspace_desktop_icon(title, icon, roles, visible, label)
 
     # Put every RundiNova user on an intentional home instead of Frappe's
     # generic Welcome Workspace fallback.
-    for user in frappe.get_all("User", filters={"user_type": "System User"}, pluck="name"):
+    for user in frappe.get_all(
+        "User", filters={"user_type": "System User"}, pluck="name"
+    ):
         user_roles = set(frappe.get_roles(user))
         current_default = frappe.db.get_value("User", user, "default_workspace")
-        if user_roles.intersection(product_workspace_roles) and current_default != "RundiNova Tech":
+        if (
+            user_roles.intersection(product_workspace_roles)
+            and current_default != "RundiNova Tech"
+        ):
             frappe.db.set_value("User", user, "default_workspace", "RundiNova Tech")
 
 
@@ -381,15 +514,24 @@ def hide_unused_desktop_icons():
     for label in frappe.get_all("Desktop Icon", filters={"hidden": 0}, pluck="label"):
         if label not in VISIBLE_DESKTOP_ICONS:
             frappe.db.set_value("Desktop Icon", label, "hidden", 1)
-    for user in frappe.get_all("User", filters={"user_type": "System User"}, pluck="name"):
+    for user in frappe.get_all(
+        "User", filters={"user_type": "System User"}, pluck="name"
+    ):
         frappe.cache.hdel("desktop_icons", user)
         frappe.cache.hdel("bootinfo", user)
 
     # Older iterations exposed separate Setup and Team tiles. Keep one obvious
     # RundiNova entry point; setup and team actions live inside its navigation.
-    for label in ("RundiNova Setup", "RundiNova Team", "RundiNova Finance", "RundiNova Dashboards"):
+    for label in (
+        "RundiNova Setup",
+        "RundiNova Team",
+        "RundiNova Finance",
+        "RundiNova Dashboards",
+    ):
         if frappe.db.exists("Desktop Icon", label):
-            frappe.db.set_value("Desktop Icon", label, "hidden", 1, update_modified=False)
+            frappe.db.set_value(
+                "Desktop Icon", label, "hidden", 1, update_modified=False
+            )
 
 
 def hide_unused_workspaces():

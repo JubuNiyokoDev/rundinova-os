@@ -6,8 +6,8 @@ from rundinova_core.cash import (
     calculate_cash_account_balance,
     cash_account_opening_balance_violation,
     cash_movement_violation,
-    food_expense_cash_mutation_violation,
     food_expense_cash_link_violation,
+    food_expense_cash_mutation_violation,
     food_expense_movement_fields,
 )
 
@@ -26,7 +26,9 @@ class TestCashDomain(unittest.TestCase):
             )
         )
 
-    def test_cash_linked_purchase_protected_fields_require_cancellation_before_change(self):
+    def test_cash_linked_purchase_protected_fields_require_cancellation_before_change(
+        self,
+    ):
         previous = {"amount": 45000, "status": "Paid", "notes": "market purchase"}
         unchanged = dict(previous)
         changed = {**previous, "amount": 46000}
@@ -65,7 +67,9 @@ class TestCashDomain(unittest.TestCase):
     def test_transfer_debits_source_and_credits_destination(self):
         transfer = [("Transfer", "cash-a", "cash-b", 40.0)]
 
-        self.assertEqual(calculate_cash_account_balance(100.0, "cash-a", transfer), 60.0)
+        self.assertEqual(
+            calculate_cash_account_balance(100.0, "cash-a", transfer), 60.0
+        )
         self.assertEqual(calculate_cash_account_balance(5.0, "cash-b", transfer), 45.0)
 
     def test_movement_validation_keeps_existing_precedence(self):
@@ -133,7 +137,9 @@ class TestCashDomain(unittest.TestCase):
             "food_expense_must_be_paid",
         )
         self.assertEqual(
-            food_expense_cash_link_violation(expense_status="Paid", duplicate_movement=True),
+            food_expense_cash_link_violation(
+                expense_status="Paid", duplicate_movement=True
+            ),
             "food_expense_already_linked",
         )
         self.assertIsNone(food_expense_cash_link_violation(expense_status="Paid"))

@@ -13,13 +13,13 @@ qu'elle fait chaque jour.
 
 ## Vue d'ensemble
 
-| Personne | Titre | Rôles dans l'application | Mission en une phrase |
-| --- | --- | --- | --- |
-| Joffre Niyondiko | **Co-Founder & CEO** | RundiNova Director, RundiNova Finance Manager, RundiNova Team Member | Décide de la direction, contrôle les finances, tranche en dernier |
-| Janvier Ndabubaha | **COO** | RundiNova Operations, RundiNova Team Member | Fait exécuter la direction : suit les 3 leads et garantit la livraison |
-| Franck Maniranyibutse | **Head of Engineering** | RundiNova Project Lead, RundiNova Team Member | Dirige les projets de développement et la livraison technique |
-| Elvis Irambona | **Head of Communications** | RundiNova Communications, RundiNova Team Member | Porte la voix de l'entreprise : communication, image, CRM |
-| Fanuel Kasumba Mandela | **Head of People & Culture** | RundiNova People & Culture, RundiNova Team Member | Garde les règles, la discipline et la culture de l'équipe |
+| Personne               | Titre                        | Rôles dans l'application                                             | Mission en une phrase                                                  |
+| ---------------------- | ---------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Joffre Niyondiko       | **Co-Founder & CEO**         | RundiNova Director, RundiNova Finance Manager, RundiNova Team Member | Décide de la direction, contrôle les finances, tranche en dernier      |
+| Janvier Ndabubaha      | **COO**                      | RundiNova Operations, RundiNova Team Member                          | Fait exécuter la direction : suit les 3 leads et garantit la livraison |
+| Franck Maniranyibutse  | **Head of Engineering**      | RundiNova Project Lead, RundiNova Team Member                        | Dirige les projets de développement et la livraison technique          |
+| Elvis Irambona         | **Head of Communications**   | RundiNova Communications, RundiNova Team Member                      | Porte la voix de l'entreprise : communication, image, CRM              |
+| Fanuel Kasumba Mandela | **Head of People & Culture** | RundiNova People & Culture, RundiNova Team Member                    | Garde les règles, la discipline et la culture de l'équipe              |
 
 Fondateur (basé en Suède) : **Founder & Chairman** — compte créé plus tard.
 Le titre « Founder » est un statut d'origine (qui a créé la boîte) ; le titre
@@ -72,13 +72,13 @@ sans gérer le contenu technique.
 
 ### Différence CEO vs COO (pour éviter toute confusion)
 
-| Question | CEO (Joffre) | COO (Janvier) |
-| --- | --- | --- |
-| QUOI et POURQUOI on le fait | ✅ décide | applique |
-| COMMENT et QUAND c'est livré | est informé | ✅ garantit |
-| Argent et budgets | ✅ possède | consulte |
-| Suivi quotidien des 3 leads | non | ✅ oui |
-| Représentation externe | ✅ oui | appui |
+| Question                     | CEO (Joffre) | COO (Janvier) |
+| ---------------------------- | ------------ | ------------- |
+| QUOI et POURQUOI on le fait  | ✅ décide    | applique      |
+| COMMENT et QUAND c'est livré | est informé  | ✅ garantit   |
+| Argent et budgets            | ✅ possède   | consulte      |
+| Suivi quotidien des 3 leads  | non          | ✅ oui        |
+| Représentation externe       | ✅ oui       | appui         |
 
 Le COO d'une équipe de 5 développeurs est un rôle à temps plein : pipeline de
 livraison, suivi GitHub en lecture, reporting, coordination, plus son propre
@@ -137,32 +137,32 @@ restent au CEO.
 
 ## Qui fait quoi — tableau anti-confusion
 
-| Activité | Propriétaire | Contributeur | Informé |
-| --- | --- | --- | --- |
-| Budget & trésorerie | CEO | — | COO |
-| Suivi quotidien des 3 leads | COO | — | CEO |
-| Projets & tâches (planning) | Head of Engineering | COO | CEO |
-| GitHub : repos, branches, issues | Head of Engineering | équipe dev | COO (lecture) |
-| Communication externe | Head of Communications | — | CEO |
-| CRM (leads, contacts, deals) | Head of Communications | CEO | COO |
-| Règles & discipline | Head of People & Culture | — | COO, CEO |
-| Vie communautaire / sociale | Head of People & Culture | Head of Comms | CEO |
-| Décisions stratégiques | CEO | COO | toute l'équipe |
-| Développement (code) | toute l'équipe | — | Head of Engineering |
+| Activité                         | Propriétaire             | Contributeur  | Informé             |
+| -------------------------------- | ------------------------ | ------------- | ------------------- |
+| Budget & trésorerie              | CEO                      | —             | COO                 |
+| Suivi quotidien des 3 leads      | COO                      | —             | CEO                 |
+| Projets & tâches (planning)      | Head of Engineering      | COO           | CEO                 |
+| GitHub : repos, branches, issues | Head of Engineering      | équipe dev    | COO (lecture)       |
+| Communication externe            | Head of Communications   | —             | CEO                 |
+| CRM (leads, contacts, deals)     | Head of Communications   | CEO           | COO                 |
+| Règles & discipline              | Head of People & Culture | —             | COO, CEO            |
+| Vie communautaire / sociale      | Head of People & Culture | Head of Comms | CEO                 |
+| Décisions stratégiques           | CEO                      | COO           | toute l'équipe      |
+| Développement (code)             | toute l'équipe           | —             | Head of Engineering |
 
 ## Accès dans l'application par rôle
 
-| Module | Director | Finance Mgr | Operations | Project Lead | Communications | People & Culture | Team Member |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Budgets & dépenses | ✅ écriture | ✅ écriture | ✅ lecture/écriture | lecture | lecture | lecture | selon affectation |
-| Trésorerie | ✅ | ✅ | lecture | — | — | — | — |
-| Biens & équipements | ✅ | ✅ | lecture | ✅ | lecture | lecture | lecture |
-| Projets & dépôts GitHub | ✅ | — | lecture/suivi | ✅ propriétaire | lecture | lecture | lecture |
-| Décisions | ✅ | — | ✅ | ✅ | ✅ | ✅ | lecture |
-| Documents | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Goals & KPI | ✅ | lecture | lecture | ✅ | lecture | lecture | lecture |
-| CRM & communications | lecture | — | lecture | lecture | ✅ propriétaire | lecture | — |
-| Règles & vie d'équipe | validation | — | informé | informé | informé | ✅ propriétaire | informé |
+| Module                  | Director    | Finance Mgr | Operations          | Project Lead    | Communications  | People & Culture | Team Member       |
+| ----------------------- | ----------- | ----------- | ------------------- | --------------- | --------------- | ---------------- | ----------------- |
+| Budgets & dépenses      | ✅ écriture | ✅ écriture | ✅ lecture/écriture | lecture         | lecture         | lecture          | selon affectation |
+| Trésorerie              | ✅          | ✅          | lecture             | —               | —               | —                | —                 |
+| Biens & équipements     | ✅          | ✅          | lecture             | ✅              | lecture         | lecture          | lecture           |
+| Projets & dépôts GitHub | ✅          | —           | lecture/suivi       | ✅ propriétaire | lecture         | lecture          | lecture           |
+| Décisions               | ✅          | —           | ✅                  | ✅              | ✅              | ✅               | lecture           |
+| Documents               | ✅          | ✅          | ✅                  | ✅              | ✅              | ✅               | ✅                |
+| Goals & KPI             | ✅          | lecture     | lecture             | ✅              | lecture         | lecture          | lecture           |
+| CRM & communications    | lecture     | —           | lecture             | lecture         | ✅ propriétaire | lecture          | —                 |
+| Règles & vie d'équipe   | validation  | —           | informé             | informé         | informé         | ✅ propriétaire  | informé           |
 
 > Les permissions techniques exactes sont appliquées dans l'application par
 > `rundinova_tech.rundinova_tech.setup.seed()` ; ce tableau décrit l'intention

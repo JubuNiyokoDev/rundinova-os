@@ -4,7 +4,9 @@ import json
 import unittest
 from types import SimpleNamespace
 
-from rundinova_tech.rundinova_tech.provisioning.workspace_layout import _workspace_content
+from rundinova_tech.rundinova_tech.provisioning.workspace_layout import (
+    _workspace_content,
+)
 
 
 class TestWorkspaceContent(unittest.TestCase):
@@ -15,11 +17,15 @@ class TestWorkspaceContent(unittest.TestCase):
                 [
                     SimpleNamespace(type="DocType", label="Projets", link_to="Project"),
                     SimpleNamespace(
-                        type="DocType", label="Achats alimentaires", link_to="RundiNova Food Expense"
+                        type="DocType",
+                        label="Achats alimentaires",
+                        link_to="RundiNova Food Expense",
                     ),
                     SimpleNamespace(type="Dashboard", label="Pilotage exécutif"),
                     SimpleNamespace(
-                        type="URL", label="Configuration RundiNova", url="/desk/rundinova-setup"
+                        type="URL",
+                        label="Configuration RundiNova",
+                        url="/desk/rundinova-setup",
                     ),
                 ],
                 "test-home",
@@ -31,17 +37,34 @@ class TestWorkspaceContent(unittest.TestCase):
         widget_types = [block["type"] for block in content]
         self.assertLess(widget_types.index("header", 1), widget_types.index("shortcut"))
         self.assertEqual(
-			[block["data"]["shortcut_name"] for block in content if block["type"] == "shortcut"],
-			["Pilotage exécutif", "Achats alimentaires", "Projets", "Configuration RundiNova"],
+            [
+                block["data"]["shortcut_name"]
+                for block in content
+                if block["type"] == "shortcut"
+            ],
+            [
+                "Pilotage exécutif",
+                "Achats alimentaires",
+                "Projets",
+                "Configuration RundiNova",
+            ],
         )
-        headers = [block["data"]["text"] for block in content if block["type"] == "header"]
+        headers = [
+            block["data"]["text"] for block in content if block["type"] == "header"
+        ]
         self.assertIn("Tableaux de bord", headers)
         self.assertIn("Finance & achats", headers)
         self.assertIn("Projets & livraison", headers)
         self.assertIn("Administration", headers)
-        self.assertLess(headers.index("Finance & achats"), headers.index("Projets & livraison"))
+        self.assertLess(
+            headers.index("Finance & achats"), headers.index("Projets & livraison")
+        )
         self.assertEqual(
-            [block["data"]["shortcut_name"] for block in content if block["type"] == "shortcut"][-1],
+            [
+                block["data"]["shortcut_name"]
+                for block in content
+                if block["type"] == "shortcut"
+            ][-1],
             "Configuration RundiNova",
         )
 
@@ -57,7 +80,9 @@ class TestWorkspaceContent(unittest.TestCase):
         )
 
         blocks = {block["type"]: block for block in content}
-        self.assertEqual(blocks["number_card"]["data"]["number_card_name"], "Projets actifs")
+        self.assertEqual(
+            blocks["number_card"]["data"]["number_card_name"], "Projets actifs"
+        )
         self.assertEqual(blocks["chart"]["data"]["chart_name"], "Projets par statut")
 
 

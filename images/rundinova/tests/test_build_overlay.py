@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 REPOSITORY = Path(__file__).parents[3]
 BUILDER = REPOSITORY / "images" / "rundinova" / "build-overlay.sh"
 BASE_IMAGE = "rundinova/erpnext:approved-base"
@@ -16,19 +15,25 @@ BASE_IMAGE_ID = "sha256:approved-base-id"
 
 class TestBuildOverlay(unittest.TestCase):
     def test_overlay_replaces_the_prior_app_tree_instead_of_leaving_stale_files(self):
-        containerfile = (REPOSITORY / "images" / "rundinova" / "Overlay.Containerfile").read_text(
-            encoding="utf-8"
-        )
+        containerfile = (
+            REPOSITORY / "images" / "rundinova" / "Overlay.Containerfile"
+        ).read_text(encoding="utf-8")
 
-        copy_source = "COPY --chown=frappe:frappe apps/rundinova_tech /tmp/rundinova_tech-source"
+        copy_source = (
+            "COPY --chown=frappe:frappe apps/rundinova_tech /tmp/rundinova_tech-source"
+        )
         remove_old_tree = "rm -rf apps/rundinova_tech"
         install_new_tree = "mv /tmp/rundinova_tech-source apps/rundinova_tech"
 
         self.assertIn(copy_source, containerfile)
         self.assertIn(remove_old_tree, containerfile)
         self.assertIn(install_new_tree, containerfile)
-        self.assertLess(containerfile.index(copy_source), containerfile.index(remove_old_tree))
-        self.assertLess(containerfile.index(remove_old_tree), containerfile.index(install_new_tree))
+        self.assertLess(
+            containerfile.index(copy_source), containerfile.index(remove_old_tree)
+        )
+        self.assertLess(
+            containerfile.index(remove_old_tree), containerfile.index(install_new_tree)
+        )
 
     def test_builder_passes_resolved_base_id_and_never_pulls(self):
         with tempfile.TemporaryDirectory() as temp_dir:

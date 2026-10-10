@@ -1,9 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-
 from rundinova_core.expense import expense_validation_actions
-
 
 EXPENSE_VALIDATION_MESSAGES = {
     "amount_must_be_positive": "Expense amount must be greater than zero.",
@@ -34,4 +32,6 @@ class RundiNovaExpense(Document):
 
 def set_expense_title(doc):
     if doc.expense_date and doc.category and doc.description:
-        doc.expense_title = f"{doc.expense_date} - {doc.category} - {doc.description[:60]}"
+        doc.expense_title = (
+            f"{doc.expense_date} - {doc.category} - {doc.description[:60]}"
+        )

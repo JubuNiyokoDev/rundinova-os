@@ -35,7 +35,8 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
-        exclude: ^docs/pnpm-lock\.yaml$
+        # These files intentionally contain French labels and operating guides.
+        exclude: ^(docs/pnpm-lock\.yaml|docs/rundinova/|apps/rundinova_tech/|CLAUDE\.md$)
         args:
           - -L
           - "ro"

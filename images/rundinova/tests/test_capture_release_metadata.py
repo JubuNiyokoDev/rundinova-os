@@ -8,7 +8,6 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-
 SCRIPT = Path(__file__).parents[1] / "capture-release-metadata.py"
 SPEC = importlib.util.spec_from_file_location("capture_release_metadata", SCRIPT)
 METADATA = importlib.util.module_from_spec(SPEC)
@@ -110,7 +109,9 @@ class TestReleaseMetadata(unittest.TestCase):
             self.assertNotIn("secret", serialized)
             by_name = {record["name"]: record for record in metadata["applications"]}
             self.assertEqual(by_name["erpnext"]["requested_ref"], "approved-sha")
-            self.assertEqual(by_name["erpnext"]["repository"], "github.com/acme/erpnext")
+            self.assertEqual(
+                by_name["erpnext"]["repository"], "github.com/acme/erpnext"
+            )
             self.assertEqual(
                 metadata["framework_inputs"]["frappe_repository"],
                 "github.com/frappe/frappe",

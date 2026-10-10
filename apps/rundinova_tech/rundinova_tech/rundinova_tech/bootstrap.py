@@ -5,15 +5,25 @@ these re-exports preserve existing bench commands and hook paths.
 """
 
 import frappe
-
 from rundinova_tech.rundinova_tech.setup import seed
+
 from .provisioning.workspaces import (
     UNUSED_WORKSPACES,
     hide_unused_desktop_icons,
     hide_unused_workspaces,
 )
-from .site_bootstrap.company import COMPANY_ABBR, COMPANY_NAME, ensure_company, ensure_transit_warehouse_type
-from .site_bootstrap.diagnostics import check_page_access, check_sidebar, current_state, permission_report
+from .site_bootstrap.company import (
+    COMPANY_ABBR,
+    COMPANY_NAME,
+    ensure_company,
+    ensure_transit_warehouse_type,
+)
+from .site_bootstrap.diagnostics import (
+    check_page_access,
+    check_sidebar,
+    current_state,
+    permission_report,
+)
 from .site_bootstrap.team import TEAM_USERS, ensure_team_users
 
 

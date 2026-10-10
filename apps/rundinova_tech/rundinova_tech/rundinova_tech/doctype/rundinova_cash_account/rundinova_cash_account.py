@@ -1,7 +1,6 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-
 from rundinova_core.cash import (
     BALANCE_STATUSES,
     calculate_cash_account_balance,
@@ -11,7 +10,9 @@ from rundinova_core.cash import (
 
 class RundiNovaCashAccount(Document):
     def validate(self):
-        if cash_account_opening_balance_violation(frappe.utils.flt(self.opening_balance)):
+        if cash_account_opening_balance_violation(
+            frappe.utils.flt(self.opening_balance)
+        ):
             frappe.throw(_("Opening balance cannot be negative."))
         if not self.currency:
             self.currency = "BIF"
@@ -42,4 +43,10 @@ def refresh_account_balance(account_name):
             for row in rows
         ],
     )
-    frappe.db.set_value("RundiNova Cash Account", account_name, "current_balance", balance, update_modified=False)
+    frappe.db.set_value(
+        "RundiNova Cash Account",
+        account_name,
+        "current_balance",
+        balance,
+        update_modified=False,
+    )
