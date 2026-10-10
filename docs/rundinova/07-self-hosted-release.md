@@ -934,7 +934,7 @@ VPS Compose project to pull the unique release tag before starting services.
   postponed by explicit user decision. Full business workflow acceptance is
   still to be performed by the RundiNova team in the browser.
 
-## Active VPS release — rn.73 — 2026-10-10
+## Superseded VPS release — rn.73 — 2026-10-10
 
 - Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.73-install-provisioning-fbu`
 - Image ID and registry digest:
@@ -962,6 +962,41 @@ VPS Compose project to pull the unique release tag before starting services.
   production environment pins rn.73 and uses `PULL_POLICY=never`; release
   images are pulled explicitly with temporary GHCR authentication.
 
+## Active VPS release — rn.76 — 2026-10-10
+
+- Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.76-self-hosted-candidate`
+- Image ID and registry digest:
+  `sha256:67af1c8493c8a55b0137e8596e24bb93687550723f6469435a2064ab62aafde7`
+- Source commit: `5c53e014de017ff828bc8c1e28b2c52e0f0e92ca` on
+  `release/rn-76-self-hosted-candidate`.
+- RundiNova source SHA-256:
+  `ce08da1dc8fcbb5cfeedb81d17ff50863cf07d239c65320b121b801014f0baf0`;
+  it matches the image metadata and source tree.
+- Pinned base: rn.73 image ID
+  `sha256:ed0ea47107141e7e5ef272ffc4902855d58303b01832abad980afe25fccd4a31`.
+  Frappe, ERPNext, HRMS, and CRM versions were not upgraded.
+- Change: decouple workspace/provisioning tests from production users, fix the
+  Frappe v16 food-expense test session, and declare the app's `requests`
+  dependency so the GitHub checks install the package correctly.
+- Verification: GitHub workflow run
+  [38053192054](https://github.com/JubuNiyokoDev/rundinova-os/actions/runs/38053192054)
+  passed after the dependency fix. The isolated VPS harness passed 55 core
+  tests and 52 Frappe controller/provisioning tests; its temporary services,
+  networks, and volumes were removed. Production `bench migrate` exited 0,
+  backend and database are healthy, and public HTTPS `/api/method/ping` returns
+  `200 pong`.
+- Preserved production records: six employees, five enabled team accounts, one
+  food budget, and zero food expenses before and after migration.
+- Pre-migration backup with database and files:
+  `20261010_145123-workspace_rundinova_com`; gzip and both file archives were
+  verified. Encrypted off-machine retention and restoration rehearsal remain
+  deferred by operator decision.
+- Production is pinned to rn.76 with `PULL_POLICY=never`. The prior production
+  image is rn.73; the previous environment file is kept at
+  `/etc/rundinova/production.env.before-rn76-self-hosted-candidate`.
+- Status: deployed candidate; browser acceptance of day-to-day workflows is
+  pending with the RundiNova team.
+
 ## Local verification candidate — rn.76 — 2026-10-10
 
 - Image: `rundinova/erpnext:16.37.7-rn.76-test-fixture-independence`
@@ -981,6 +1016,5 @@ VPS Compose project to pull the unique release tag before starting services.
   25 workspace/provisioning tests. The harness removed its temporary Compose
   containers, networks, and volumes. `git diff --check` and
   `git diff --cached --check` passed.
-- Status: local candidate only. It contains test-fixture corrections and is not
-  published or deployed; production remains on rn.73. No app runtime behavior
-  was changed by this candidate.
+- Status: superseded by the active VPS release below. It was a local test
+  candidate; its framework and app versions were unchanged.
