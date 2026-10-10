@@ -4,6 +4,7 @@
   "module": "RundiNova Tech",
   "custom": 0,
   "title_field": "account_name",
+  "show_title_field_in_link": 1,
   "fields": [
     {"fieldname": "account_name", "fieldtype": "Data", "label": "Account Name", "reqd": 1, "in_list_view": 1},
     {"fieldname": "account_type", "fieldtype": "Select", "label": "Type", "options": "Cash\nBank\nMobile Money\nOther", "reqd": 1, "in_list_view": 1},

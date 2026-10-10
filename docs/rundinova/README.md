@@ -10,10 +10,13 @@ static website and it does not store production secrets.
 
 ## Documents
 
+- [Repository architecture and contributor map](00-repository-guide.md)
 - [Architecture](01-architecture.md)
 - [Business model](02-business-model.md)
 - [Rollout plan](03-rollout.md)
 - [Approved V1 scope and acceptance checklist](04-v1-scope.md)
+- [Roles and responsibilities](06-roles-and-responsibilities.md)
+- [Self-hosted releases and controlled upstream updates](07-self-hosted-release.md)
 
 ## First deployment profile
 
@@ -24,19 +27,17 @@ can be added without redesigning the accounting or reporting model.
 
 ## Build the application image
 
-Use Docker BuildKit and keep the application manifest outside the image layers:
+For the initial stack image or an intentional upstream framework update, use
+the controlled candidate process in [the self-hosted release guide](07-self-hosted-release.md).
+Pin the Frappe/ERPNext/HRMS/CRM inputs and build-image digests for that release;
+do not treat a moving branch as an automatic update mechanism. For ordinary
+RundiNova app changes, use the local overlay builder documented there. It
+starts from an image already present on the host and does not change the
+framework revisions.
 
-```bash
-docker build \
-  --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
-  --build-arg=FRAPPE_BRANCH=version-16 \
-  --secret=id=apps_json,src=apps-rundinova.json \
-  --tag=rundinova/erpnext:16.36.1 \
-  --file=images/rundinova/Containerfile .
-```
-
-The actual production image should be pushed to a private registry and the
-tag should be pinned in the private environment file.
+The resulting image tag is selected explicitly in the private environment
+file. Self-hosted deployments can keep that image on the local Docker host;
+publishing to a private registry is optional.
 
 ## Configuration and hostname
 
@@ -44,6 +45,28 @@ Copy `rundinova.env.example` to a private file such as
 `~/gitops/rundinova.env`, replace the database password and email, and set the
 real hostname. The DNS record for the ERP hostname must point to the server;
 the static website can continue to use its own hosting and DNS records.
+
+Before starting the stack, replace `CUSTOM_TAG` with the exact release tag and
+make that image available on the Docker host. Build it from an approved local
+base, load a verified release archive, or pull it explicitly from the private
+registry. `PULL_POLICY=never` prevents Compose from silently selecting or
+downloading a different image. Confirm the rendered image and local image ID:
+
+```bash
+docker compose --project-name rundinova \
+  --env-file ~/gitops/rundinova.env \
+  -f compose.yaml \
+  -f overrides/compose.mariadb.yaml \
+  -f overrides/compose.redis.yaml \
+  -f overrides/compose.nginxproxy.yaml \
+  -f overrides/compose.nginxproxy-ssl.yaml config --images
+
+docker image inspect rundinova/erpnext:<release-tag> \
+  --format '{{.Id}} {{json .RepoDigests}}'
+```
+
+The environment example deliberately uses a placeholder tag so a new
+installation cannot accidentally select an old local release.
 
 Render the production Compose file with MariaDB, Redis and the HTTPS proxy:
 

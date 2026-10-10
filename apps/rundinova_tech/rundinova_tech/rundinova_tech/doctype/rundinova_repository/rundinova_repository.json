@@ -4,6 +4,7 @@
   "module": "RundiNova Tech",
   "custom": 0,
   "title_field": "repository_name",
+  "show_title_field_in_link": 1,
   "fields": [
     {
       "fieldname": "repository_name",
@@ -49,6 +50,23 @@
       "label": "Project"
     },
     {
+      "fieldname": "column_break_basic",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "project_stage",
+      "fieldtype": "Select",
+      "label": "Project Stage",
+      "options": "Idea\nDiscovery\nPlanning\nDevelopment\nTesting\nDeployment\nMaintenance\nRetired",
+      "default": "Planning"
+    },
+    {
+      "fieldname": "priority",
+      "fieldtype": "Select",
+      "label": "Priority",
+      "options": "Critical\nHigh\nMedium\nLow"
+    },
+    {
       "fieldname": "progress_percent",
       "fieldtype": "Percent",
       "label": "Progress %",
@@ -57,12 +75,85 @@
     {
       "fieldname": "business_value",
       "fieldtype": "Currency",
-      "label": "Business Value (BIF)"
+      "label": "Business Value (FBu)"
+    },
+    {
+      "fieldname": "section_timeline",
+      "fieldtype": "Section Break",
+      "label": "Timeline"
+    },
+    {
+      "fieldname": "start_date",
+      "fieldtype": "Date",
+      "label": "Start Date"
+    },
+    {
+      "fieldname": "target_end_date",
+      "fieldtype": "Date",
+      "label": "Target End Date"
+    },
+    {
+      "fieldname": "actual_end_date",
+      "fieldtype": "Date",
+      "label": "Actual End Date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "column_break_timeline",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "estimated_hours",
+      "fieldtype": "Float",
+      "label": "Estimated Hours"
+    },
+    {
+      "fieldname": "actual_hours",
+      "fieldtype": "Float",
+      "label": "Actual Hours",
+      "read_only": 1
+    },
+    {
+      "fieldname": "tasks_count",
+      "fieldtype": "Int",
+      "label": "Total Tasks",
+      "read_only": 1
+    },
+    {
+      "fieldname": "completed_tasks_count",
+      "fieldtype": "Int",
+      "label": "Completed Tasks",
+      "read_only": 1
+    },
+    {
+      "fieldname": "section_metrics",
+      "fieldtype": "Section Break",
+      "label": "Metrics"
     },
     {
       "fieldname": "impact_summary",
       "fieldtype": "Small Text",
       "label": "Impact Summary"
+    },
+    {
+      "fieldname": "tech_stack",
+      "fieldtype": "Small Text",
+      "label": "Tech Stack"
+    },
+    {
+      "fieldname": "column_break_metrics",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "risk_level",
+      "fieldtype": "Select",
+      "label": "Risk Level",
+      "options": "Low\nMedium\nHigh\nCritical"
+    },
+    {
+      "fieldname": "dependencies",
+      "fieldtype": "Small Text",
+      "label": "Dependencies"
     },
     {
       "fieldname": "last_reviewed_on",
@@ -138,21 +229,50 @@
       "role": "RundiNova Director",
       "read": 1,
       "write": 1,
-      "create": 1
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Finance Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Operations",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
     },
     {
       "role": "RundiNova Project Lead",
       "read": 1,
       "write": 1,
-      "create": 1
+      "create": 1,
+      "delete": 0
     },
     {
       "role": "RundiNova Team Member",
-      "read": 1
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
     },
     {
       "role": "RundiNova Communications",
-      "read": 1
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova People & Culture",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
     }
   ],
   "sort_field": "modified",

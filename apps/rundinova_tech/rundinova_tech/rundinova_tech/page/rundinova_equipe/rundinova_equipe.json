@@ -1,0 +1,21 @@
+{
+  "content": null,
+  "doctype": "Page",
+  "module": "RundiNova Tech",
+  "name": "rundinova-equipe",
+  "page_name": "rundinova-equipe",
+  "roles": [
+    {"role": "RundiNova Director"},
+    {"role": "RundiNova Finance Manager"},
+    {"role": "RundiNova Operations"},
+    {"role": "RundiNova Project Lead"},
+    {"role": "RundiNova Team Member"},
+    {"role": "RundiNova Communications"},
+    {"role": "RundiNova People & Culture"},
+    {"role": "System Manager"}
+  ],
+  "script": null,
+  "standard": "Yes",
+  "system_page": 0,
+  "title": "Redirection · Espace de l’équipe"
+}

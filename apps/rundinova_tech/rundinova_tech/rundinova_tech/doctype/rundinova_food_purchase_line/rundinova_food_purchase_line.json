@@ -1,0 +1,11 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Food Purchase Line",
+  "module": "RundiNova Tech",
+  "istable": 1,
+  "fields": [
+    {"fieldname": "item", "fieldtype": "Link", "options": "Item", "label": "Article", "reqd": 1},
+    {"fieldname": "quantity", "fieldtype": "Float", "label": "Quantité achetée", "reqd": 1},
+    {"fieldname": "amount", "fieldtype": "Currency", "label": "Montant total (FBu)", "reqd": 1}
+  ]
+}

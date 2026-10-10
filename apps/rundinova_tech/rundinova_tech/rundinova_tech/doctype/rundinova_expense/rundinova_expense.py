@@ -2,6 +2,15 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
+from rundinova_core.expense import expense_validation_actions
+
+
+EXPENSE_VALIDATION_MESSAGES = {
+    "amount_must_be_positive": "Expense amount must be greater than zero.",
+    "evidence_required": "Attach a receipt or other evidence before submitting an expense.",
+    "payment_method_required": "Payment method is required for a paid expense.",
+}
+
 
 class RundiNovaExpense(Document):
     def before_insert(self):
@@ -9,14 +18,18 @@ class RundiNovaExpense(Document):
 
     def validate(self):
         set_expense_title(self)
-        if frappe.utils.flt(self.amount) <= 0:
-            frappe.throw(_("Expense amount must be greater than zero."))
-        if self.status in ("Submitted", "Approved", "Paid") and not self.receipt:
-            frappe.throw(_("Attach a receipt or other evidence before submitting an expense."))
-        if self.status in ("Approved", "Paid") and not self.approved_by:
-            self.approved_by = frappe.session.user
-        if self.status == "Paid" and not self.payment_method:
-            frappe.throw(_("Payment method is required for a paid expense."))
+        actions = expense_validation_actions(
+            amount=frappe.utils.flt(self.amount),
+            status=self.status,
+            receipt_present=bool(self.receipt),
+            approved_by_present=bool(self.approved_by),
+            payment_method=self.payment_method,
+        )
+        for action in actions:
+            if action == "stamp_approver":
+                self.approved_by = frappe.session.user
+            else:
+                frappe.throw(_(EXPENSE_VALIDATION_MESSAGES[action]))
 
 
 def set_expense_title(doc):

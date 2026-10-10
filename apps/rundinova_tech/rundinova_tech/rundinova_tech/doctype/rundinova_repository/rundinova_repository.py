@@ -16,6 +16,18 @@ class RundiNovaRepository(Document):
         if not 0 <= frappe.utils.flt(self.progress_percent) <= 100:
             frappe.throw(_("Progress must be between 0 and 100 percent."))
 
+    def before_save(self):
+        """Update task counts before saving."""
+        self.update_task_counts()
+
+    def update_task_counts(self):
+        """Count tasks linked to this repository."""
+        if self.name:
+            total_tasks = frappe.db.count("Task", {"rundinova_repository": self.name})
+            completed_tasks = frappe.db.count("Task", {"rundinova_repository": self.name, "status": "Completed"})
+            self.tasks_count = total_tasks
+            self.completed_tasks_count = completed_tasks
+
     @frappe.whitelist()
     def sync_from_github(self):
         """Pull public metadata from GitHub (read-only GET). Updates local fields."""
@@ -39,3 +51,9 @@ class RundiNovaRepository(Document):
         self.save()
         frappe.msgprint(_("Repository synced from GitHub successfully."))
         return info
+
+    @frappe.whitelist()
+    def view_tasks(self):
+        """Redirect to Task list filtered by this repository."""
+        frappe.response.type = "redirect"
+        frappe.response.location = "/app/task?rundinova_repository={0}".format(self.name)

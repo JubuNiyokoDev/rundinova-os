@@ -1,15 +1,21 @@
-ARG FRAPPE_BRANCH=version-16
+ARG FRAPPE_BRANCH
 ARG FRAPPE_IMAGE_PREFIX=frappe
+ARG FRAPPE_BUILD_IMAGE
+ARG FRAPPE_RUNTIME_IMAGE
 
-FROM ${FRAPPE_IMAGE_PREFIX}/build:${FRAPPE_BRANCH} AS builder
+FROM ${FRAPPE_BUILD_IMAGE} AS builder
 
-ARG FRAPPE_BRANCH=version-16
+ARG FRAPPE_IMAGE_PREFIX=frappe
+ARG FRAPPE_BRANCH
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
+ARG FRAPPE_BUILD_IMAGE
+ARG FRAPPE_RUNTIME_IMAGE
 ARG CACHE_BUST=""
 
 USER frappe
 
 COPY --chown=frappe:frappe apps/rundinova_tech /opt/rundinova_tech
+COPY images/rundinova/capture-release-metadata.py /opt/capture-release-metadata.py
 
 RUN --mount=type=secret,id=apps_json,target=/opt/frappe/apps.json,uid=1000,gid=1000 \
   : "${CACHE_BUST}" && \
@@ -30,9 +36,17 @@ RUN --mount=type=secret,id=apps_json,target=/opt/frappe/apps.json,uid=1000,gid=1
   uv pip install --quiet -e apps/rundinova_tech --python env/bin/python && \
   bench build --app rundinova_tech && \
   echo "{}" > sites/common_site_config.json && \
+  python3 /opt/capture-release-metadata.py base \
+    --bench-dir /home/frappe/frappe-bench \
+    --manifest /opt/frappe/apps.json \
+    --output /home/frappe/frappe-bench/release-metadata.json \
+    --frappe-ref "${FRAPPE_BRANCH}" \
+    --frappe-path "${FRAPPE_PATH}" \
+    --build-image "${FRAPPE_BUILD_IMAGE}" \
+    --runtime-image "${FRAPPE_RUNTIME_IMAGE}" && \
   find apps -mindepth 1 -path "*/.git" | xargs rm -fr
 
-FROM ${FRAPPE_IMAGE_PREFIX}/base:${FRAPPE_BRANCH} AS backend
+FROM ${FRAPPE_RUNTIME_IMAGE} AS backend
 
 USER frappe
 

@@ -162,6 +162,16 @@
         "overrides/compose.custom-domain.yaml",
         "overrides/compose.custom-domain-ssl.yaml"
       ]
+    },
+    {
+      "name": "rundinova-local-development",
+      "files": [
+        "compose.yaml",
+        "overrides/compose.mariadb.yaml",
+        "overrides/compose.redis.yaml",
+        "overrides/compose.noproxy.yaml",
+        "overrides/compose.rundinova-dev.yaml"
+      ]
     }
   ]
 }

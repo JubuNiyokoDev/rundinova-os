@@ -1,338 +1,41 @@
-import json
+"""Stable Frappe hook entry points for RundiNova provisioning.
 
-import frappe
+Implementation is split by responsibility under the provisioning package.
+Keep these re-exports so installed hooks and integrations retain their paths.
+"""
 
-
-def _insert(doctype, name, values):
-    if frappe.db.exists(doctype, name):
-        return frappe.get_doc(doctype, name)
-    doc = frappe.new_doc(doctype)
-    doc.name = name
-    doc.flags.name_set = True
-    doc.flags.ignore_mandatory = True
-    for key, value in values.items():
-        setattr(doc, key, value)
-    doc.insert(ignore_permissions=True, ignore_links=True, ignore_mandatory=True)
-    return doc
+from .provisioning.dashboards import sync_dashboards
+from .provisioning.fields import (
+    backfill_budget_titles,
+    ensure_project_repository_field,
+    ensure_purchase_invoice_budget_field,
+    ensure_task_repository_field,
+    fix_company_currency,
+)
+from .provisioning.permissions import ensure_rundinova_permissions
+from .provisioning.roles import ensure_rundinova_roles
+from .provisioning.branding import sync_branding
+from .provisioning.form_layouts import sync_form_layouts
+from .provisioning.workspaces import hide_unused_desktop_icons, hide_unused_workspaces
 
 
 def seed():
-    """Provision app configuration only; never create fictitious business data.
-
-    Companies, users, employees, items, budgets, opening balances, and
-    transactions must be entered and approved by the RundiNova team.
-    """
+    """Provision configuration only; never create fictitious business data."""
     roles = ensure_rundinova_roles()
     permissions = ensure_rundinova_permissions()
     sync_dashboards()
-    return {"configured": True, "business_data_created": False, "roles": roles, "permissions": list(permissions)}
-
-
-def ensure_rundinova_roles():
-    """Create only named roles; users and permissions remain administrator-controlled."""
-    role_names = [
-        "RundiNova Director",
-        "RundiNova Finance Manager",
-        "RundiNova Operations",
-        "RundiNova Project Lead",
-        "RundiNova Team Member",
-        "RundiNova Communications",
-        "RundiNova People & Culture",
-    ]
-    created = []
-    for role_name in role_names:
-        if frappe.db.exists("Role", role_name):
-            continue
-        frappe.get_doc({
-            "doctype": "Role",
-            "role_name": role_name,
-            "desk_access": 1,
-            "is_custom": 1,
-        }).insert(ignore_permissions=True)
-        created.append(role_name)
-    frappe.db.commit()
-    return created
-
-
-def ensure_rundinova_permissions():
-    """Apply least-privilege access to custom RundiNova DocTypes.
-
-    Writes DocPerm rows directly instead of saving the parent DocType,
-    because Frappe protects standard-doctype metadata when developer mode
-    is disabled.  Idempotent: existing rows are updated in place.
-    """
-    matrix = {
-        "RundiNova Director": {"read": 1, "write": 1, "create": 1, "delete": 0},
-        "RundiNova Finance Manager": {"read": 1, "write": 1, "create": 1, "delete": 1},
-        "RundiNova Operations": {"read": 1, "write": 1, "create": 1, "delete": 0},
-        "RundiNova Project Lead": {"read": 1, "write": 1, "create": 1, "delete": 0},
-        "RundiNova Team Member": {"read": 1, "write": 1, "create": 1, "delete": 0},
-        "RundiNova Communications": {"read": 1, "write": 1, "create": 1, "delete": 0},
-        "RundiNova People & Culture": {"read": 1, "write": 1, "create": 1, "delete": 0},
+    branding = sync_branding()
+    form_layouts = sync_form_layouts()
+    hidden_workspaces = hide_unused_workspaces()
+    hide_unused_desktop_icons()
+    fix_company_currency()
+    return {
+        "configured": True,
+        "business_data_created": False,
+        "roles": roles,
+        "permissions": list(permissions),
+        "branding": branding,
+        "form_layouts": form_layouts,
+        "hidden_workspaces": hidden_workspaces,
+        "currency_symbol": "FBU",
     }
-    # Per-doctype narrowing of the default matrix.  People & Culture owns
-    # community life, decisions and documents; finances, assets, repositories
-    # and KPIs stay read-only (see docs/rundinova/06-roles-and-responsibilities.md).
-    read_only = {"read": 1, "write": 0, "create": 0, "delete": 0}
-    overrides = {
-        (dt, "RundiNova People & Culture"): read_only
-        for dt in (
-            "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Budget Review",
-            "RundiNova Expense", "RundiNova Asset",
-            "RundiNova Cash Account", "RundiNova Cash Movement",
-            "RundiNova Repository", "RundiNova KPI Definition", "RundiNova KPI Snapshot",
-            "RundiNova Goal", "RundiNova Office",
-        )
-    }
-    doctypes = [
-        "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Budget Review",
-        "RundiNova KPI Definition", "RundiNova KPI Snapshot", "RundiNova Risk",
-        "RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact",
-        "RundiNova Office",
-        "RundiNova Repository",
-        "RundiNova Expense",
-        "RundiNova Asset",
-        "RundiNova Cash Account",
-        "RundiNova Cash Movement",
-        "RundiNova Decision",
-        "RundiNova Document",
-        "RundiNova Goal",
-    ]
-    for doctype in doctypes:
-        if not frappe.db.exists("DocType", doctype):
-            continue
-        for role, permissions in matrix.items():
-            permissions = overrides.get((doctype, role), permissions)
-            existing = frappe.db.get_value(
-                "DocPerm",
-                {"parent": doctype, "parenttype": "DocType", "role": role, "permlevel": 0},
-                "name",
-            )
-            if existing:
-                frappe.db.set_value("DocPerm", existing, permissions)
-            else:
-                frappe.get_doc({
-                    "doctype": "DocPerm",
-                    "parent": doctype,
-                    "parenttype": "DocType",
-                    "parentfield": "permissions",
-                    "role": role,
-                    "permlevel": 0,
-                    **permissions,
-                }).insert(ignore_permissions=True)
-    # Standard ERPNext doctypes that RundiNova forms link to or that the
-    # dashboards report on.  Read-only for every RundiNova role so link
-    # fields resolve and number-card / report queries run without errors.
-    linked_standard_doctypes = [
-        "Branch", "Cost Center", "Company", "Department", "Designation",
-        "Employee", "Supplier", "Item", "Warehouse", "UOM",
-        "Project", "Task", "Account", "GL Entry", "Mode of Payment",
-    ]
-    standard_read_only = {"read": 1, "write": 0, "create": 0, "delete": 0}
-    for doctype in linked_standard_doctypes:
-        if not frappe.db.exists("DocType", doctype):
-            continue
-        for role in matrix:
-            existing = frappe.db.get_value(
-                "DocPerm",
-                {"parent": doctype, "parenttype": "DocType", "role": role, "permlevel": 0},
-                "name",
-            )
-            if existing:
-                frappe.db.set_value("DocPerm", existing, standard_read_only)
-            else:
-                frappe.get_doc({
-                    "doctype": "DocPerm",
-                    "parent": doctype,
-                    "parenttype": "DocType",
-                    "parentfield": "permissions",
-                    "role": role,
-                    "permlevel": 0,
-                    **standard_read_only,
-                }).insert(ignore_permissions=True)
-    frappe.clear_cache()
-    return matrix
-
-
-def _ensure_number_card(name, label, document_type, function="Count", report_field=None,
-                        filters=None, color=None, background_color=None):
-    values = {
-        "label": label, "type": "Document Type", "function": function,
-        "document_type": document_type,
-        "aggregate_function_based_on": report_field,
-        "filters_json": json.dumps(filters or []), "is_public": 1,
-        "show_full_number": 1, "color": color,
-        "background_color": background_color, "module": "RundiNova Tech",
-    }
-    existing = frappe.db.get_value("Number Card", {"module": "RundiNova Tech", "label": label}, "name") or (name if frappe.db.exists("Number Card", name) else None)
-    if existing:
-        doc = frappe.get_doc("Number Card", existing)
-        doc.update(values)
-        doc.save(ignore_permissions=True)
-    else:
-        doc = frappe.get_doc({"doctype": "Number Card", "name": name, **values})
-        doc.insert(ignore_permissions=True)
-    return doc.name
-
-
-def _ensure_chart(name, chart_name, chart_type, document_type, chart_kind,
-                  group_by=None, based_on=None, value_based_on=None,
-                  filters=None, timeseries=False, time_interval="Monthly"):
-    values = {
-        "chart_name": chart_name, "chart_type": chart_type,
-        "document_type": document_type, "group_by_type": "Count",
-        "group_by_based_on": group_by, "based_on": based_on,
-        "value_based_on": value_based_on,
-        "aggregate_function_based_on": value_based_on,
-        "type": chart_kind,
-        "timeseries": 1 if timeseries else 0, "time_interval": time_interval,
-        "filters_json": json.dumps(filters or []), "is_public": 1,
-        "module": "RundiNova Tech",
-    }
-    existing = frappe.db.get_value("Dashboard Chart", {"module": "RundiNova Tech", "chart_name": chart_name}, "name") or frappe.db.get_value("Dashboard Chart", {"chart_name": chart_name}, "name") or (name if frappe.db.exists("Dashboard Chart", name) else None)
-    if existing:
-        doc = frappe.get_doc("Dashboard Chart", existing)
-        doc.update(values)
-        doc.save(ignore_permissions=True)
-    else:
-        doc = frappe.get_doc({"doctype": "Dashboard Chart", "name": name, **values})
-        doc.insert(ignore_permissions=True, ignore_if_duplicate=True)
-        if frappe.db.exists("Dashboard Chart", doc.name):
-            doc = frappe.get_doc("Dashboard Chart", doc.name)
-            doc.update(values)
-            doc.save(ignore_permissions=True)
-    return doc.name
-
-
-def _dashboard(name, charts, cards):
-    doc = frappe.get_doc("Dashboard", name) if frappe.db.exists("Dashboard", name) else frappe.new_doc("Dashboard")
-    doc.name = name
-    doc.dashboard_name = name
-    doc.module = "RundiNova Tech"
-    doc.is_standard = 0
-    doc.charts = []
-    for chart, width in charts:
-        doc.append("charts", {"chart": chart, "width": width})
-    doc.cards = []
-    for card in cards:
-        doc.append("cards", {"card": card})
-    doc.save(ignore_permissions=True)
-
-
-def _workspace_content():
-    links = [
-        ("rundinova-onboarding", "Préparation au démarrage", "tool"),
-        ("RundiNova Office", "Hub & organisation", "building"),
-        ("RundiNova Food Budget", "Budget alimentaire", "food"),
-        ("RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
-        ("RundiNova Repository", "Dépôts GitHub", "github"),
-        ("RundiNova Expense", "Dépenses générales", "expense"),
-        ("RundiNova Asset", "Biens & équipements", "asset"),
-        ("RundiNova Cash Account", "Comptes de trésorerie", "bank"),
-        ("RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
-        ("RundiNova Decision", "Décisions & réunions", "note"),
-        ("RundiNova Document", "Documents & fichiers", "file"),
-        ("RundiNova KPI Definition", "Définitions KPI", "target"),
-        ("RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
-        ("RundiNova Goal", "Objectifs & KPI", "target"),
-        ("RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
-        ("RundiNova Finance Dashboard", "Finance & budgets", "accounting"),
-        ("RundiNova People Dashboard", "Équipe & RH", "users"),
-        ("RundiNova Delivery Dashboard", "Projets & livraison", "project"),
-        ("RundiNova Ecosystem Dashboard", "Écosystème & croissance", "crm"),
-    ]
-    content = [{"id": "rundinova-title", "type": "header", "data": {"text": "RundiNova Tech · Centre de pilotage", "col": 12}}]
-    for idx, (target, label, icon) in enumerate(links):
-        if target == "rundinova-onboarding":
-            target_type = "Page"
-        elif target in ("RundiNova Office", "RundiNova Food Budget", "RundiNova Food Expense", "RundiNova Repository", "RundiNova Expense", "RundiNova Asset", "RundiNova Cash Account", "RundiNova Cash Movement", "RundiNova Decision", "RundiNova Document", "RundiNova KPI Definition", "RundiNova KPI Snapshot", "RundiNova Goal"):
-            target_type = "DocType"
-        else:
-            target_type = "Dashboard"
-        content.append({"id": f"rundinova-shortcut-{idx}", "type": "shortcut", "data": {"type": target_type, "link_to": target, "label": label, "icon": icon, "col": 4}})
-    return json.dumps(content)
-
-
-def sync_dashboards():
-    """Provision rich, clickable dashboards and the branded app workspace."""
-    ensure_purchase_invoice_budget_field()
-    backfill_budget_titles()
-    cards = {
-        "employees": _ensure_number_card("RundiNova Active Employees", "Employés actifs", "Employee", filters=[["Employee", "status", "=", "Active"]], color="#2563EB", background_color="#EFF6FF"),
-        "budgets": _ensure_number_card("RundiNova Food Budgets", "Budgets alimentaires", "RundiNova Food Budget", color="#0F766E", background_color="#ECFDF5"),
-        "planned": _ensure_number_card("RundiNova Planned Budget", "Budget planifié", "RundiNova Food Budget", "Sum", "total_planned_amount", color="#7C3AED", background_color="#F5F3FF"),
-        "committed": _ensure_number_card("RundiNova Committed Food Spend", "Dépenses engagées", "RundiNova Food Expense", "Sum", "amount", filters=[["RundiNova Food Expense", "status", "in", ["Submitted", "Approved", "Paid"]]], color="#EA580C", background_color="#FFF7ED"),
-        "actual": _ensure_number_card("RundiNova Actual Food Spend", "Dépenses payées", "RundiNova Food Expense", "Sum", "amount", filters=[["RundiNova Food Expense", "status", "=", "Paid"]], color="#B91C1C", background_color="#FEF2F2"),
-        "remaining": _ensure_number_card("RundiNova Food Budget Remaining", "Solde alimentaire", "RundiNova Food Budget", "Sum", "balance_amount", color="#059669", background_color="#ECFDF5"),
-        "risks": _ensure_number_card("RundiNova Open Risks", "Risques ouverts", "RundiNova Risk", filters=[["RundiNova Risk", "status", "in", ["Open", "Monitoring"]]], color="#DC2626", background_color="#FEF2F2"),
-        "opportunities": _ensure_number_card("RundiNova Opportunities", "Opportunités", "RundiNova Growth Opportunity", color="#D97706", background_color="#FFFBEB"),
-        "pipeline": _ensure_number_card("RundiNova Pipeline Value", "Valeur du pipeline", "RundiNova Growth Opportunity", "Sum", "expected_value", color="#0891B2", background_color="#ECFEFF"),
-        "partnerships": _ensure_number_card("RundiNova Partnerships", "Partenariats actifs", "RundiNova Partnership", filters=[["RundiNova Partnership", "status", "=", "Active"]], color="#DB2777", background_color="#FDF2F8"),
-        "kpis": _ensure_number_card("RundiNova KPI Snapshots", "Mesures KPI", "RundiNova KPI Snapshot", color="#4F46E5", background_color="#EEF2FF"),
-        "repositories": _ensure_number_card("RundiNova Active Repositories", "Dépôts actifs", "RundiNova Repository", filters=[["RundiNova Repository", "status", "=", "Active"]], color="#111827", background_color="#F3F4F6"),
-        "cash_accounts": _ensure_number_card("RundiNova Active Cash Accounts", "Comptes actifs", "RundiNova Cash Account", filters=[["RundiNova Cash Account", "status", "=", "Active"]], color="#1D4ED8", background_color="#EFF6FF"),
-        "cash_balance": _ensure_number_card("RundiNova Cash Balance", "Solde de trésorerie", "RundiNova Cash Account", "Sum", "current_balance", filters=[["RundiNova Cash Account", "status", "=", "Active"]], color="#047857", background_color="#ECFDF5"),
-        "cash_movements": _ensure_number_card("RundiNova Approved Cash Movements", "Mouvements approuvés", "RundiNova Cash Movement", "Sum", "amount", filters=[["RundiNova Cash Movement", "status", "in", ["Approved", "Reconciled"]]], color="#7C3AED", background_color="#F5F3FF"),
-        "projects": _ensure_number_card("RundiNova Active Projects", "Projets actifs", "Project", filters=[["Project", "status", "!=", "Cancelled"]], color="#2563EB", background_color="#EFF6FF"),
-        "open_tasks": _ensure_number_card("RundiNova Open Tasks", "Tâches ouvertes", "Task", filters=[["Task", "status", "not in", ["Completed", "Cancelled"]]], color="#D97706", background_color="#FFFBEB"),
-        "completed_tasks": _ensure_number_card("RundiNova Completed Tasks", "Tâches terminées", "Task", filters=[["Task", "status", "=", "Completed"]], color="#059669", background_color="#ECFDF5"),
-        "overdue_tasks": _ensure_number_card("RundiNova Overdue Tasks", "Tâches en retard", "Task", filters=[["Task", "status", "not in", ["Completed", "Cancelled"]], ["Task", "exp_end_date", "<", "Today"]], color="#DC2626", background_color="#FEF2F2"),
-        "goals": _ensure_number_card("RundiNova Active Goals", "Objectifs actifs", "RundiNova Goal", filters=[["RundiNova Goal", "status", "in", ["Planned", "Active", "At Risk"]]], color="#4F46E5", background_color="#EEF2FF"),
-        "goals_achieved": _ensure_number_card("RundiNova Achieved Goals", "Objectifs atteints", "RundiNova Goal", filters=[["RundiNova Goal", "status", "=", "Achieved"]], color="#059669", background_color="#ECFDF5"),
-        "goals_at_risk": _ensure_number_card("RundiNova Goals At Risk", "Objectifs à risque", "RundiNova Goal", filters=[["RundiNova Goal", "status", "=", "At Risk"]], color="#DC2626", background_color="#FEF2F2"),
-    }
-    charts = {
-        "employees_branch": _ensure_chart("RundiNova Employees by Branch", "Employés par bureau", "Group By", "Employee", "Donut", group_by="branch", filters=[["Employee", "status", "=", "Active"]]),
-        "employees_department": _ensure_chart("RundiNova Employees by Department", "Employés par département", "Group By", "Employee", "Bar", group_by="department", filters=[["Employee", "status", "=", "Active"]]),
-        "budget_branch": _ensure_chart("RundiNova Budgets by Branch", "Budgets par bureau", "Group By", "RundiNova Food Budget", "Bar", group_by="branch"),
-        "budget_trend": _ensure_chart("RundiNova Budget Trend", "Évolution du budget planifié", "Sum", "RundiNova Food Budget", "Line", based_on="period_start", value_based_on="total_planned_amount", timeseries=True),
-        "expense_trend": _ensure_chart("RundiNova Food Expense Trend", "Consommation alimentaire quotidienne", "Sum", "RundiNova Food Expense", "Line", based_on="expense_date", value_based_on="amount", filters=[["RundiNova Food Expense", "status", "in", ["Submitted", "Approved", "Paid"]]], timeseries=True, time_interval="Daily"),
-        "expense_category": _ensure_chart("RundiNova Food Expense by Category", "Dépenses par catégorie", "Group By", "RundiNova Food Expense", "Donut", group_by="category", filters=[["RundiNova Food Expense", "status", "in", ["Submitted", "Approved", "Paid"]]]),
-        "risk_status": _ensure_chart("RundiNova Risks by Status", "Risques par statut", "Group By", "RundiNova Risk", "Donut", group_by="status"),
-        "risk_impact": _ensure_chart("RundiNova Risks by Impact", "Risques par impact", "Group By", "RundiNova Risk", "Bar", group_by="impact"),
-        "opportunity_stage": _ensure_chart("RundiNova Opportunities by Stage", "Opportunités par étape", "Group By", "RundiNova Growth Opportunity", "Bar", group_by="stage"),
-        "opportunity_trend": _ensure_chart("RundiNova KPI Trend", "Mesures KPI dans le temps", "Average", "RundiNova KPI Snapshot", "Line", based_on="period_start", value_based_on="target_achievement_percent", timeseries=True),
-        "partnership_status": _ensure_chart("RundiNova Partnerships by Status", "Partenariats par statut", "Group By", "RundiNova Partnership", "Donut", group_by="status"),
-        "community_status": _ensure_chart("RundiNova Community Activities", "Activités communautaires", "Group By", "RundiNova Community Impact", "Bar", group_by="status"),
-    }
-    _dashboard("RundiNova Executive Dashboard", [(charts["employees_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["opportunity_stage"], "Half"), (charts["risk_status"], "Half")], [cards["employees"], cards["cash_balance"], cards["goals"], cards["goals_at_risk"], cards["planned"], cards["risks"], cards["pipeline"]])
-    _dashboard("RundiNova Finance Dashboard", [(charts["budget_branch"], "Half"), (charts["budget_trend"], "Half"), (charts["expense_trend"], "Full"), (charts["expense_category"], "Half")], [cards["cash_accounts"], cards["cash_balance"], cards["cash_movements"], cards["budgets"], cards["planned"], cards["committed"], cards["actual"], cards["remaining"]])
-    _dashboard("RundiNova People Dashboard", [(charts["employees_branch"], "Half"), (charts["employees_department"], "Half"), (charts["opportunity_trend"], "Full")], [cards["employees"], cards["goals"], cards["goals_achieved"], cards["kpis"]])
-    _dashboard("RundiNova Delivery Dashboard", [(charts["opportunity_stage"], "Half"), (charts["risk_impact"], "Half"), (charts["opportunity_trend"], "Full")], [cards["projects"], cards["open_tasks"], cards["completed_tasks"], cards["overdue_tasks"], cards["repositories"], cards["opportunities"], cards["risks"]])
-    _dashboard("RundiNova Ecosystem Dashboard", [(charts["partnership_status"], "Half"), (charts["community_status"], "Half"), (charts["opportunity_stage"], "Full")], [cards["partnerships"], cards["opportunities"], cards["pipeline"]])
-
-    workspace = frappe.get_doc("Workspace", "RundiNova Tech") if frappe.db.exists("Workspace", "RundiNova Tech") else frappe.new_doc("Workspace")
-    workspace.update({"label": "RundiNova Tech", "title": "RundiNova Tech", "module": "RundiNova Tech", "app": "rundinova_tech", "type": "Workspace", "icon": "briefcase", "indicator_color": "blue", "public": 1, "is_hidden": 0, "content": _workspace_content()})
-    workspace.save(ignore_permissions=True)
-    frappe.db.commit()
-
-
-def backfill_budget_titles():
-    """Populate human-readable titles and consumption totals on legacy budgets."""
-    from rundinova_tech.rundinova_tech.doctype.rundinova_food_budget.rundinova_food_budget import (
-        set_budget_title,
-        update_budget_totals,
-    )
-
-    for name in frappe.get_all("RundiNova Food Budget", pluck="name"):
-        budget = frappe.get_doc("RundiNova Food Budget", name)
-        set_budget_title(budget)
-        update_budget_totals(budget)
-        budget.db_update()
-
-
-def ensure_purchase_invoice_budget_field():
-    """Add the optional budget selector to ERPNext Purchase Invoice once."""
-    fieldname = "rundinova_food_budget"
-    if frappe.db.exists("Custom Field", {"dt": "Purchase Invoice", "fieldname": fieldname}):
-        return
-    frappe.get_doc({
-        "doctype": "Custom Field",
-        "dt": "Purchase Invoice",
-        "fieldname": fieldname,
-        "label": "RundiNova Food Budget",
-        "fieldtype": "Link",
-        "options": "RundiNova Food Budget",
-        "insert_after": "supplier",
-        "module": "RundiNova Tech",
-    }).insert(ignore_permissions=True, ignore_if_duplicate=True)

@@ -9,7 +9,7 @@ frappe.pages['rundinova-onboarding'].on_page_load = function (wrapper) {
 	page.main.html(`
 	<div class="rundinova-onboarding container" style="max-width:860px;margin:0 auto;padding:24px 0;">
 		<div style="text-align:center;margin-bottom:32px;">
-			<img src="/assets/rundinova_tech/images/rundinova-logo.png"
+			<img src="/assets/rundinova_tech/images/rundinova-logo-wide.svg"
 				alt="RundiNova" style="height:64px;margin-bottom:16px;">
 			<h2 style="margin:0;">Bienvenue chez RundiNova Tech</h2>
 			<p class="text-muted">Suivez ces étapes pour configurer votre espace de travail.</p>

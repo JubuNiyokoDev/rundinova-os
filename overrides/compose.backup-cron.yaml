@@ -1,15 +1,36 @@
+# The historical filename is kept for compatibility; the backup job runs
+# directly in a container from the approved RundiNova image. It does not
+# mount the Docker socket or pull a separate scheduler image.
 services:
-  cron:
-    image: mcuadros/ofelia:latest
-    depends_on:
-      - scheduler
-    command: daemon --docker
+  backup:
+    image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
+    pull_policy: ${PULL_POLICY:-never}
+    restart: unless-stopped
+    command:
+      - bash
+      - -lc
+      - |
+        interval="$$BACKUP_INTERVAL_SECONDS"
+        case "$$interval" in
+          ''|*[!0-9]*) echo "[backup] BACKUP_INTERVAL_SECONDS must be a positive integer"; exit 2 ;;
+        esac
+        if [ "$$interval" -le 0 ]; then
+          echo "[backup] BACKUP_INTERVAL_SECONDS must be greater than zero";
+          exit 2;
+        fi
+        while true; do
+          echo "[backup] Starting site backups with files at $$(date -u +%FT%TZ)";
+          if bench --site all backup --with-files; then
+            echo "[backup] Backup cycle completed at $$(date -u +%FT%TZ)";
+          else
+            echo "[backup] Backup cycle failed at $$(date -u +%FT%TZ)";
+          fi
+          sleep "$$interval";
+        done
+    environment:
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-21600}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-
-  scheduler:
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.datecron.schedule: "${BACKUP_CRONSTRING:-@every 6h}"
-      ofelia.job-exec.datecron.command: "bench --site all backup"
-      ofelia.job-exec.datecron.user: "frappe"
+      - sites:/home/frappe/frappe-bench/sites
+    depends_on:
+      configurator:
+        condition: service_completed_successfully

@@ -6,11 +6,20 @@
     {"fieldname": "partner_name", "fieldtype": "Data", "label": "Partner Name", "reqd": 1},
     {"fieldname": "partner_type", "fieldtype": "Select", "options": "Institution\nCompany\nCommunity\nInvestor\nAcademic\nNGO", "label": "Partner Type", "reqd": 1},
     {"fieldname": "contact", "fieldtype": "Link", "options": "Contact", "label": "Primary Contact"},
-    {"fieldname": "owner", "fieldtype": "Link", "options": "Employee", "label": "Relationship Owner"},
+    {"fieldname": "relationship_owner", "fieldtype": "Link", "options": "Employee", "label": "Relationship Owner"},
     {"fieldname": "start_date", "fieldtype": "Date", "label": "Start Date"},
     {"fieldname": "review_date", "fieldtype": "Date", "label": "Review Date"},
     {"fieldname": "agreement", "fieldtype": "Attach", "label": "Agreement"},
     {"fieldname": "status", "fieldtype": "Select", "options": "Prospect\nActive\nPaused\nEnded", "label": "Status", "default": "Prospect", "reqd": 1}
   ],
-  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}]
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Operations", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Communications", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova People & Culture", "read": 1, "write": 1, "create": 1, "delete": 0}
+  ]
 }

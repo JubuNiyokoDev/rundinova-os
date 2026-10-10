@@ -1,0 +1,35 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Food Progress",
+  "module": "RundiNova Tech",
+  "custom": 0,
+  "is_submittable": 0,
+  "title_field": "progress_title",
+  "show_title_field_in_link": 1,
+  "fields": [
+    {"fieldname": "progress_title", "fieldtype": "Data", "label": "Suivi de l’article", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "budget_section", "fieldtype": "Section Break", "label": "Article et période"},
+    {"fieldname": "budget", "fieldtype": "Link", "options": "RundiNova Food Budget", "label": "Budget alimentaire", "reqd": 1, "read_only": 1},
+    {"fieldname": "item", "fieldtype": "Link", "options": "Item", "label": "Article", "reqd": 1, "read_only": 1, "in_list_view": 1},
+    {"fieldname": "unit", "fieldtype": "Data", "label": "Unité prévue", "read_only": 1},
+    {"fieldname": "usage_section", "fieldtype": "Section Break", "label": "Prévision et consommation"},
+    {"fieldname": "planned_quantity", "fieldtype": "Float", "label": "Quantité prévue", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "planned_amount", "fieldtype": "Currency", "label": "Budget prévu", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "consumed_quantity", "fieldtype": "Float", "label": "Quantité achetée", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "consumed_amount", "fieldtype": "Currency", "label": "Montant dépensé", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "balance_section", "fieldtype": "Section Break", "label": "Solde et suivi"},
+    {"fieldname": "remaining_amount", "fieldtype": "Currency", "label": "Solde restant", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "consumed_percent", "fieldtype": "Percent", "label": "Budget consommé (%)", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "remaining_days", "fieldtype": "Int", "label": "Jours restants", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Statut", "options": "OK\nWarning\nOver\nClosed", "default": "OK", "read_only": 1, "in_list_view": 1},
+    {"fieldname": "carryover_note", "fieldtype": "Small Text", "label": "Note sur le solde restant"}
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1},
+    {"role": "RundiNova Operations", "read": 1}
+  ],
+  "sort_field": "item",
+  "sort_order": "ASC"
+}

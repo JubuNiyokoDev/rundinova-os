@@ -13,5 +13,14 @@
     {"fieldname": "variance_amount", "fieldtype": "Currency", "label": "Variance", "read_only": 1},
     {"fieldname": "review_notes", "fieldtype": "Long Text", "label": "Review Notes"}
   ],
-  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1}]
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 0},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
+    {"role": "RundiNova Operations", "read": 1, "write": 1, "create": 1, "submit": 0, "cancel": 0},
+    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1, "submit": 0, "cancel": 0},
+    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1, "submit": 0, "cancel": 0},
+    {"role": "RundiNova Communications", "read": 1, "write": 1, "create": 1, "submit": 0, "cancel": 0},
+    {"role": "RundiNova People & Culture", "read": 1, "write": 0, "create": 0, "submit": 0, "cancel": 0}
+  ]
 }

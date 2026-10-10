@@ -28,7 +28,13 @@ development/*
 # Python
 *.pyc
 __pycache__
+**/build/
+**/*.egg-info/
 venv
+.pytest_cache/
+
+# Local Claude worktrees are Git-managed checkouts, not product source.
+.claude/worktrees/
 
 # NodeJS
 node_modules

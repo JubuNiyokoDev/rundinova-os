@@ -1,0 +1,81 @@
+name: RundiNova checks
+
+on:
+  push:
+    paths:
+      - "apps/rundinova_tech/**"
+      - "images/rundinova/**"
+      - "docs/rundinova/**"
+      - "rundinova.env.example"
+      - "compose.yaml"
+      - "overrides/**"
+      - "tests/compose-configs.json"
+      - ".github/scripts/validate_compose.py"
+      - ".github/workflows/rundinova-checks.yml"
+  pull_request:
+    paths:
+      - "apps/rundinova_tech/**"
+      - "images/rundinova/**"
+      - "docs/rundinova/**"
+      - "rundinova.env.example"
+      - "compose.yaml"
+      - "overrides/**"
+      - "tests/compose-configs.json"
+      - ".github/scripts/validate_compose.py"
+      - ".github/workflows/rundinova-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-tests:
+    name: Business and release tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Test framework-independent business rules
+        run: >-
+          python -m unittest discover
+          -s apps/rundinova_tech/rundinova_tech/tests
+          -p 'test_*.py' -v
+        env:
+          PYTHONPATH: apps/rundinova_tech:apps/rundinova_tech/rundinova_core
+          PYTHONDONTWRITEBYTECODE: "1"
+
+      - name: Install and test the standalone business core
+        run: |
+          python -m pip install --no-deps --target "$RUNNER_TEMP/rundinova-core" \
+            ./apps/rundinova_tech/rundinova_core
+          PYTHONPATH="$RUNNER_TEMP/rundinova-core" python -m unittest discover \
+            -s apps/rundinova_tech/rundinova_core/tests -p 'test_*.py' -v
+
+      - name: Test release provenance metadata
+        run: >-
+          python -m unittest discover
+          -s images/rundinova/tests
+          -p 'test_*.py' -v
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+
+  compose-config:
+    name: Validate supported Compose profiles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Validate Compose combinations
+        run: python3 .github/scripts/validate_compose.py

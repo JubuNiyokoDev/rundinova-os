@@ -9,4 +9,4 @@ description = "RundiNova Tech business application for Frappe"
 requires-python = ">=3.10"
 
 [tool.setuptools.packages.find]
-include = ["rundinova_tech*"]
+include = ["rundinova_tech*", "rundinova_core*"]

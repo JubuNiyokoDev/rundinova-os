@@ -17,7 +17,7 @@ one or more subdomains such as `erp.rundinova.com`.
 | ERPNext | Accounting, selling, buying, projects, assets, stock | Installed app |
 | HRMS | Employees, leave, attendance, payroll, appraisals | Installed app |
 | CRM | Leads, opportunities, activities and sales pipeline | Installed app |
-| RundiNova application | Company-specific data, dashboards and controls | Separate Frappe app repository |
+| RundiNova application | Company-specific data, dashboards and controls | `apps/rundinova_tech/` in this same self-hosted repository |
 | Static website | Marketing and public content | Existing website repository |
 
 ## Sites and offices
@@ -61,6 +61,34 @@ The target platform includes these modules:
 ERPNext, HRMS and CRM provide the standard processes. The RundiNova app must
 provide only the company-specific objects and rules that should not be hidden
 inside generic configuration.
+
+## Progressive framework boundary
+
+RundiNova owns its business rules even while Frappe owns the current database,
+permissions, workflow engine, and web interface. Framework-independent rules
+live in the separately installable `rundinova-core` package under
+`apps/rundinova_tech/rundinova_core/` and operate on plain Python values.
+Frappe DocType controllers act as adapters: they load and save records, apply
+the caller's permissions, translate rule codes into localized messages, and
+call the core functions. Core code must not import Frappe or issue database or
+HTTP requests. The former nested `domain` import path remains as a compatibility
+layer while adapters transition. Food-budget calculations, food-item progress
+aggregation, food-purchase limits, food-expense policy validation, cash-movement
+validation, account-balance arithmetic, general expense validation, document and decision governance,
+asset controls, goal validation and progress, dashboard currency semantics,
+and the food-purchase use case now use this boundary. Frappe adapters own
+document reads, permission checks, role context, date conversion, and writes;
+the food-expense policy port supplies period and aggregate snapshots while core
+decides the applicable rules. The pure purchase service owns the
+budget-item/progress relationship and expense command mapping. The Purchase
+Invoice bridge also maps invoice
+lines to food expenses and handles idempotent updates and cancellation through
+a persistence port. Frappe continues to own the invoice and expense documents,
+while the synchronization decisions and mapping are independently tested.
+Automatic association of an expense with its budget/item progress record also
+uses a core policy and a narrow Frappe lookup/create adapter.
+Future modules can follow this boundary without changing existing DocTypes or
+stored records.
 
 ## Security baseline
 

@@ -12,5 +12,14 @@
     {"fieldname": "evidence", "fieldtype": "Attach", "label": "Evidence"},
     {"fieldname": "notes", "fieldtype": "Small Text", "label": "Notes"}
   ],
-  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}]
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "delete": 1},
+    {"role": "RundiNova Operations", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova Communications", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "RundiNova People & Culture", "read": 1, "write": 0, "create": 0, "delete": 0}
+  ]
 }
