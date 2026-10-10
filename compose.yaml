@@ -3,7 +3,9 @@ x-customizable-image: &customizable_image
   # See https://github.com/frappe/frappe_docker/blob/main/docs/02-setup/02-build-setup.md#define-custom-apps
   # about using custom images.
   image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
-  pull_policy: ${PULL_POLICY:-always}
+  # RundiNova runs a locally built, controlled release image by default.
+  # Set PULL_POLICY explicitly when an operator intends to pull an image.
+  pull_policy: ${PULL_POLICY:-never}
   restart: ${RESTART_POLICY:-unless-stopped}
 
 x-depends-on-configurator: &depends_on_configurator
@@ -46,6 +48,16 @@ services:
   backend:
     <<: *backend_defaults
     platform: linux/amd64
+    healthcheck:
+      test:
+        - CMD
+        - /home/frappe/frappe-bench/env/bin/python
+        - -c
+        - "import pathlib, socket, urllib.request; sites=pathlib.Path('/home/frappe/frappe-bench/sites'); site=next((p.name for p in sites.iterdir() if p.is_dir() and (p/'site_config.json').exists()), None); socket.create_connection(('127.0.0.1',8000),timeout=3).close() if site is None else urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/api/method/ping', headers={'Host': site}), timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
     environment:
       GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
@@ -69,8 +81,10 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
     depends_on:
-      - backend
-      - websocket
+      backend:
+        condition: service_healthy
+      websocket:
+        condition: service_started
 
   websocket:
     <<: [*depends_on_configurator, *customizable_image]

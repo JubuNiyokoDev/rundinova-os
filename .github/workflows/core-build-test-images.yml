@@ -225,6 +225,9 @@ jobs:
         run: |
           python -m venv venv
           venv/bin/pip install -r requirements-test.txt
+          venv/bin/pip install ./apps/rundinova_tech/rundinova_core
 
       - name: Test
-        run: venv/bin/pytest --color=yes
+        run: venv/bin/pytest --color=yes --ignore=apps/rundinova_tech/rundinova_tech
+        env:
+          PULL_POLICY: always

@@ -16,7 +16,7 @@ deployment infrastructure required to run it.
 - partnerships, opportunities, risks, and community impact;
 - KPI definitions and snapshots for management reporting;
 - role-based workflows, auditability, and multi-office reporting;
-- a production-ready Docker deployment profile.
+- a self-hosted Docker deployment profile with locally controlled releases.
 
 ## Repository map
 
@@ -31,8 +31,9 @@ rundinova.env.example Safe configuration template (no production secrets)
 ```
 
 The Docker and Compose files are the platform layer; RundiNova is the product
-and business layer. Keeping both in one repository makes a deployment
-reproducible while keeping company-specific logic in the `rundinova_tech` app.
+and business layer. Keeping both in one repository lets the operator control
+the complete self-hosted release while keeping company-specific logic in the
+`rundinova_tech` app.
 
 ## Quick start for development
 
@@ -69,11 +70,13 @@ is the custom product built on top of it.
 
 ## Documentation
 
+- [Repository architecture and contributor map](docs/rundinova/00-repository-guide.md)
 - [Product and deployment guide](docs/rundinova/README.md)
 - [Architecture](docs/rundinova/01-architecture.md)
 - [Business model](docs/rundinova/02-business-model.md)
 - [Rollout plan](docs/rundinova/03-rollout.md)
 - [Approved V1 scope](docs/rundinova/04-v1-scope.md)
+- [Self-hosted releases and controlled upstream updates](docs/rundinova/07-self-hosted-release.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## License

@@ -7,7 +7,9 @@ x-customizable-image: &customizable_image
   # See https://github.com/frappe/frappe_docker/blob/main/docs/02-setup/02-build-setup.md#define-custom-apps
   # about using custom images.
   image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
-  pull_policy: ${PULL_POLICY:-always}
+  # Keep migrations on the same locally approved image as the application.
+  # Set PULL_POLICY explicitly when an operator intends to pull an image.
+  pull_policy: ${PULL_POLICY:-never}
   restart: ${RESTART_POLICY:-unless-stopped}
 
 x-depends-on-configurator: &depends_on_configurator
@@ -40,5 +42,6 @@ services:
         echo "[migrator] Migrating all sites";
         bench --site all migrate;
     environment:
-      MIGRATE_SITES: ${MIGRATE_SITES:-true}
+      # Schema changes happen only during an explicitly approved release.
+      MIGRATE_SITES: ${MIGRATE_SITES:-false}
     restart: on-failure:5

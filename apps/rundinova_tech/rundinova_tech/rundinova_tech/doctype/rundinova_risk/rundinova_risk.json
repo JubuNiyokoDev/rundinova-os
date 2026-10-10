@@ -3,14 +3,111 @@
   "name": "RundiNova Risk",
   "module": "RundiNova Tech",
   "fields": [
-    {"fieldname": "risk_title", "fieldtype": "Data", "label": "Risk", "reqd": 1},
-    {"fieldname": "area", "fieldtype": "Select", "options": "Strategy\nFinance\nPeople\nEngineering\nOperations\nCompliance\nCommunity", "label": "Area", "reqd": 1},
-    {"fieldname": "owner", "fieldtype": "Link", "options": "Employee", "label": "Owner", "reqd": 1},
-    {"fieldname": "probability", "fieldtype": "Select", "options": "Low\nMedium\nHigh", "label": "Probability", "reqd": 1},
-    {"fieldname": "impact", "fieldtype": "Select", "options": "Low\nMedium\nHigh\nCritical", "label": "Impact", "reqd": 1},
-    {"fieldname": "mitigation", "fieldtype": "Long Text", "label": "Mitigation"},
-    {"fieldname": "review_date", "fieldtype": "Date", "label": "Review Date"},
-    {"fieldname": "status", "fieldtype": "Select", "options": "Open\nMonitoring\nMitigated\nClosed", "label": "Status", "default": "Open", "reqd": 1}
+    {
+      "fieldname": "risk_title",
+      "fieldtype": "Data",
+      "label": "Risk",
+      "reqd": 1
+    },
+    {
+      "fieldname": "area",
+      "fieldtype": "Select",
+      "options": "Strategy\nFinance\nPeople\nEngineering\nOperations\nCompliance\nCommunity",
+      "label": "Area",
+      "reqd": 1
+    },
+    {
+      "fieldname": "risk_owner",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "label": "Owner",
+      "reqd": 1
+    },
+    {
+      "fieldname": "probability",
+      "fieldtype": "Select",
+      "options": "Low\nMedium\nHigh",
+      "label": "Probability",
+      "reqd": 1
+    },
+    {
+      "fieldname": "impact",
+      "fieldtype": "Select",
+      "options": "Low\nMedium\nHigh\nCritical",
+      "label": "Impact",
+      "reqd": 1
+    },
+    {
+      "fieldname": "mitigation",
+      "fieldtype": "Long Text",
+      "label": "Mitigation"
+    },
+    { "fieldname": "review_date", "fieldtype": "Date", "label": "Review Date" },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "options": "Open\nMonitoring\nMitigated\nClosed",
+      "label": "Status",
+      "default": "Open",
+      "reqd": 1
+    }
   ],
-  "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}]
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Director",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Finance Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1
+    },
+    {
+      "role": "RundiNova Operations",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Project Lead",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Team Member",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova Communications",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    },
+    {
+      "role": "RundiNova People & Culture",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0
+    }
+  ]
 }

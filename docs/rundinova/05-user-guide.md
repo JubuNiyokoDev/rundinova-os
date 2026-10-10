@@ -12,34 +12,47 @@ activé ou désactivé sans toucher au code.
 
 ---
 
-## Comment activer / désactiver un module
+## Navigation et espaces de travail
 
-### Via l'interface (sans code)
+La page `/desk` ouvre directement **RundiNova Tech**. C’est l’espace de travail
+principal de tous les rôles RundiNova; les liens visibles et les données restent
+filtrés par les permissions du compte. Les cinq dashboards apparaissent en haut,
+puis les raccourcis sont groupés par organisation, finance et achats, projets et
+livraison, communication et partenariats, équipe et gouvernance. Les liens **Projets**, **Tâches**, **Budget
+alimentaire**, **Achats alimentaires**, **Dépenses générales**, **Comptes de
+trésorerie** et **Mouvements de trésorerie** ouvrent directement les listes.
 
-1. Allez dans **Workspace** (icône carré en haut à gauche).
-2. Cliquez sur **RundiNova Tech**.
-3. Les liens visibles sont les modules actifs.
-4. Pour masquer un module : **Settings > Workspace > RundiNova Tech** et
-   décochez le lien correspondant.
+Le menu latéral reste visible depuis les dashboards et reprend les destinations
+opérationnelles. Il évite de mémoriser les URL. La page **Configuration
+RundiNova** est accessible depuis la section Administration du menu; elle
+regroupe les réglages de l’entreprise, des articles et des utilisateurs.
 
-### Via les rôles (contrôle d'accès)
+Pour ouvrir son compte, cliquer sur son avatar, son nom ou son adresse e-mail en
+bas du menu latéral. **Mon profil** ouvre sa propre fiche utilisateur. Le champ
+**User Image** permet de téléverser la photo; les coordonnées et préférences
+personnelles modifiables y sont disponibles. Les rôles et accès restent gérés
+par l’administration.
 
-Chaque module est lié à des rôles. Si un utilisateur n'a pas le rôle,
-il ne voit pas le module.
+| Espace                      | Qui le voit                                  | Usage                                                                    |
+| --------------------------- | -------------------------------------------- | ------------------------------------------------------------------------ |
+| **RundiNova Tech**          | Tous les rôles RundiNova                     | Accueil commun; dashboards et raccourcis filtrés selon les autorisations |
+| **Configuration RundiNova** | Direction, Finance, Operations, Project Lead | Page dédiée aux paramètres de base; accessible depuis Administration     |
 
-| Module | Rôles requis |
-| --- | --- |
-| Budget alimentaire | Director, Finance Manager, Team Member |
-| Dépenses générales | Director, Finance Manager |
-| Trésorerie | Director, Finance Manager |
-| Biens/Équipements | Director, Finance Manager, Project Lead |
-| Projets/Tâches | Director, Project Lead, Team Member |
-| Repositories GitHub | Director, Project Lead |
-| Décisions | Director, Project Lead, Communications |
-| Documents | Tous les rôles |
-| Goals/KPI | Director, Project Lead, Team Member |
-| CRM | Director, Communications |
-| Dashboard | Selon le dashboard (voir ci-dessous) |
+Les espaces internes Finance, Dashboards et Équipe ne sont pas affichés comme
+des destinations supplémentaires. Les paramètres restent groupés dans
+**Configuration RundiNova**, sans mélanger les listes de travail quotidien et
+les écrans de configuration ERPNext.
+
+Un raccourci visible ne remplace jamais la permission du document. Chaque
+liste, fiche, carte KPI et graphique reste filtré par les permissions du
+compte. Un utilisateur ayant uniquement le rôle Team Member n'accède pas aux
+espaces Finance et Dashboards; ses dépenses restent limitées aux
+enregistrements qu'il a créés ou qui lui sont affectés.
+
+Les espaces, raccourcis et icônes du lanceur sont synchronisés par
+l'application pendant `bench migrate`. Pour changer durablement la
+navigation, modifier `rundinova_tech.rundinova_tech.provisioning.workspaces`;
+une modification manuelle dans Desk sera remplacée à la prochaine migration.
 
 ---
 
@@ -53,10 +66,11 @@ il ne voit pas le module.
 
 ### 2. Projets et tâches
 
-**Où** : Projects > Project List / Task List
-**Quoi** : Chaque projet a des tâches avec propriétaire, deadline, statut.
-**Activation** : Standard ERPNext. Créez un projet, ajoutez des tâches.
-**Désactivation** : Masquez le workspace "Projects".
+**Où** : RundiNova Tech > **Projets** / **Tâches**.
+**Quoi** : Chaque projet peut regrouper des tâches avec responsable, échéance
+et statut.
+**Activation** : un Project Lead ou Operations crée le projet et les tâches;
+les collaborateurs consultent les tâches autorisées depuis RundiNova Équipe.
 
 ### 3. Intégration GitHub
 
@@ -68,13 +82,58 @@ mettre à jour les stats (issues, stars, forks, dernier push).
 
 ### 4. Budget alimentaire
 
-**Où** : RundiNova Tech > RundiNova Food Budget
-**Quoi** : Budget mensuel de 1 150 000 FBu. Chaque achat est un
-"RundiNova Food Expense" avec date, catégorie, article, quantité, montant,
-fournisseur, payeur, reçu.
-**Activation** : Créez un budget pour le mois, puis enregistrez les achats.
-**Règle** : Les achats peuvent changer (viande → poisson). L'historique
-reste intact.
+**Où** : Dans **RundiNova Tech**, ouvrez **Progression Food** et utilisez le
+bouton **Acheter** sur la ligne de l’article. Depuis un budget ouvert, le bouton
+**Enregistrer un achat** ouvre le même parcours rapide. La création générique
+depuis la liste **Achats alimentaires** demande d’abord le budget et l’article.
+
+**Achat au marché sans facture fournisseur** : choisissez l’article, puis
+saisissez la quantité et le montant total. L’unité vient du budget; la date du
+jour et le paiement comptant sont proposés par défaut. Le fournisseur, le reçu
+et la note sont facultatifs. Pour 5 kg de riz payés comptant,
+indiquez par exemple Article « Riz », Quantité `5`, Unité `Kg`, Paiement
+« Cash » et Statut « Paid ». Le fournisseur et le reçu peuvent être ajoutés
+s'ils sont disponibles; les notes peuvent préciser le nom du marché.
+La date de l'achat doit appartenir à la période du budget sélectionné; créez
+d'abord le budget du mois si aucun budget ne couvre cette date.
+
+**Accès au budget** : Finance ou un Director doit affecter le budget aux
+collaborateurs concernés avec l'action **Assigner**. Un Team Member ne voit
+dans le formulaire que les budgets dont il est propriétaire ou auquel il est
+affecté. Sans affectation, il ne peut pas sélectionner le budget obligatoire
+de l'achat.
+
+**Avant le premier règlement en caisse** : un Director ou Finance Manager crée
+un compte dans **Comptes de trésorerie** (type, devise, date et solde réel à la
+date de départ). Ne remplacez pas un solde inconnu par `0` : le solde initial
+doit correspondre à l'argent réellement présent.
+
+Après avoir enregistré l'achat au statut **Paid**, Finance ouvre
+**Mouvements de trésorerie**, choisit l'achat et le compte utilisé, puis joint
+le reçu ou une autre preuve de paiement. Les détails de l'achat sont repris
+automatiquement. La preuve est obligatoire pour soumettre le mouvement; le
+solde de caisse ne change qu'une fois le mouvement **Approved** ou
+**Reconciled**. L'équipe peut saisir l'achat, tandis que Finance enregistre et
+valide le mouvement de caisse.
+
+La **Progression Food** correspondante est créée automatiquement au premier
+achat d'un article du budget. Le **Compte de trésorerie** est une configuration
+à créer une fois pour chaque vraie caisse, banque ou porte-monnaie mobile. Un
+**Mouvement de trésorerie** est créé pour chaque entrée ou sortie réelle; il
+n'est pas inventé automatiquement depuis un achat alimentaire. Une **Revue de
+budget** est créée lors d'une revue effective (par exemple en fin de mois), pas
+pour chaque achat. Une **Dépense générale** est créée pour chaque dépense réelle
+hors alimentation.
+
+**Achat avec facture fournisseur** : créez la facture dans **Purchase Invoice**
+et renseignez le budget alimentaire. À la soumission, chaque ligne d'article
+est synchronisée comme achat alimentaire. Ne saisissez pas une deuxième fois
+les mêmes lignes dans **Achats alimentaires**.
+
+Les achats aux statuts **Submitted**, **Approved** et **Paid** sont comptés
+dans le budget engagé; **Paid** alimente aussi le montant réellement payé.
+Les statuts **Rejected** et **Cancelled** ne sont pas comptés. L'article et la
+quantité restent dans l'historique, même si le menu change plus tard.
 
 ### 5. Dépenses générales
 
@@ -84,8 +143,11 @@ reste intact.
 
 ### 6. Trésorerie / Comptabilité de base
 
-**Où** : RundiNova Tech > RundiNova Cash Account / Cash Movement
+**Où** : Finance & trésorerie > Comptes de trésorerie / Mouvements de trésorerie
 **Quoi** : Comptes cash (caisse, banque, mobile money) et mouvements.
+**Mise en service** : enregistrez le vrai solde initial et sa date avant de
+rapprocher les achats. Seuls les mouvements approuvés ou rapprochés sont
+comptés dans le solde courant.
 **Activation** : Créez les comptes, puis enregistrez les entrées/sorties.
 **Solde** : Calculé automatiquement à chaque mouvement approuvé.
 
@@ -95,12 +157,15 @@ reste intact.
 **Quoi** : Ordinateurs, meubles, licences, avec responsable et statut.
 **Activation** : Créez un asset avec nom, catégorie, responsable, valeur.
 
-### 8. CRM et communication interne
+### 8. CRM et communication
 
-**Où** : CRM (workspace dédié)
-**Quoi** : Contacts, opportunités, activités, notes de réunion.
-Sert aussi de communication interne : décisions, annonces, suivi.
-**Activation** : Standard Frappe CRM. Créez des contacts et activités.
+**Où** : RundiNova Tech > **Communication & partenariats**. Le lien **CRM &
+communications** ouvre Frappe CRM; les raccourcis **Opportunités**,
+**Partenariats** et **Activités communautaires** ouvrent les registres RundiNova.
+**Quoi** : contacts et échanges commerciaux dans le CRM; pipeline et partenaires
+dans les registres RundiNova; décisions et réunions dans **Décisions & réunions**.
+Les entrées CRM sont des fiches opérationnelles à créer au fil des relations,
+pas des écrans de configuration.
 
 ### 9. KPI et objectifs
 
@@ -117,7 +182,7 @@ Le % se calcule automatiquement.
 
 ### 11. Tableau de bord de direction
 
-**Où** : RundiNova Tech workspace > Dashboards
+**Où** : RundiNova Tech > Tableaux de bord (également dans RundiNova Dashboards)
 **Quoi** : 5 dashboards (Executive, Finance, People, Delivery, Ecosystem).
 **Activation** : Automatique après `seed()`. Visibles selon les rôles.
 

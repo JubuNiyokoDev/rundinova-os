@@ -5,28 +5,165 @@
   "custom": 0,
   "is_submittable": 1,
   "title_field": "budget_title",
+  "show_title_field_in_link": 1,
   "fields": [
-    {"fieldname": "budget_title", "fieldtype": "Data", "label": "Budget Name", "read_only": 1, "in_list_view": 1},
-    {"fieldname": "period_start", "fieldtype": "Date", "label": "Period Start", "reqd": 1},
-    {"fieldname": "period_end", "fieldtype": "Date", "label": "Period End", "reqd": 1},
-    {"fieldname": "branch", "fieldtype": "Link", "options": "Branch", "label": "Office / Branch", "reqd": 1},
-    {"fieldname": "cost_center", "fieldtype": "Link", "options": "Cost Center", "label": "Cost Center", "reqd": 1},
-    {"fieldname": "covered_people", "fieldtype": "Int", "label": "Covered People", "default": "6", "reqd": 1},
-    {"fieldname": "approved_ceiling", "fieldtype": "Currency", "label": "Approved Ceiling", "default": "1150000", "reqd": 1},
-    {"fieldname": "items", "fieldtype": "Table", "options": "RundiNova Food Budget Item", "label": "Budget Items"},
-    {"fieldname": "total_planned_amount", "fieldtype": "Currency", "label": "Total Planned Amount", "read_only": 1},
-    {"fieldname": "annual_planned_amount", "fieldtype": "Currency", "label": "Annual Planned Amount", "read_only": 1},
-    {"fieldname": "daily_planned_amount", "fieldtype": "Currency", "label": "Daily Planned Amount", "read_only": 1},
-    {"fieldname": "per_person_daily_amount", "fieldtype": "Currency", "label": "Per Person Daily Amount", "read_only": 1}
-    ,{"fieldname": "committed_amount", "fieldtype": "Currency", "label": "Committed Amount", "read_only": 1, "in_list_view": 1}
-    ,{"fieldname": "actual_amount", "fieldtype": "Currency", "label": "Actual Consumed", "read_only": 1, "in_list_view": 1}
-    ,{"fieldname": "balance_amount", "fieldtype": "Currency", "label": "Remaining Balance", "read_only": 1, "in_list_view": 1}
-    ,{"fieldname": "consumed_percent", "fieldtype": "Percent", "label": "Consumed %", "read_only": 1, "in_list_view": 1}
+    {
+      "fieldname": "budget_title",
+      "fieldtype": "Data",
+      "label": "Nom du budget",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "period_section",
+      "fieldtype": "Section Break",
+      "label": "Période et organisation"
+    },
+    {
+      "fieldname": "period_start",
+      "fieldtype": "Date",
+      "label": "Début de la période",
+      "reqd": 1
+    },
+    {
+      "fieldname": "period_end",
+      "fieldtype": "Date",
+      "label": "Fin de la période",
+      "reqd": 1
+    },
+    { "fieldname": "column_break_location", "fieldtype": "Column Break" },
+    {
+      "fieldname": "branch",
+      "fieldtype": "Link",
+      "options": "Branch",
+      "label": "Bureau ou agence",
+      "reqd": 1
+    },
+    {
+      "fieldname": "cost_center",
+      "fieldtype": "Link",
+      "options": "Cost Center",
+      "label": "Centre de coûts",
+      "reqd": 1
+    },
+    {
+      "fieldname": "covered_people",
+      "fieldtype": "Int",
+      "label": "Personnes couvertes",
+      "default": "6",
+      "reqd": 1
+    },
+    {
+      "fieldname": "approved_ceiling",
+      "fieldtype": "Currency",
+      "label": "Plafond approuvé (FBu)",
+      "default": "1150000",
+      "reqd": 1
+    },
+    {
+      "fieldname": "items_section",
+      "fieldtype": "Section Break",
+      "label": "Articles et montants prévus"
+    },
+    {
+      "fieldname": "items",
+      "fieldtype": "Table",
+      "options": "RundiNova Food Budget Item",
+      "label": "Lignes du budget"
+    },
+    {
+      "fieldname": "summary_section",
+      "fieldtype": "Section Break",
+      "label": "Résumé du budget",
+      "collapsible": 1
+    },
+    {
+      "fieldname": "total_planned_amount",
+      "fieldtype": "Currency",
+      "label": "Total prévu pour la période",
+      "read_only": 1
+    },
+    {
+      "fieldname": "annual_planned_amount",
+      "fieldtype": "Currency",
+      "label": "Projection annuelle",
+      "read_only": 1
+    },
+    {
+      "fieldname": "daily_planned_amount",
+      "fieldtype": "Currency",
+      "label": "Montant prévu par jour",
+      "read_only": 1
+    },
+    {
+      "fieldname": "per_person_daily_amount",
+      "fieldtype": "Currency",
+      "label": "Montant journalier par personne",
+      "read_only": 1
+    },
+    { "fieldname": "column_break_totals", "fieldtype": "Column Break" },
+    {
+      "fieldname": "committed_amount",
+      "fieldtype": "Currency",
+      "label": "Achats engagés",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "actual_amount",
+      "fieldtype": "Currency",
+      "label": "Montant payé",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "balance_amount",
+      "fieldtype": "Currency",
+      "label": "Solde disponible",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "consumed_percent",
+      "fieldtype": "Percent",
+      "label": "Budget consommé",
+      "read_only": 1,
+      "in_list_view": 1
+    }
   ],
   "permissions": [
-    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1},
-    {"role": "RundiNova Finance Manager", "read": 1, "write": 1, "create": 1, "submit": 1},
-    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "submit": 1, "cancel": 1}
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1
+    },
+    {
+      "role": "RundiNova Finance Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1
+    },
+    {
+      "role": "RundiNova Director",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 1,
+      "cancel": 1
+    },
+    {
+      "role": "RundiNova Operations",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "submit": 0,
+      "cancel": 0
+    }
   ],
   "sort_field": "period_start",
   "sort_order": "DESC"

@@ -1,0 +1,18 @@
+{
+  "content": null,
+  "doctype": "Page",
+  "module": "RundiNova Tech",
+  "name": "rundinova-setup",
+  "page_name": "rundinova-setup",
+  "roles": [
+    { "role": "RundiNova Director" },
+    { "role": "RundiNova Finance Manager" },
+    { "role": "RundiNova Operations" },
+    { "role": "RundiNova Project Lead" },
+    { "role": "System Manager" }
+  ],
+  "script": null,
+  "standard": "Yes",
+  "system_page": 0,
+  "title": "Configuration RundiNova"
+}

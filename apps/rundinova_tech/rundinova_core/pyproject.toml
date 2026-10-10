@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rundinova-core"
+version = "0.1.0"
+description = "Framework-independent RundiNova business rules"
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["rundinova_core", "rundinova_core.application"]
+package-dir = {rundinova_core = "."}

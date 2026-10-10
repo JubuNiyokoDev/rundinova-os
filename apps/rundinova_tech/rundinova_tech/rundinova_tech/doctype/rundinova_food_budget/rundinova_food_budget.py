@@ -1,6 +1,11 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from rundinova_core.food import (
+    calculate_food_budget_plan,
+    calculate_food_budget_usage,
+    validate_food_budget_plan,
+)
 
 
 class RundiNovaFoodBudget(Document):
@@ -13,10 +18,20 @@ class RundiNovaFoodBudget(Document):
 
 def validate_budget(doc, _method=None):
     set_budget_title(doc)
-    total = sum(frappe.utils.flt(item.monthly_amount) for item in (doc.items or []))
+    monthly_amounts = [
+        frappe.utils.flt(item.monthly_amount) for item in (doc.items or [])
+    ]
+    total = sum(monthly_amounts)
     ceiling = frappe.utils.flt(doc.approved_ceiling)
 
-    if total > ceiling:
+    violation = validate_food_budget_plan(
+        total,
+        ceiling,
+        doc.covered_people,
+        bool(doc.branch),
+        bool(doc.cost_center),
+    )
+    if violation == "planned_total_exceeds_ceiling":
         frappe.throw(
             _("The item total {0} BIF exceeds the approved ceiling of {1} BIF.").format(
                 frappe.utils.fmt_money(total, currency="BIF"),
@@ -24,18 +39,15 @@ def validate_budget(doc, _method=None):
             )
         )
 
-    if doc.covered_people and doc.covered_people < 1:
+    if violation == "covered_people_must_be_positive":
         frappe.throw(_("Covered people must be at least one."))
 
-    if doc.branch and not doc.cost_center:
+    if violation == "branch_requires_cost_center":
         frappe.throw(_("A cost center is required when a branch is selected."))
 
-    doc.total_planned_amount = total
-    doc.annual_planned_amount = total * 12
-    doc.daily_planned_amount = total / 30
-    doc.per_person_daily_amount = (
-        total / 30 / doc.covered_people if doc.covered_people else 0
-    )
+    plan = calculate_food_budget_plan(monthly_amounts, doc.covered_people)
+    for field, value in plan.items():
+        setattr(doc, field, value)
     update_budget_totals(doc)
 
 
@@ -47,17 +59,24 @@ def set_budget_title(doc):
 
 def update_budget_totals(doc):
     """Refresh committed, paid and remaining amounts from daily expenses."""
-    expenses = frappe.get_all(
-        "RundiNova Food Expense",
-        filters={"budget": doc.name, "status": ["in", ["Submitted", "Approved", "Paid"]]},
-        fields=["amount", "status"],
-    ) if doc.name and frappe.db.exists("RundiNova Food Expense", {"budget": doc.name}) else []
-    committed = sum(frappe.utils.flt(row.amount) for row in expenses)
-    actual = sum(frappe.utils.flt(row.amount) for row in expenses if row.status == "Paid")
-    doc.committed_amount = committed
-    doc.actual_amount = actual
-    doc.balance_amount = frappe.utils.flt(doc.approved_ceiling) - committed
-    doc.consumed_percent = (committed / frappe.utils.flt(doc.approved_ceiling) * 100) if doc.approved_ceiling else 0
+    expenses = (
+        frappe.get_all(
+            "RundiNova Food Expense",
+            filters={
+                "budget": doc.name,
+                "status": ["in", ["Submitted", "Approved", "Paid"]],
+            },
+            fields=["amount", "status"],
+        )
+        if doc.name and frappe.db.exists("RundiNova Food Expense", {"budget": doc.name})
+        else []
+    )
+    usage = calculate_food_budget_usage(
+        frappe.utils.flt(doc.approved_ceiling),
+        [(frappe.utils.flt(row.amount), row.status) for row in expenses],
+    )
+    for field, value in usage.items():
+        setattr(doc, field, value)
 
 
 def refresh_budget_totals(budget_name):
