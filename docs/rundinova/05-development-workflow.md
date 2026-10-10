@@ -51,7 +51,7 @@ python3 -m unittest discover \
 ```
 
 The pure business core can also be installed without Frappe, ERPNext or a
-database. See [`rundinova-core`](../../apps/rundinova_tech/rundinova_core/README.md)
+database. See the [`rundinova-core installation guide`](https://github.com/JubuNiyokoDev/rundinova-os/blob/5c53e014de017ff828bc8c1e28b2c52e0f0e92ca/apps/rundinova_tech/rundinova_core/README.md)
 for the isolated installation check.
 
 Frappe controller tests live beside their DocTypes and need an installed app.
