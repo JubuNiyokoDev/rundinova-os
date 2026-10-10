@@ -229,3 +229,5 @@ jobs:
 
       - name: Test
         run: venv/bin/pytest --color=yes --ignore=apps/rundinova_tech/rundinova_tech
+        env:
+          PULL_POLICY: always
