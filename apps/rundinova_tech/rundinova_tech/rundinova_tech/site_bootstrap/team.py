@@ -64,6 +64,9 @@ def ensure_team_users(temporary_password=None):
             if user.user_type != "System User":
                 user.user_type = "System User"
                 user_changed = True
+            if not user.default_workspace:
+                user.default_workspace = "RundiNova Tech"
+                user_changed = True
         else:
             user = frappe.new_doc("User")
             user_data = {
@@ -72,6 +75,7 @@ def ensure_team_users(temporary_password=None):
                 "last_name": spec["last_name"],
                 "enabled": 1,
                 "user_type": "System User",
+                "default_workspace": "RundiNova Tech",
                 "send_welcome_email": 0,
             }
             if temporary_password:
