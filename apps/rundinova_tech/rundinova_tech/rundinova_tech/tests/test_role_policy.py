@@ -33,6 +33,7 @@ class TestRolePolicy(UnitTestCase):
             },
         )
         self.assertIn("RundiNova Director", users["joffre.niyondiko@kit-hub.com"])
+        self.assertIn("Employee", users["ndabubahajanvier@gmail.com"])
         self.assertIn("RundiNova Ecosystem Lead", users["ndabubahajanvier@gmail.com"])
         self.assertIn("RundiNova Growth Lead", users["maniranyibutsef@gmail.com"])
         self.assertIn(
