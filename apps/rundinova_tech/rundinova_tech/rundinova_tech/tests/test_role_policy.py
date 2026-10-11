@@ -1,6 +1,7 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
 from frappe.tests import UnitTestCase
+from rundinova_tech import hooks
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
@@ -9,6 +10,12 @@ from rundinova_tech.rundinova_tech.site_bootstrap.team import TEAM_USERS
 
 
 class TestRolePolicy(UnitTestCase):
+    def test_custom_roles_exist_before_migrate_syncs_workspace_fixtures(self):
+        self.assertIn(
+            "rundinova_tech.rundinova_tech.provisioning.roles.ensure_rundinova_roles",
+            hooks.before_migrate,
+        )
+
     def test_team_seed_uses_confirmed_login_addresses_and_business_roles(self):
         users = {row["email"]: set(row["roles"]) for row in TEAM_USERS}
         self.assertEqual(
