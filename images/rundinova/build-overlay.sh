@@ -48,13 +48,16 @@ if docker image inspect "$target_image" >/dev/null 2>&1; then
 fi
 
 base_id="$(docker image inspect --format '{{.Id}}' "$base_image")"
+source_commit="${RUNDINOVA_SOURCE_COMMIT:-$(git rev-parse HEAD)}"
 echo "Building app-only candidate: $target_image"
 echo "Pinned local base: $base_image ($base_id)"
+echo "RundiNova source commit: $source_commit"
 
 docker build \
   --pull=false \
   --build-arg="RUNDINOVA_BASE_IMAGE=${base_image}" \
   --build-arg="RUNDINOVA_BASE_IMAGE_ID=${base_id}" \
+  --build-arg="RUNDINOVA_SOURCE_COMMIT=${source_commit}" \
   --tag="$target_image" \
   --file=images/rundinova/Overlay.Containerfile .
 

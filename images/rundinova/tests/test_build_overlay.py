@@ -89,6 +89,12 @@ class TestBuildOverlay(unittest.TestCase):
             self.assertIn(
                 f"--build-arg=RUNDINOVA_BASE_IMAGE_ID={BASE_IMAGE_ID}", build_args
             )
+            self.assertTrue(
+                any(
+                    arg.startswith("--build-arg=RUNDINOVA_SOURCE_COMMIT=")
+                    for arg in build_args
+                )
+            )
             self.assertIn("sha256:candidate-id", result.stdout)
 
 

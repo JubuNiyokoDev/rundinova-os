@@ -1,6 +1,7 @@
 name: RundiNova checks
 
 on:
+  workflow_call:
   push:
     paths:
       - "apps/rundinova_tech/**"
@@ -12,6 +13,7 @@ on:
       - "tests/compose-configs.json"
       - ".github/scripts/validate_compose.py"
       - ".github/workflows/rundinova-checks.yml"
+      - ".github/workflows/rundinova-release-candidate.yml"
   pull_request:
     paths:
       - "apps/rundinova_tech/**"
@@ -23,6 +25,7 @@ on:
       - "tests/compose-configs.json"
       - ".github/scripts/validate_compose.py"
       - ".github/workflows/rundinova-checks.yml"
+      - ".github/workflows/rundinova-release-candidate.yml"
   workflow_dispatch:
 
 permissions:

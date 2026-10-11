@@ -1,0 +1,157 @@
+name: RundiNova release candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_image:
+        description: Approved GHCR image pinned by sha256 digest
+        required: true
+        type: string
+        default: ghcr.io/jubuniyokodev/rundinova-erpnext@sha256:2164d00b66f9cf2edb76d75e69088ac488fd971cc4967993365e5831f8877d15
+      release_tag:
+        description: New immutable tag, for example 16.37.7-rn.78-next-change
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Business rules and deployment checks
+    uses: ./.github/workflows/rundinova-checks.yml
+
+  build-and-publish:
+    name: Build and publish candidate image
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout approved main revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Validate release inputs and source branch
+        shell: bash
+        env:
+          BASE_IMAGE: ${{ inputs.base_image }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "Release candidates can only be built from main." >&2
+            exit 1
+          fi
+          if [[ ! "$BASE_IMAGE" =~ ^ghcr\.io/jubuniyokodev/rundinova-erpnext@sha256:[a-f0-9]{64}$ ]]; then
+            echo "Base must be the approved RundiNova GHCR image pinned by sha256 digest." >&2
+            exit 1
+          fi
+          if [[ ! "$RELEASE_TAG" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ || "$RELEASE_TAG" == latest ]]; then
+            echo "Release tag must be unique, immutable, and must not be latest." >&2
+            exit 1
+          fi
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull pinned base and refuse tag reuse
+        id: base
+        shell: bash
+        env:
+          BASE_IMAGE: ${{ inputs.base_image }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          target="ghcr.io/jubuniyokodev/rundinova-erpnext:${RELEASE_TAG}"
+          if docker manifest inspect "$target" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing image tag: $target" >&2
+            exit 1
+          fi
+          docker pull "$BASE_IMAGE"
+          base_id="$(docker image inspect --format '{{.Id}}' "$BASE_IMAGE")"
+          echo "base_id=$base_id" >> "$GITHUB_OUTPUT"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Build app-only candidate
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          file: images/rundinova/Overlay.Containerfile
+          load: true
+          push: false
+          tags: ${{ steps.base.outputs.target }}
+          build-args: |
+            RUNDINOVA_BASE_IMAGE=${{ inputs.base_image }}
+            RUNDINOVA_BASE_IMAGE_ID=${{ steps.base.outputs.base_id }}
+            RUNDINOVA_SOURCE_COMMIT=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/JubuNiyokoDev/rundinova-os
+            org.opencontainers.image.revision=${{ github.sha }}
+          provenance: false
+
+      - name: Smoke-check image assets and release metadata
+        shell: bash
+        env:
+          IMAGE: ${{ steps.base.outputs.target }}
+          BASE_ID: ${{ steps.base.outputs.base_id }}
+          SOURCE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint bash "$IMAGE" -lc '
+            set -euo pipefail
+            test -f assets/rundinova_tech/js/workspace_sidebar.js
+            test -f assets/rundinova_tech/js/rundinova_branding.js
+            test -f assets/rundinova_tech/css/rundinova_desk.css
+            test -f assets/rundinova_tech/images/rundinova-favicon.svg
+            test -f assets/rundinova_tech/images/rundinova-logo.png
+            test -f release-metadata.json
+          '
+          actual_revision="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$IMAGE")"
+          test "$actual_revision" = "$SOURCE_COMMIT"
+          echo "Smoke checks passed for $IMAGE (base $BASE_ID, source $SOURCE_COMMIT)."
+
+      - name: Publish immutable candidate
+        id: publish
+        shell: bash
+        env:
+          IMAGE: ${{ steps.base.outputs.target }}
+        run: |
+          set -euo pipefail
+          push_log="$RUNNER_TEMP/rundinova-image-push.log"
+          docker push "$IMAGE" | tee "$push_log"
+          registry_digest="$(awk '/digest: sha256:/ { print $3; exit }' "$push_log")"
+          if [[ ! "$registry_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Docker did not return a valid registry manifest digest." >&2
+            exit 1
+          fi
+          docker manifest inspect "$IMAGE" >/dev/null
+          echo "registry_digest=$registry_digest" >> "$GITHUB_OUTPUT"
+
+      - name: Record candidate provenance
+        shell: bash
+        env:
+          IMAGE: ${{ steps.base.outputs.target }}
+          BASE_IMAGE: ${{ inputs.base_image }}
+          BASE_ID: ${{ steps.base.outputs.base_id }}
+          REGISTRY_DIGEST: ${{ steps.publish.outputs.registry_digest }}
+        run: |
+          set -euo pipefail
+          image_id="$(docker image inspect --format '{{.Id}}' "$IMAGE")"
+          {
+            echo "## RundiNova image candidate published"
+            echo
+            echo "- Image: \`$IMAGE\`"
+            echo "- Registry manifest digest: \`$REGISTRY_DIGEST\`"
+            echo "- Image configuration ID: \`$image_id\`"
+            echo "- Base reference: \`$BASE_IMAGE\`"
+            echo "- Base image ID: \`$BASE_ID\`"
+            echo "- Source commit: \`$GITHUB_SHA\`"
+            echo "- Production was not changed."
+          } >> "$GITHUB_STEP_SUMMARY"
