@@ -54,6 +54,28 @@ jobs:
             exit 1
           fi
 
+      - name: Configure Docker containerd image store
+        uses: docker/setup-docker-action@v5
+        with:
+          set-host: true
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
+      - name: Verify Docker image store
+        shell: bash
+        run: |
+          set -euo pipefail
+          storage_status="$(docker info --format '{{.DriverStatus}}')"
+          echo "Docker image store: $storage_status"
+          if [[ "$storage_status" != *io.containerd.snapshotter.v1* ]]; then
+            echo "GitHub runner must use the containerd image store for the approved base image." >&2
+            exit 1
+          fi
+
       - name: Log in to GHCR
         uses: docker/login-action@v4
         with:
@@ -75,7 +97,7 @@ jobs:
             exit 1
           fi
           if ! docker pull "$BASE_IMAGE"; then
-            echo "::error title=GHCR access failed::Could not read the private base image. Confirm the digest and grant JubuNiyokoDev/rundinova-os Write access under Manage Actions access: https://github.com/users/JubuNiyokoDev/packages/container/package/rundinova-erpnext/settings" >&2
+            echo "::error title=Pinned base pull failed::Could not pull the pinned image. Check package access, digest validity, and runner image-store depth." >&2
             exit 1
           fi
           base_id="$(docker image inspect --format '{{.Id}}' "$BASE_IMAGE")"
