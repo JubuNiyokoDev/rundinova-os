@@ -19,7 +19,7 @@ rôle possède des responsabilités et des accès distincts dans l'application.
 | Franck Maniranyibutse  | **Growth Lead**               | RundiNova Growth Lead, RundiNova Team Member                               | Suit la croissance, les opportunités et le pipeline CRM                  |
 | Elvis Irambona         | **Communication Lead**        | RundiNova Communications, RundiNova Team Member                             | Porte la communication interne/externe et l'image de RundiNova           |
 | Fanuel Kasumba Mandela | **Community Relations Lead** | RundiNova Community Relations, RundiNova Team Member                        | Suit les activités, bénéficiaires et impacts communautaires               |
-| Housekeeping           | **Housekeeping**              | RundiNova Team Member                                                       | Accède aux fonctions opérationnelles minimales nécessaires à son travail |
+| Housekeeping           | **Housekeeping**              | Employee, RundiNova Team Member                                             | Accède à son profil et aux fonctions opérationnelles minimales            |
 
 Fondateur (basé en Suède) : **Founder & Chairman** — compte créé plus tard.
 Le titre « Founder » est un statut d'origine (qui a créé la boîte) ; le titre

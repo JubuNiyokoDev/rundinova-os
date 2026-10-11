@@ -30,7 +30,8 @@ class TestRolePolicy(UnitTestCase):
             "RundiNova Community Relations", users["mandela.fanuel.1@gmail.com"]
         )
         self.assertEqual(
-            users["housekeeping@rundinova.com"], {"RundiNova Team Member"}
+            users["housekeeping@rundinova.com"],
+            {"Employee", "RundiNova Team Member"},
         )
 
     def test_growth_ecosystem_and_community_roles_are_separated(self):

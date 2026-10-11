@@ -48,7 +48,7 @@ TEAM_USERS = [
         "first_name": "Housekeeping",
         "last_name": "",
         "employee_name": "Housekeeping",
-        "roles": ["RundiNova Team Member"],
+        "roles": ["Employee", "RundiNova Team Member"],
     },
 ]
 
