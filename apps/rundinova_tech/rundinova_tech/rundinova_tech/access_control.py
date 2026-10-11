@@ -7,6 +7,9 @@ ROLES = (
     "RundiNova Finance Manager",
     "RundiNova Operations",
     "RundiNova Project Lead",
+    "RundiNova Ecosystem Lead",
+    "RundiNova Growth Lead",
+    "RundiNova Community Relations",
     "RundiNova Team Member",
     "RundiNova Communications",
     "RundiNova People & Culture",
@@ -90,7 +93,10 @@ def get_custom_doctype_permissions():
         FINANCIAL_DOCTYPES,
         (
             "RundiNova Project Lead",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
             "RundiNova Communications",
+            "RundiNova Community Relations",
             "RundiNova People & Culture",
         ),
         READ,
@@ -121,7 +127,10 @@ def get_custom_doctype_permissions():
         PROJECT_DOCTYPES,
         (
             "RundiNova Operations",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
             "RundiNova Communications",
+            "RundiNova Community Relations",
             "RundiNova People & Culture",
             "RundiNova Team Member",
         ),
@@ -133,7 +142,10 @@ def get_custom_doctype_permissions():
         (
             "RundiNova Operations",
             "RundiNova Project Lead",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
             "RundiNova Communications",
+            "RundiNova Community Relations",
             "RundiNova People & Culture",
         ),
         WRITE,
@@ -150,7 +162,10 @@ def get_custom_doctype_permissions():
             "RundiNova Finance Manager",
             "RundiNova Operations",
             "RundiNova Team Member",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
             "RundiNova Communications",
+            "RundiNova Community Relations",
             "RundiNova People & Culture",
         ),
         READ,
@@ -158,14 +173,28 @@ def get_custom_doctype_permissions():
 
     grant(CRM_DOCTYPES, ("RundiNova Communications",), WRITE)
     grant(
+        ("RundiNova Partnership", "RundiNova Growth Opportunity"),
+        ("RundiNova Ecosystem Lead",),
+        WRITE,
+    )
+    grant(
+        ("RundiNova Community Impact",),
+        ("RundiNova Community Relations",),
+        WRITE,
+    )
+    grant(
         CRM_DOCTYPES,
-        (
-            "RundiNova Operations",
-            "RundiNova Project Lead",
-            "RundiNova People & Culture",
-        ),
+        ("RundiNova Operations", "RundiNova Project Lead", "RundiNova People & Culture"),
         READ,
     )
+    grant(
+        ("RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact"),
+        ("RundiNova Growth Lead", "RundiNova Community Relations"),
+        READ,
+    )
+    # Specific ownership grants must follow the broader read-only grants.
+    grant(("RundiNova Growth Opportunity",), ("RundiNova Growth Lead",), WRITE)
+    grant(("RundiNova Community Impact",), ("RundiNova Community Relations",), WRITE)
 
     grant(OFFICE_DOCTYPES, ("RundiNova People & Culture",), WRITE)
     grant(
@@ -223,14 +252,30 @@ def get_standard_doctype_permissions():
     grant(("HR Settings",), ("RundiNova Director", "RundiNova People & Culture"))
     grant(
         CRM_OPERATIONAL_DOCTYPES,
-        ("RundiNova Director", "RundiNova Communications"),
+        (
+            "RundiNova Director",
+            "RundiNova Communications",
+            "RundiNova Growth Lead",
+        ),
         WRITE,
     )
     grant(
         CRM_OPERATIONAL_DOCTYPES + CRM_LOOKUP_DOCTYPES,
-        ("RundiNova Operations", "RundiNova Project Lead"),
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Community Relations",
+        ),
     )
-    grant(CRM_LOOKUP_DOCTYPES, ("RundiNova Director", "RundiNova Communications"))
+    grant(
+        CRM_LOOKUP_DOCTYPES,
+        (
+            "RundiNova Director",
+            "RundiNova Communications",
+            "RundiNova Growth Lead",
+        ),
+    )
     grant(
         ("Account", "GL Entry", "Mode of Payment"),
         ("RundiNova Director", "RundiNova Finance Manager"),

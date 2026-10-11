@@ -9,6 +9,9 @@
     { "role": "RundiNova Finance Manager" },
     { "role": "RundiNova Operations" },
     { "role": "RundiNova Project Lead" },
+    { "role": "RundiNova Ecosystem Lead" },
+    { "role": "RundiNova Growth Lead" },
+    { "role": "RundiNova Community Relations" },
     { "role": "System Manager" }
   ],
   "script": null,

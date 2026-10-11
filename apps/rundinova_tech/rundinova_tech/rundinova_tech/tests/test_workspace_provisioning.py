@@ -368,12 +368,14 @@ class TestWorkspaceProvisioning(UnitTestCase):
         for doctype in ("CRM Global Settings", "FCRM Settings", "CRM Telephony Agent"):
             self.assertNotIn((doctype, "RundiNova Communications"), policy)
 
-    def test_crm_entry_role_is_granted_to_director_and_communications_users(self):
+    def test_crm_entry_role_is_granted_to_roles_that_use_crm(self):
         from rundinova_tech.rundinova_tech.provisioning import permissions
 
         roles_by_user = {
             "director@example.test": {"RundiNova Director"},
             "communications@example.test": {"RundiNova Communications"},
+            "ecosystem@example.test": {"RundiNova Ecosystem Lead"},
+            "growth@example.test": {"RundiNova Growth Lead"},
             "member@example.test": {"RundiNova Team Member"},
             "existing-sales@example.test": {"RundiNova Director", "Sales User"},
         }
@@ -399,7 +401,12 @@ class TestWorkspaceProvisioning(UnitTestCase):
 
         self.assertEqual(
             updated,
-            ["director@example.test", "communications@example.test"],
+            [
+                "director@example.test",
+                "communications@example.test",
+                "ecosystem@example.test",
+                "growth@example.test",
+            ],
         )
         get_users.assert_called_once_with(
             "User", filters={"user_type": "System User"}, pluck="name"
