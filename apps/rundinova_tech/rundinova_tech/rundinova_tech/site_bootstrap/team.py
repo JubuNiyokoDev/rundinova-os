@@ -24,7 +24,7 @@ TEAM_USERS = [
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
         "employee_name": "NDABUBAHA Janvier",
-        "roles": ["RundiNova Ecosystem Lead", "RundiNova Team Member"],
+        "roles": ["Employee", "RundiNova Ecosystem Lead", "RundiNova Team Member"],
     },
     {
         "email": "maniranyibutsef@gmail.com",
