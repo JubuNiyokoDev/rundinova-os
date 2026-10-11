@@ -13,7 +13,7 @@ class RundiNovaRepository(Document):
         if not GITHUB_URL.fullmatch((self.github_url or "").strip()):
             frappe.throw(
                 _(
-                    "Use a public GitHub repository URL, for example https://github.com/org/repository."
+                    "Use a GitHub repository URL, for example https://github.com/org/repository."
                 )
             )
         if not 0 <= frappe.utils.flt(self.progress_percent) <= 100:
@@ -35,7 +35,7 @@ class RundiNovaRepository(Document):
 
     @frappe.whitelist()
     def sync_from_github(self):
-        """Pull public metadata from GitHub (read-only GET). Updates local fields."""
+        """Pull public or token-authorized private metadata from GitHub."""
         if not frappe.has_permission("RundiNova Repository", "write", self):
             frappe.throw(
                 _("You need write access to sync this repository."),

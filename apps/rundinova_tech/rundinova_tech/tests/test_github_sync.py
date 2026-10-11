@@ -1,25 +1,32 @@
 """Unit tests for the read-only GitHub sync module."""
 
+import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from rundinova_tech.github_sync import (
-    parse_github_url,
-    fetch_repository_info,
     fetch_recent_commits,
+    fetch_repository_info,
+    parse_github_url,
     sync_repository,
 )
 
 
 class TestParseGithubUrl(unittest.TestCase):
     def test_valid_url(self):
-        self.assertEqual(parse_github_url("https://github.com/org/repo"), ("org", "repo"))
+        self.assertEqual(
+            parse_github_url("https://github.com/org/repo"), ("org", "repo")
+        )
 
     def test_valid_url_trailing_slash(self):
-        self.assertEqual(parse_github_url("https://github.com/org/repo/"), ("org", "repo"))
+        self.assertEqual(
+            parse_github_url("https://github.com/org/repo/"), ("org", "repo")
+        )
 
     def test_valid_url_with_dots(self):
-        self.assertEqual(parse_github_url("https://github.com/my-org/my.repo"), ("my-org", "my.repo"))
+        self.assertEqual(
+            parse_github_url("https://github.com/my-org/my.repo"), ("my-org", "my.repo")
+        )
 
     def test_invalid_url_no_path(self):
         self.assertIsNone(parse_github_url("https://github.com"))
@@ -118,13 +125,54 @@ class TestSyncRepository(unittest.TestCase):
             "pushed_at": "2026-09-28T12:00:00Z",
             "html_url": "https://github.com/org/repo",
         }
-        mock_commits.return_value = [{"sha": "abc", "message": "init", "author": "Dev", "date": ""}]
+        mock_commits.return_value = [
+            {"sha": "abc", "message": "init", "author": "Dev", "date": ""}
+        ]
 
         result = sync_repository("https://github.com/org/repo")
         self.assertEqual(result["owner"], "org")
         self.assertEqual(result["repo"], "repo")
         self.assertEqual(result["stargazers_count"], 10)
         self.assertIn("recent_commits", result)
+
+
+class TestGitHubToken(unittest.TestCase):
+    @patch("rundinova_tech.github_sync.requests.get")
+    @patch.dict(os.environ, {"RUNDINOVA_GITHUB_TOKEN": "fine-grained-test-token"})
+    def test_token_is_used_for_private_repository_read_requests(self, mock_get):
+        response = MagicMock()
+        response.json.side_effect = [
+            {
+                "full_name": "RundiNova/PartenerWanje",
+                "default_branch": "main",
+            },
+            [],
+        ]
+        response.raise_for_status = MagicMock()
+        mock_get.return_value = response
+
+        result = sync_repository("https://github.com/RundiNova/PartenerWanje")
+
+        self.assertEqual(result["full_name"], "RundiNova/PartenerWanje")
+        self.assertEqual(mock_get.call_count, 2)
+        for request in mock_get.call_args_list:
+            headers = request.kwargs["headers"]
+            self.assertEqual(headers["Authorization"], "Bearer fine-grained-test-token")
+            self.assertEqual(headers["X-GitHub-Api-Version"], "2026-03-10")
+        self.assertNotIn("Authorization", result)
+
+    @patch("rundinova_tech.github_sync.requests.get")
+    @patch.dict(os.environ, {"RUNDINOVA_GITHUB_TOKEN": ""})
+    def test_public_repository_requests_work_without_a_token(self, mock_get):
+        response = MagicMock()
+        response.json.side_effect = [{"full_name": "org/repo"}, []]
+        response.raise_for_status = MagicMock()
+        mock_get.return_value = response
+
+        sync_repository("https://github.com/org/repo")
+
+        for request in mock_get.call_args_list:
+            self.assertNotIn("Authorization", request.kwargs["headers"])
 
 
 if __name__ == "__main__":
