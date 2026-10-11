@@ -5,9 +5,9 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from rundinova_tech.github_sync import (
-    parse_github_url,
-    fetch_repository_info,
     fetch_recent_commits,
+    fetch_repository_info,
+    parse_github_url,
     sync_repository,
 )
 

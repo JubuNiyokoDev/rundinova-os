@@ -16,14 +16,14 @@ Les membres utilisent leur adresse réelle et leur propre compte. Cette recette 
 contient aucun mot de passe. Les rôles ci-dessous décrivent les parcours à
 vérifier; ils ne donnent pas implicitement accès aux données confidentielles.
 
-| Membre | Adresse de connexion | Parcours métier |
-| --- | --- | --- |
-| Joffre Niyondiko | `joffre.niyondiko@kit-hub.com` | Direction, pilotage, projets et validations selon ses rôles attribués |
-| Janvier Ndabubaha | `ndabubahajanvier@gmail.com` | Écosystème, partenariats et opportunités |
-| Elvis Presira | `presira857@gmail.com` | Communication et activités CRM autorisées |
-| Franck Maniranyibutse | `maniranyibutsef@gmail.com` | Croissance, prospects et opportunités |
-| Fanuel Mandela | `mandela.fanuel.1@gmail.com` | Relations communautaires, activités et impact |
-| Housekeeping | `housekeeping@rundinova.com` | Opérations de son poste et libre-service limité |
+| Membre                | Adresse de connexion           | Parcours métier                                                       |
+| --------------------- | ------------------------------ | --------------------------------------------------------------------- |
+| Joffre Niyondiko      | `joffre.niyondiko@kit-hub.com` | Direction, pilotage, projets et validations selon ses rôles attribués |
+| Janvier Ndabubaha     | `ndabubahajanvier@gmail.com`   | Écosystème, partenariats et opportunités                              |
+| Elvis Presira         | `presira857@gmail.com`         | Communication et activités CRM autorisées                             |
+| Franck Maniranyibutse | `maniranyibutsef@gmail.com`    | Croissance, prospects et opportunités                                 |
+| Fanuel Mandela        | `mandela.fanuel.1@gmail.com`   | Relations communautaires, activités et impact                         |
+| Housekeeping          | `housekeeping@rundinova.com`   | Opérations de son poste et libre-service limité                       |
 
 Le rôle `RundiNova Director` ne transforme pas Joffre en compte système
 `Administrator`. La recette doit confirmer les autorisations effectives de
