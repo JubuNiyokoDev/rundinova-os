@@ -76,9 +76,16 @@ les collaborateurs consultent les tâches autorisées depuis RundiNova Équipe.
 
 **Où** : RundiNova Tech > RundiNova Repository
 **Quoi** : Enregistrez vos repos GitHub. Cliquez "Sync from GitHub" pour
-mettre à jour les stats (issues, stars, forks, dernier push).
-**Activation** : Créez un record "RundiNova Repository" avec l'URL du repo.
-**Note** : Lecture seule. Ne modifie jamais rien sur GitHub.
+mettre à jour les métadonnées du dépôt et les cinq derniers commits. Exemple :
+`https://github.com/JubuNiyokoDev/PartenerWanje`.
+**Activation** : Créez un record "RundiNova Repository" avec l'URL du dépôt.
+Les dépôts publics fonctionnent sans token. Pour un dépôt privé, configurez
+`RUNDINOVA_GITHUB_TOKEN` dans le fichier d'environnement privé du serveur puis
+recréez le service backend. Utilisez un fine-grained token limité au dépôt,
+avec uniquement `Metadata: read` et `Contents: read`.
+**Note** : Lecture seule. La synchronisation ne crée pas de tâches/issues et
+n'écrit jamais sur GitHub. Ne mettez pas le token dans le code, dans un record
+Frappe, dans Git ou dans une conversation.
 
 ### 4. Budget alimentaire
 

@@ -1,31 +1,47 @@
 """Read-only GitHub integration for RundiNova Repository records.
 
-This module only performs GET requests against the public GitHub REST API.
-It never creates, modifies, or deletes anything on GitHub.
+Public repositories work without credentials. A token supplied through the
+RUNDINOVA_GITHUB_TOKEN environment variable enables the same GET-only sync for
+private repositories. This module never writes to GitHub.
 """
 
+import os
 import re
 
 import requests
 
 GITHUB_API_BASE = "https://api.github.com"
 TIMEOUT_SECONDS = 15
+API_VERSION = "2026-03-10"
 GITHUB_URL = re.compile(r"^https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/?$")
 
 
 def parse_github_url(url):
-    """Extract (owner, repo) from a public GitHub URL. Returns None if invalid."""
+    """Extract (owner, repo) from a GitHub URL. Returns None if invalid."""
     match = GITHUB_URL.match((url or "").strip())
     if not match:
         return None
     return match.group(1), match.group(2)
 
 
+def _api_headers():
+    """Build request headers without exposing credentials in sync results."""
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "RundiNova-OS",
+        "X-GitHub-Api-Version": API_VERSION,
+    }
+    token = os.environ.get("RUNDINOVA_GITHUB_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 def fetch_repository_info(owner, repo):
     """GET /repos/{owner}/{repo} - returns parsed dict or raises on error."""
     response = requests.get(
         f"{GITHUB_API_BASE}/repos/{owner}/{repo}",
-        headers={"Accept": "application/vnd.github.v3+json", "User-Agent": "RundiNova-OS"},
+        headers=_api_headers(),
         timeout=TIMEOUT_SECONDS,
     )
     response.raise_for_status()
@@ -49,19 +65,21 @@ def fetch_recent_commits(owner, repo, limit=5):
     response = requests.get(
         f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits",
         params={"per_page": limit},
-        headers={"Accept": "application/vnd.github.v3+json", "User-Agent": "RundiNova-OS"},
+        headers=_api_headers(),
         timeout=TIMEOUT_SECONDS,
     )
     response.raise_for_status()
     commits = []
     for item in response.json():
         commit = item.get("commit", {})
-        commits.append({
-            "sha": item.get("sha", "")[:8],
-            "message": (commit.get("message") or "").split("\n")[0][:120],
-            "author": (commit.get("author") or {}).get("name", ""),
-            "date": (commit.get("author") or {}).get("date", ""),
-        })
+        commits.append(
+            {
+                "sha": item.get("sha", "")[:8],
+                "message": (commit.get("message") or "").split("\n")[0][:120],
+                "author": (commit.get("author") or {}).get("name", ""),
+                "date": (commit.get("author") or {}).get("date", ""),
+            }
+        )
     return commits
 
 
