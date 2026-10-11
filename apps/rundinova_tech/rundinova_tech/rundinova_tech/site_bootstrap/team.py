@@ -61,9 +61,6 @@ def ensure_team_users(temporary_password=None):
         user_changed = False
         if frappe.db.exists("User", email):
             user = frappe.get_doc("User", email)
-            if not user.enabled:
-                user.enabled = 1
-                user_changed = True
             if user.user_type != "System User":
                 user.user_type = "System User"
                 user_changed = True
