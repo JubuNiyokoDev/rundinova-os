@@ -20,15 +20,15 @@ Ce document sert à vérifier les parcours réellement utilisables par l’équi
 
 ## Parcours commun — chaque membre
 
-| Contrôle | Résultat attendu | Fait / anomalie |
-|---|---|---|
-| Connexion à son compte nominatif | Le compte s’ouvre et affiche le bon nom et la bonne adresse | |
-| Changement du mot de passe temporaire | Le membre définit un mot de passe individuel et peut se reconnecter | |
-| Profil utilisateur | Nom, photo et coordonnées modifiables selon les droits accordés | |
-| Accueil RundiNova | Les raccourcis visibles ouvrent les bonnes pages, sans « Page not found » | |
-| Navigation et recherche | Le membre trouve les fonctions nécessaires depuis le menu ou la recherche | |
-| Droits | Les pages autorisées s’ouvrent ; les données confidentielles hors rôle restent inaccessibles | |
-| Notifications | Les alertes dans l’application sont visibles et ouvrent le bon document | |
+| Contrôle                              | Résultat attendu                                                                             | Fait / anomalie |
+| ------------------------------------- | -------------------------------------------------------------------------------------------- | --------------- |
+| Connexion à son compte nominatif      | Le compte s’ouvre et affiche le bon nom et la bonne adresse                                  |                 |
+| Changement du mot de passe temporaire | Le membre définit un mot de passe individuel et peut se reconnecter                          |                 |
+| Profil utilisateur                    | Nom, photo et coordonnées modifiables selon les droits accordés                              |                 |
+| Accueil RundiNova                     | Les raccourcis visibles ouvrent les bonnes pages, sans « Page not found »                    |                 |
+| Navigation et recherche               | Le membre trouve les fonctions nécessaires depuis le menu ou la recherche                    |                 |
+| Droits                                | Les pages autorisées s’ouvrent ; les données confidentielles hors rôle restent inaccessibles |                 |
+| Notifications                         | Les alertes dans l’application sont visibles et ouvrent le bon document                      |                 |
 
 ## Recette par rôle
 
@@ -121,8 +121,8 @@ Ce document sert à vérifier les parcours réellement utilisables par l’équi
 ## Compte rendu de chaque test
 
 | Date / heure | Utilisateur et rôle | Parcours | Résultat (OK / anomalie / bloqué) | URL ou référence | Détail sans secret |
-|---|---|---|---|---|---|
-| | | | | | |
+| ------------ | ------------------- | -------- | --------------------------------- | ---------------- | ------------------ |
+|              |                     |          |                                   |                  |                    |
 
 ## Critères de démarrage
 

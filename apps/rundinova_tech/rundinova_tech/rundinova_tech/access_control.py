@@ -184,11 +184,19 @@ def get_custom_doctype_permissions():
     )
     grant(
         CRM_DOCTYPES,
-        ("RundiNova Operations", "RundiNova Project Lead", "RundiNova People & Culture"),
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova People & Culture",
+        ),
         READ,
     )
     grant(
-        ("RundiNova Growth Opportunity", "RundiNova Partnership", "RundiNova Community Impact"),
+        (
+            "RundiNova Growth Opportunity",
+            "RundiNova Partnership",
+            "RundiNova Community Impact",
+        ),
         ("RundiNova Growth Lead", "RundiNova Community Relations"),
         READ,
     )

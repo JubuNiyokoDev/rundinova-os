@@ -12,14 +12,14 @@ rôle possède des responsabilités et des accès distincts dans l'application.
 
 ## Vue d'ensemble
 
-| Personne               | Titre                         | Rôles dans l'application                                                   | Mission en une phrase                                                   |
-| ---------------------- | ----------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Joffre Niyondiko       | **CEO / Direction**           | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead      | Dirige l'entreprise, contrôle les finances et voit le répertoire d'équipe |
-| Janvier Ndabubaha      | **Ecosystem Lead**            | RundiNova Ecosystem Lead, RundiNova Team Member                            | Suit les partenariats, l'écosystème et les opportunités                  |
-| Franck Maniranyibutse  | **Growth Lead**               | RundiNova Growth Lead, RundiNova Team Member                               | Suit la croissance, les opportunités et le pipeline CRM                  |
-| Elvis Irambona         | **Communication Lead**        | RundiNova Communications, RundiNova Team Member                             | Porte la communication interne/externe et l'image de RundiNova           |
-| Fanuel Kasumba Mandela | **Community Relations Lead** | RundiNova Community Relations, RundiNova Team Member                        | Suit les activités, bénéficiaires et impacts communautaires               |
-| Housekeeping           | **Housekeeping**              | Employee, RundiNova Team Member                                             | Accède à son profil et aux fonctions opérationnelles minimales            |
+| Personne               | Titre                        | Rôles dans l'application                                              | Mission en une phrase                                                     |
+| ---------------------- | ---------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Joffre Niyondiko       | **CEO / Direction**          | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead | Dirige l'entreprise, contrôle les finances et voit le répertoire d'équipe |
+| Janvier Ndabubaha      | **Ecosystem Lead**           | RundiNova Ecosystem Lead, RundiNova Team Member                       | Suit les partenariats, l'écosystème et les opportunités                   |
+| Franck Maniranyibutse  | **Growth Lead**              | RundiNova Growth Lead, RundiNova Team Member                          | Suit la croissance, les opportunités et le pipeline CRM                   |
+| Elvis Irambona         | **Communication Lead**       | RundiNova Communications, RundiNova Team Member                       | Porte la communication interne/externe et l'image de RundiNova            |
+| Fanuel Kasumba Mandela | **Community Relations Lead** | RundiNova Community Relations, RundiNova Team Member                  | Suit les activités, bénéficiaires et impacts communautaires               |
+| Housekeeping           | **Housekeeping**             | Employee, RundiNova Team Member                                       | Accède à son profil et aux fonctions opérationnelles minimales            |
 
 Fondateur (basé en Suède) : **Founder & Chairman** — compte créé plus tard.
 Le titre « Founder » est un statut d'origine (qui a créé la boîte) ; le titre
@@ -70,11 +70,11 @@ GitHub.
 
 ### Direction et Écosystème
 
-| Domaine | Direction (Joffre) | Écosystème (Janvier) |
-| --- | --- | --- |
-| Budgets et validations | décide | consulte selon autorisation |
-| Partenariats et opportunités | arbitre | suit les dossiers |
-| Représentation externe | valide les engagements | entretient les relations |
+| Domaine                      | Direction (Joffre)     | Écosystème (Janvier)        |
+| ---------------------------- | ---------------------- | --------------------------- |
+| Budgets et validations       | décide                 | consulte selon autorisation |
+| Partenariats et opportunités | arbitre                | suit les dossiers           |
+| Représentation externe       | valide les engagements | entretient les relations    |
 
 Le rôle Écosystème assure un suivi fiable des partenaires, des opportunités et
 des prochaines actions.
@@ -131,28 +131,28 @@ dépenses sans autorisation.
 
 ## Qui fait quoi — tableau anti-confusion
 
-| Activité | Propriétaire | Contributeur | Informé |
-| --- | --- | --- | --- |
-| Budget et trésorerie | CEO | — | Écosystème, selon rôle |
-| Partenariats | Écosystème | Communication | CEO |
-| Pipeline de croissance | Growth | Communication | CEO |
-| Projets et tâches | Direction / propriétaire du projet | Toute l'équipe | CEO |
-| Communication externe | Communication | Écosystème, Growth | CEO |
-| Impact communautaire | Community Relations | Communication | CEO |
-| Décisions stratégiques | CEO | Équipe | Équipe |
+| Activité               | Propriétaire                       | Contributeur       | Informé                |
+| ---------------------- | ---------------------------------- | ------------------ | ---------------------- |
+| Budget et trésorerie   | CEO                                | —                  | Écosystème, selon rôle |
+| Partenariats           | Écosystème                         | Communication      | CEO                    |
+| Pipeline de croissance | Growth                             | Communication      | CEO                    |
+| Projets et tâches      | Direction / propriétaire du projet | Toute l'équipe     | CEO                    |
+| Communication externe  | Communication                      | Écosystème, Growth | CEO                    |
+| Impact communautaire   | Community Relations                | Communication      | CEO                    |
+| Décisions stratégiques | CEO                                | Équipe             | Équipe                 |
 
 ## Accès dans l'application par rôle
 
-| Rôle | Accès principal |
-| --- | --- |
-| RundiNova Director | Pilotage et écriture des données métier ; consultation de toutes les fiches Employé |
-| RundiNova Finance Manager | Budgets, dépenses, comptes et mouvements financiers |
-| RundiNova Ecosystem Lead | Écriture des partenariats et opportunités ; lecture des projets et indicateurs |
-| RundiNova Growth Lead | Écriture des opportunités et activités CRM ; lecture des partenariats et projets |
-| RundiNova Project Lead | Projets, tâches, dépôts et KPI de livraison |
-| RundiNova Communications | Activités CRM et communication |
-| RundiNova Community Relations | Activités, partenariats et impact communautaires |
-| RundiNova Team Member | Fonctions communes et documents financiers affectés à la personne |
+| Rôle                          | Accès principal                                                                     |
+| ----------------------------- | ----------------------------------------------------------------------------------- |
+| RundiNova Director            | Pilotage et écriture des données métier ; consultation de toutes les fiches Employé |
+| RundiNova Finance Manager     | Budgets, dépenses, comptes et mouvements financiers                                 |
+| RundiNova Ecosystem Lead      | Écriture des partenariats et opportunités ; lecture des projets et indicateurs      |
+| RundiNova Growth Lead         | Écriture des opportunités et activités CRM ; lecture des partenariats et projets    |
+| RundiNova Project Lead        | Projets, tâches, dépôts et KPI de livraison                                         |
+| RundiNova Communications      | Activités CRM et communication                                                      |
+| RundiNova Community Relations | Activités, partenariats et impact communautaires                                    |
+| RundiNova Team Member         | Fonctions communes et documents financiers affectés à la personne                   |
 
 > Les permissions techniques exactes sont appliquées dans l'application par
 > `rundinova_tech.rundinova_tech.setup.seed()` ; ce tableau décrit l'intention

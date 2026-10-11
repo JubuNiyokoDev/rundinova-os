@@ -1,7 +1,6 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
 from frappe.tests import UnitTestCase
-
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
@@ -51,9 +50,7 @@ class TestRolePolicy(UnitTestCase):
         )
         self.assertNotIn(("RundiNova Cash Account", "RundiNova Growth Lead"), policy)
         self.assertEqual(
-            policy[("RundiNova Food Budget", "RundiNova Community Relations")][
-                "write"
-            ],
+            policy[("RundiNova Food Budget", "RundiNova Community Relations")]["write"],
             0,
         )
 
