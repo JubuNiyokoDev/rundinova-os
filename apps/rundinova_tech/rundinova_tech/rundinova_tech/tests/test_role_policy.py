@@ -6,7 +6,10 @@ from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
 )
-from rundinova_tech.rundinova_tech.site_bootstrap.team import TEAM_USERS
+from rundinova_tech.rundinova_tech.site_bootstrap.team import (
+    LEGACY_TEAM_LOGIN_REPLACEMENTS,
+    TEAM_USERS,
+)
 
 
 class TestRolePolicy(UnitTestCase):
@@ -38,6 +41,10 @@ class TestRolePolicy(UnitTestCase):
         self.assertEqual(
             users["housekeeping@rundinova.com"],
             {"Employee", "RundiNova Team Member"},
+        )
+        self.assertEqual(
+            LEGACY_TEAM_LOGIN_REPLACEMENTS,
+            {"1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com"},
         )
 
     def test_growth_ecosystem_and_community_roles_are_separated(self):
