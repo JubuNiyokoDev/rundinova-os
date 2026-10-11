@@ -38,7 +38,10 @@ class TestReleaseWorkflow(unittest.TestCase):
         self,
     ):
         self.assertIn("Pinned base pull failed", self.release)
-        self.assertIn("package access, digest validity, and runner image-store depth", self.release)
+        self.assertIn(
+            "package access, digest validity, and runner image-store depth",
+            self.release,
+        )
 
     def test_candidate_uses_containerd_image_store_for_deep_base_images(self):
         self.assertIn("docker/setup-docker-action@v5", self.release)
