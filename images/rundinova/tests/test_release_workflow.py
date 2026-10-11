@@ -34,6 +34,11 @@ class TestReleaseWorkflow(unittest.TestCase):
         self.assertIn("Refusing to overwrite existing image tag", self.release)
         self.assertIn('"$RELEASE_TAG" == latest', self.release)
 
+    def test_private_base_failure_explains_the_required_package_access(self):
+        self.assertIn("GHCR access failed", self.release)
+        self.assertIn("Manage Actions access", self.release)
+        self.assertIn("rundinova-erpnext/settings", self.release)
+
     def test_candidate_never_deploys_or_changes_production(self):
         self.assertIn("images/rundinova/Overlay.Containerfile", self.release)
         self.assertIn("Smoke-check image assets and release metadata", self.release)

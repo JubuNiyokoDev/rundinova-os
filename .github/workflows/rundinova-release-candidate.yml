@@ -74,7 +74,10 @@ jobs:
             echo "Refusing to overwrite existing image tag: $target" >&2
             exit 1
           fi
-          docker pull "$BASE_IMAGE"
+          if ! docker pull "$BASE_IMAGE"; then
+            echo "::error title=GHCR access failed::Could not read the private base image. Confirm the digest and grant JubuNiyokoDev/rundinova-os Write access under Manage Actions access: https://github.com/users/JubuNiyokoDev/packages/container/package/rundinova-erpnext/settings" >&2
+            exit 1
+          fi
           base_id="$(docker image inspect --format '{{.Id}}' "$BASE_IMAGE")"
           echo "base_id=$base_id" >> "$GITHUB_OUTPUT"
           echo "target=$target" >> "$GITHUB_OUTPUT"
