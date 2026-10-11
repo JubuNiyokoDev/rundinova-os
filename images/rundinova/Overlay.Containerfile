@@ -5,6 +5,10 @@ ARG RUNDINOVA_BASE_IMAGE=rundinova/erpnext:16.37.7
 FROM ${RUNDINOVA_BASE_IMAGE}
 ARG RUNDINOVA_BASE_IMAGE
 ARG RUNDINOVA_BASE_IMAGE_ID
+ARG RUNDINOVA_SOURCE_COMMIT=unknown
+LABEL org.opencontainers.image.source="https://github.com/JubuNiyokoDev/rundinova-os" \
+      org.opencontainers.image.revision="${RUNDINOVA_SOURCE_COMMIT}" \
+      org.opencontainers.image.title="RundiNova Tech self-hosted application"
 
 USER frappe
 WORKDIR /home/frappe/frappe-bench

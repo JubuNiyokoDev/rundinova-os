@@ -48,6 +48,9 @@ RUN --mount=type=secret,id=apps_json,target=/opt/frappe/apps.json,uid=1000,gid=1
 
 FROM ${FRAPPE_RUNTIME_IMAGE} AS backend
 
+LABEL org.opencontainers.image.source="https://github.com/JubuNiyokoDev/rundinova-os" \
+      org.opencontainers.image.title="RundiNova Tech self-hosted application"
+
 USER frappe
 
 COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe/frappe-bench

@@ -85,6 +85,27 @@ candidate does not become active until `CUSTOM_TAG` is deliberately changed in
 the private environment file and the normal backup, staging, migration, and
 acceptance steps are completed.
 
+## GitHub Actions candidate releases
+
+`.github/workflows/rundinova-release-candidate.yml` provides a manual candidate
+build from `main`. It runs the reusable business, provenance, and Compose
+checks first, then accepts only the private RundiNova GHCR package pinned by an
+immutable SHA-256 digest. It refuses a reused release tag, builds only the
+RundiNova overlay, smoke-checks its Desk assets and embedded metadata, and
+publishes the candidate. It does not change the production environment or
+deploy anything.
+
+The GHCR package is private and currently separate from the source repository.
+Before the first Actions run, open the
+[package settings](https://github.com/users/JubuNiyokoDev/packages/container/package/rundinova-erpnext/settings),
+choose **Manage Actions access**, add `JubuNiyokoDev/rundinova-os`, and grant
+**Write** so the workflow can pull the approved base and publish candidates.
+The workflow uses the short-lived `GITHUB_TOKEN`; no personal token is stored
+as a repository secret. Run **RundiNova release candidate** from the Actions
+tab on `main`, keep the approved base digest, and choose a new tag such as
+`16.37.7-rn.78-next-change`. The job summary records the candidate digest and
+source commit for staging and review.
+
 The active local stack uses the release documented at the end of this file.
 Previous release records are retained as history.
 
@@ -961,7 +982,7 @@ VPS Compose project to pull the unique release tag before starting services.
   production environment pins rn.73 and uses `PULL_POLICY=never`; release
   images are pulled explicitly with temporary GHCR authentication.
 
-## Active VPS release — rn.76 — 2026-10-10
+## Superseded VPS release — rn.76 — 2026-10-10
 
 - Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.76-self-hosted-candidate`
 - Image ID and registry digest:
@@ -993,8 +1014,51 @@ VPS Compose project to pull the unique release tag before starting services.
 - Production is pinned to rn.76 with `PULL_POLICY=never`. The prior production
   image is rn.73; the previous environment file is kept at
   `/etc/rundinova/production.env.before-rn76-self-hosted-candidate`.
-- Status: deployed candidate; browser acceptance of day-to-day workflows is
-  pending with the RundiNova team.
+- Status: deployed and verified; superseded by rn.77 below.
+
+## Active VPS release — rn.77 — 2026-10-10
+
+- Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.77-professional-ux`
+- Image ID and published GHCR manifest digest (published and verified on
+  2026-10-11):
+  `sha256:2164d00b66f9cf2edb76d75e69088ac488fd971cc4967993365e5831f8877d15`.
+  The image was built locally on the VPS, then pushed directly from that host
+  to GHCR; its registry manifest digest matches the VPS image ID. Production
+  remains pinned with `PULL_POLICY=never`. The GHCR package is private, so a
+  separate host needs authorized package access before it can pull this image.
+- Source: merged main commit `ae5e81451daee1e05ed07c9d529065578f1cfd9f`;
+  the candidate source tree used for the build is identical to the merge tree.
+- RundiNova source SHA-256:
+  `838fd96027f12031f0516ed4540091ca2a67a55b7fe21904c719a05753a9b0fa`,
+  verified in the image's release metadata.
+- Pinned base: rn.76 image ID
+  `sha256:67af1c8493c8a55b0137e8596e24bb93687550723f6469435a2064ab62aafde7`.
+  Frappe 16.36.1, ERPNext 16.37.0, HRMS 16.20.1, and CRM 1.86.0 remain
+  unchanged.
+- Change: correct the image CI so it installs the standalone RundiNova core,
+  excludes only Frappe-dependent app tests from the host-side test environment,
+  and sets `PULL_POLICY=always` for the integration test that must pull the
+  locally built images. The complete image builds and tests pass for v15/v16
+  on amd64/arm64.
+- Staging verification: restored the production backup into an isolated Compose
+  project with separate database and site volumes, ran `bench migrate`, and
+  verified 6 employees, 1 food budget, and 33 food expenses before and after.
+  The RundiNova Tech workspace and Executive Dashboard exist after migration.
+- Production migration: the deliberate migrator completed successfully after
+  the final backup. All RundiNova containers are running; backend and database
+  report healthy. Public HTTPS `/api/method/ping` returns `pong`.
+- Preserved records after deployment: 6 employees, 1 food budget, and 33 food
+  expenses.
+- Pre-migration backup with database and files:
+  `20261010_232412-workspace_rundinova_com`; archives were created on the VPS.
+  Encrypted off-machine retention and restoration rehearsal remain postponed
+  by explicit user decision.
+- Rollback image: rn.76 remains on the VPS. Previous environment file:
+  `/etc/rundinova/production.env.before-rn77-professional-ux`.
+- A private staging stack remains on the VPS, bound to localhost port 28181
+  with separate volumes. It must not be exposed publicly.
+- Status: deployed and health-checked; RundiNova team acceptance of daily
+  browser workflows remains pending.
 
 ## Local verification candidate — rn.76 — 2026-10-10
 
