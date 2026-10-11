@@ -1081,3 +1081,43 @@ VPS Compose project to pull the unique release tag before starting services.
   `git diff --cached --check` passed.
 - Status: superseded by the active VPS release below. It was a local test
   candidate; its framework and app versions were unchanged.
+
+## Active VPS release — rn.82 — 2026-10-11
+
+- Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.82-team-accounts`
+- Published GHCR manifest digest:
+  `sha256:ac69af5d6e97756907bd9e2a6cc38e009143f718c958c868ba19c1a716b3a7a5`.
+- Source: main commit `e4fc1a8e93241a34f4d5d910cbf320f93e4dedff`; the build
+  used the merged role, migration-order, and team-account corrections.
+- Base: rn.81 digest
+  `sha256:7dfba025adfa8c1f7becd4a1e4731d09dd5729e62164fdf14de93fc5a0b4b750`.
+  Frappe 16.36.1, ERPNext 16.37.0, HRMS 16.20.1, and CRM 1.86.0 remain
+  unchanged.
+- Changes: create RundiNova custom roles before workspace fixtures are synced;
+  attach Janvier's Employee record to the confirmed
+  `ndabubahajanvier@gmail.com` login and disable the superseded
+  `1.ndabubahajanvier@gmail.com` account. Preserve self-only Employee access for
+  team members while allowing the Director to read the full directory.
+- Staging: candidate migration and user sync passed on the isolated `rn77-staging`
+  Compose project. Application-level `get_list` checks returned 6 Employee
+  records for Joffre and 1 for Housekeeping. All six intended accounts are
+  enabled, linked to their correct Employee record, and carry the intended
+  business role. The superseded Janvier account is disabled.
+- Production: deployed on `workspace.rundinova.com`; pinned with
+  `PULL_POLICY=never`. The production `.env` rollback copy is
+  `/etc/rundinova/production.env.before-rn82-team-accounts`. The complete
+  pre-migration backup is
+  `20261011_163124-workspace_rundinova_com` and includes the database, site
+  config, public files, and private files.
+- Verification: migration and team synchronization exited successfully;
+  backend and database report healthy; public HTTPS
+  `/api/method/ping` returned `200 pong`; application permission checks returned
+  6 Employee records for Joffre and 1 for Housekeeping. Production retains six
+  employees, one food budget, zero food expenses, and zero cash movements.
+- Rollback: prior production image rn.79 remains available locally, and the
+  previous production env is saved at the path above. Restore the environment
+  file before recreating the production Compose stack if rollback is required.
+- Deferred: the RundiNova team still needs to run the browser acceptance
+  checklist in `PRODUCTION_ACCEPTANCE_TESTS.md`. SMTP and outbound email remain
+  unconfigured; GitHub repository synchronization remains a separate
+  operator-authorized setup.
