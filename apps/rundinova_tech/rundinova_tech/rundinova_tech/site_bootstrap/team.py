@@ -4,54 +4,69 @@ import frappe
 
 TEAM_USERS = [
     {
-        "email": "joffre.niyondiko@rundinova.com",
+        "email": "joffre.niyondiko@kit-hub.com",
         "first_name": "Joffre",
         "last_name": "Niyondiko",
-        "designation": "Co-Founder & CEO",
+        "employee_name": "NIYONDIKO Joffre",
         "roles": [
             "RundiNova Director",
             "RundiNova Finance Manager",
+            "RundiNova Project Lead",
             "RundiNova Team Member",
         ],
     },
     {
-        "email": "janvier.ndabubaha@rundinova.com",
+        "email": "ndabubahajanvier@gmail.com",
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
-        "designation": "COO",
-        "roles": ["RundiNova Operations", "RundiNova Team Member"],
+        "employee_name": "NDABUBAHA Janvier",
+        "roles": ["RundiNova Ecosystem Lead", "RundiNova Team Member"],
     },
     {
-        "email": "franck.maniranyibutse@rundinova.com",
+        "email": "maniranyibutsef@gmail.com",
         "first_name": "Franck",
         "last_name": "Maniranyibutse",
-        "designation": "Head of Engineering",
-        "roles": ["RundiNova Project Lead", "RundiNova Team Member"],
+        "employee_name": "MANIRANYIBUTSE Franck",
+        "roles": ["RundiNova Growth Lead", "RundiNova Team Member"],
     },
     {
-        "email": "elvis.irambona@rundinova.com",
+        "email": "presira857@gmail.com",
         "first_name": "Elvis",
         "last_name": "Irambona",
-        "designation": "Head of Communications",
+        "employee_name": "IRAMBONA Elvis",
         "roles": ["RundiNova Communications", "RundiNova Team Member"],
     },
     {
-        "email": "fanuel.kasumba@rundinova.com",
+        "email": "mandela.fanuel.1@gmail.com",
         "first_name": "Fanuel",
         "last_name": "Kasumba Mandela",
-        "designation": "Head of People & Culture",
-        "roles": ["RundiNova People & Culture", "RundiNova Team Member"],
+        "employee_name": "KASUMBA Fanuel",
+        "roles": ["RundiNova Community Relations", "RundiNova Team Member"],
+    },
+    {
+        "email": "housekeeping@rundinova.com",
+        "first_name": "Housekeeping",
+        "last_name": "",
+        "employee_name": "Housekeeping",
+        "roles": ["Employee", "RundiNova Team Member"],
     },
 ]
 
 
 def ensure_team_users(temporary_password=None):
-    """Create founding accounts and add roles without a shared default password."""
+    """Provision the real team identities and keep their role assignments exact."""
     results = {}
     for spec in TEAM_USERS:
         email = spec["email"]
+        user_changed = False
         if frappe.db.exists("User", email):
             user = frappe.get_doc("User", email)
+            if user.user_type != "System User":
+                user.user_type = "System User"
+                user_changed = True
+            if not user.default_workspace:
+                user.default_workspace = "RundiNova Tech"
+                user_changed = True
         else:
             user = frappe.new_doc("User")
             user_data = {
@@ -60,6 +75,7 @@ def ensure_team_users(temporary_password=None):
                 "last_name": spec["last_name"],
                 "enabled": 1,
                 "user_type": "System User",
+                "default_workspace": "RundiNova Tech",
                 "send_welcome_email": 0,
             }
             if temporary_password:
@@ -68,7 +84,18 @@ def ensure_team_users(temporary_password=None):
             user.insert(ignore_permissions=True)
             results[email] = "created"
         existing_roles = {row.role for row in user.roles}
-        added = False
+        desired_roles = set(spec["roles"])
+        stale_roles = {
+            row.role
+            for row in user.roles
+            if row.role.startswith("RundiNova ") and row.role not in desired_roles
+        }
+        if stale_roles:
+            user.set(
+                "roles",
+                [row for row in user.roles if row.role not in stale_roles],
+            )
+        added = bool(stale_roles) or user_changed
         for role in spec["roles"]:
             if role in existing_roles:
                 continue
@@ -79,5 +106,34 @@ def ensure_team_users(temporary_password=None):
             results.setdefault(email, "updated")
         else:
             results.setdefault(email, "already-exists")
+        employee_name = spec.get("employee_name")
+        if employee_name:
+            matches = frappe.get_all(
+                "Employee",
+                filters={"employee_name": employee_name},
+                fields=["name", "user_id"],
+                limit_page_length=2,
+            )
+            if len(matches) == 1:
+                employee = matches[0]
+                if not employee.user_id:
+                    frappe.db.set_value("Employee", employee.name, "user_id", email)
+                if "RundiNova Director" not in desired_roles and not frappe.db.exists(
+                    "User Permission",
+                    {"user": email, "allow": "Employee", "for_value": employee.name},
+                ):
+                    frappe.get_doc(
+                        {
+                            "doctype": "User Permission",
+                            "user": email,
+                            "allow": "Employee",
+                            "for_value": employee.name,
+                            "apply_to_all_doctypes": 1,
+                        }
+                    ).insert(ignore_permissions=True)
         frappe.db.commit()
+    from ..provisioning.permissions import ensure_crm_app_access_roles
+
+    ensure_crm_app_access_roles()
+    frappe.db.commit()
     return results

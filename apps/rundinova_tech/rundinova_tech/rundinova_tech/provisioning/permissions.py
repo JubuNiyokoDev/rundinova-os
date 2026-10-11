@@ -160,7 +160,27 @@ def ensure_rundinova_permissions():
                 )
 
     frappe.clear_cache()
+    ensure_director_employee_access()
     return {"custom": custom_policy, "standard": standard_policy}
+
+
+def ensure_director_employee_access():
+    """Directors can read the team directory; other members keep self scope."""
+    directors = frappe.get_all(
+        "Has Role",
+        filters={"role": "RundiNova Director"},
+        pluck="parent",
+    )
+    if not directors:
+        return
+    frappe.db.delete(
+        "User Permission",
+        {
+            "user": ["in", directors],
+            "allow": "Employee",
+        },
+    )
+    frappe.clear_cache()
 
 
 def ensure_crm_app_access_roles():
@@ -177,7 +197,14 @@ def ensure_crm_app_access_roles():
         "User", filters={"user_type": "System User"}, pluck="name"
     ):
         roles = set(frappe.get_roles(user))
-        if not roles.intersection({"RundiNova Director", "RundiNova Communications"}):
+        if not roles.intersection(
+            {
+                "RundiNova Director",
+                "RundiNova Communications",
+                "RundiNova Ecosystem Lead",
+                "RundiNova Growth Lead",
+            }
+        ):
             continue
         if "Sales User" in roles:
             continue
