@@ -1082,7 +1082,7 @@ VPS Compose project to pull the unique release tag before starting services.
 - Status: superseded by the active VPS release below. It was a local test
   candidate; its framework and app versions were unchanged.
 
-## Active VPS release — rn.82 — 2026-10-11
+## Superseded VPS release — rn.82 — 2026-10-11
 
 - Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.82-team-accounts`
 - Published GHCR manifest digest:
@@ -1121,3 +1121,32 @@ VPS Compose project to pull the unique release tag before starting services.
   checklist in `PRODUCTION_ACCEPTANCE_TESTS.md`. SMTP and outbound email remain
   unconfigured; GitHub repository synchronization remains a separate
   operator-authorized setup.
+
+## Active VPS release — rn.83 — 2026-10-11
+
+- Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.83-team-self-service`
+- Published GHCR manifest digest:
+  `sha256:fe3e2505e7b06fc6c399536405b964936b6022c64d512231cfb6305341ac5808`.
+- Source: main commit `fa6f05326eaa13b956db9648cd92d92a9a0aa40f`.
+- Base: rn.82 digest
+  `sha256:ac69af5d6e97756907bd9e2a6cc38e009143f718c958c868ba19c1a716b3a7a5`.
+  Frappe 16.36.1, ERPNext 16.37.0, HRMS 16.20.1, and CRM 1.86.0 remain
+  unchanged.
+- Change: include the standard `Employee` role in Janvier's managed account
+  roles, preserving his own Employee record scope. This aligns his confirmed
+  login with other employees' self-service access.
+- Staging: fresh backup `20261011_170211-workspace_rundinova_com`; migration and
+  account sync completed. Application access checks returned 1 Employee for
+  Janvier, 6 for Joffre, and 1 for Housekeeping.
+- Production: deployed with `PULL_POLICY=never` and the Nginx port-publishing
+  override intact. The previous env is saved at
+  `/etc/rundinova/production.env.before-rn83-team-self-service`. Full
+  pre-migration backup:
+  `20261011_170425-workspace_rundinova_com`, including config and files.
+- Verification: migration and account sync exited successfully; backend and
+  MariaDB report healthy; HTTPS `/api/method/ping` returned `200 pong`; access
+  checks returned 1 Employee for Janvier, 6 for Joffre, and 1 for Housekeeping.
+- Business data after deployment: six Employee records, one food budget, zero
+  food expenses, and zero cash movements.
+- Deferred: team browser acceptance remains pending. SMTP delivery and
+  authenticated GitHub repository synchronization require separate setup.
