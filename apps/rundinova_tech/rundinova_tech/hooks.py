@@ -87,6 +87,12 @@ fixtures = [
 
 after_install = "rundinova_tech.rundinova_tech.setup.seed"
 
+# Workspace fixtures can reference custom roles while `bench migrate` syncs
+# them, so create the role records before Frappe processes fixtures.
+before_migrate = [
+    "rundinova_tech.rundinova_tech.provisioning.roles.ensure_rundinova_roles",
+]
+
 # `bench migrate` re-syncs standard workspaces and resets is_hidden, so the
 # module hiding must be re-applied after every migrate to stay effective.
 after_migrate = [
