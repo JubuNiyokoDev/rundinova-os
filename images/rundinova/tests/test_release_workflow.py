@@ -24,7 +24,9 @@ class TestReleaseWorkflow(unittest.TestCase):
     def test_candidate_build_requires_checks_and_pinned_ghcr_base(self):
         self.assertIn("workflow_call:", self.checks)
         self.assertIn("uses: ./.github/workflows/rundinova-checks.yml", self.release)
-        self.assertLess(self.release.index("needs: checks"), self.release.index("docker push"))
+        self.assertLess(
+            self.release.index("needs: checks"), self.release.index("docker push")
+        )
         self.assertIn("@sha256:[a-f0-9]{64}", self.release)
 
     def test_candidate_has_narrow_registry_write_access_and_immutable_tags(self):
