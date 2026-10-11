@@ -34,7 +34,9 @@ class TestReleaseWorkflow(unittest.TestCase):
         self.assertIn("Refusing to overwrite existing image tag", self.release)
         self.assertIn('"$RELEASE_TAG" == latest', self.release)
 
-    def test_private_base_failure_does_not_assume_package_access_is_the_cause(self):
+    def test_private_base_failure_does_not_assume_package_access_is_the_cause(
+        self,
+    ):
         self.assertIn("Pinned base pull failed", self.release)
         self.assertIn("package access, digest validity, and runner image-store depth", self.release)
 
