@@ -14,6 +14,7 @@ def ensure_rundinova_roles():
         "RundiNova Team Member",
         "RundiNova Communications",
         "RundiNova People & Culture",
+        "RundiNova Developer",
     ]
     created = []
     for role_name in role_names:

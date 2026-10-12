@@ -1,9 +1,123 @@
 """Read-only onboarding checks for the RundiNova production setup."""
 
-import html
+import json
 import os
 
 import frappe
+
+
+def _require_access_administrator():
+    roles = set(frappe.get_roles())
+    if not roles.intersection({"System Manager", "RundiNova Director"}):
+        frappe.throw(
+            "Seuls la direction RundiNova et l’administrateur peuvent gérer les accès.",
+            frappe.PermissionError,
+        )
+
+
+@frappe.whitelist()
+def get_rundinova_access_directory():
+    """Return employee accounts and only their RundiNova role assignments."""
+    _require_access_administrator()
+    from rundinova_tech.rundinova_tech.access_control import ROLES
+
+    employees = frappe.get_all(
+        "Employee",
+        filters={"user_id": ["is", "set"]},
+        fields=["user_id", "employee_name", "status"],
+        order_by="employee_name asc",
+    )
+    return {
+        "roles": sorted(ROLES),
+        "users": [
+            {
+                "user": row.user_id,
+                "name": row.employee_name,
+                "status": row.status,
+                "enabled": bool(frappe.db.get_value("User", row.user_id, "enabled")),
+                "roles": sorted(set(frappe.get_roles(row.user_id)).intersection(ROLES)),
+            }
+            for row in employees
+            if frappe.db.exists("User", row.user_id)
+        ],
+    }
+
+
+@frappe.whitelist()
+def update_rundinova_user_roles(user, roles):
+    """Safely change only RundiNova business roles from the setup workspace."""
+    _require_access_administrator()
+    from rundinova_tech.rundinova_tech.access_control import ROLES
+    from rundinova_tech.rundinova_tech.provisioning.workspaces import (
+        DEFAULT_WORKSPACE_BY_ROLE,
+    )
+
+    if isinstance(roles, str):
+        try:
+            roles = json.loads(roles)
+        except json.JSONDecodeError:
+            roles = None
+    if (
+        not isinstance(roles, list)
+        or any(not isinstance(role, str) for role in roles)
+        or not set(roles).issubset(set(ROLES))
+    ):
+        frappe.throw("La liste contient un rôle RundiNova non autorisé.")
+    roles = list(dict.fromkeys(roles))
+    if not roles:
+        frappe.throw("Chaque compte doit garder au moins un rôle RundiNova.")
+    if user == "Administrator" or not frappe.db.exists("User", user):
+        frappe.throw("Ce compte ne peut pas être modifié depuis cette page.")
+
+    user_doc = frappe.get_doc("User", user)
+    if user_doc.user_type != "System User":
+        frappe.throw("Seuls les comptes internes peuvent recevoir ces rôles.")
+    actor_roles = set(frappe.get_roles())
+    current_roles = {row.role for row in user_doc.roles}
+    if not actor_roles.intersection({"System Manager"}) and current_roles.intersection(
+        {"System Manager", "Workspace Manager"}
+    ):
+        frappe.throw(
+            "Un administrateur système doit gérer ce compte.", frappe.PermissionError
+        )
+
+    if (
+        user == frappe.session.user
+        and "RundiNova Director" in actor_roles
+        and "RundiNova Director" not in roles
+    ):
+        frappe.throw("Vous ne pouvez pas retirer votre propre accès de direction.")
+    if "RundiNova Director" in current_roles and "RundiNova Director" not in roles:
+        other_directors = [
+            account
+            for account in frappe.get_all(
+                "User",
+                filters={"user_type": "System User", "enabled": 1},
+                pluck="name",
+            )
+            if account != user and "RundiNova Director" in frappe.get_roles(account)
+        ]
+        if not other_directors:
+            frappe.throw("Au moins un compte de direction doit rester actif.")
+
+    user_doc.set(
+        "roles",
+        [row for row in user_doc.roles if row.role not in set(ROLES)]
+        + [{"role": role} for role in roles],
+    )
+    default_workspace = next(
+        (workspace for role, workspace in DEFAULT_WORKSPACE_BY_ROLE if role in roles),
+        None,
+    )
+    if default_workspace:
+        user_doc.default_workspace = default_workspace
+    user_doc.save(ignore_permissions=True)
+    frappe.clear_cache(user=user)
+    return {
+        "user": user,
+        "roles": sorted(roles),
+        "default_workspace": default_workspace,
+    }
 
 
 @frappe.whitelist()
@@ -161,7 +275,7 @@ def sync_all_repositories():
 
 @frappe.whitelist()
 def analyze_repository(repository_name):
-    """Generate a read-only Gemini review and save it on an authorized repo."""
+    """Generate a read-only AI review and save it on an authorized repo."""
     doc = frappe.get_doc("RundiNova Repository", repository_name)
     if not frappe.has_permission("RundiNova Repository", "write", doc):
         frappe.throw(
@@ -185,17 +299,27 @@ def analyze_repository(repository_name):
     except Exception as exc:  # noqa: BLE001
         doc.custom_ai_review_status = "Failed"
         doc.custom_ai_review = (
-            "Analyse non terminée. Vérifier la configuration GitHub/Gemini "
+            "Analyse non terminée. Vérifier la configuration GitHub/IA "
             f"et relancer. Type d’erreur : {type(exc).__name__}."
         )
         doc.save()
-        frappe.throw(f"AI analysis failed: {html.escape(str(exc))}")
+        frappe.log_error(title="RundiNova AI analysis failed", message=str(exc))
+        error = str(exc)
+        if "HTTP 401" in error or "HTTP 403" in error:
+            message = "La clé du fournisseur IA est refusée. Vérifiez le fournisseur et la clé configurés côté serveur."
+        elif "HTTP 429" in error:
+            message = (
+                "Le fournisseur IA a atteint sa limite temporaire. Réessayez plus tard."
+            )
+        else:
+            message = "L’analyse IA n’a pas abouti. Vérifiez son statut et la configuration du fournisseur, puis réessayez."
+        return {"ok": False, "message": message}
 
     doc.custom_ai_review = render_markdown(report)
     doc.custom_ai_review_status = "Complete"
     doc.custom_ai_reviewed_on = frappe.utils.now_datetime()
     doc.save()
-    return report
+    return {"ok": True, **report}
 
 
 @frappe.whitelist()
@@ -208,8 +332,16 @@ def analyze_github_account(owner):
             "Only a RundiNova Director can start an account-wide analysis.",
             frappe.PermissionError,
         )
-    if not os.environ.get("RUNDINOVA_GEMINI_API_KEY", "").strip():
-        frappe.throw("Gemini AI is not configured on this deployment.")
+    provider = os.environ.get("RUNDINOVA_AI_PROVIDER", "gemini").strip().lower()
+    api_key = (
+        os.environ.get("COHERE_API_KEY", "")
+        if provider == "cohere"
+        else os.environ.get("RUNDINOVA_GEMINI_API_KEY", "")
+    )
+    if not api_key.strip():
+        frappe.throw(
+            f"Le fournisseur IA {provider} n’est pas configuré sur ce serveur."
+        )
 
     # Check the GitHub installation before queuing a potentially long job.
     repositories = fetch_installation_repositories(owner)
@@ -301,7 +433,7 @@ def _analyze_github_repository_job(repository_name, requested_by):
     except Exception as exc:  # noqa: BLE001
         doc.custom_ai_review_status = "Failed"
         doc.custom_ai_review = (
-            "Analyse non terminée. Vérifier la configuration GitHub/Gemini "
+            "Analyse non terminée. Vérifier la configuration GitHub/IA "
             f"et relancer. Type d’erreur : {type(exc).__name__}."
         )
         doc.save(ignore_permissions=True)

@@ -99,6 +99,7 @@ before_migrate = [
 after_migrate = [
     "rundinova_tech.rundinova_tech.provisioning.branding.sync_branding",
     "rundinova_tech.rundinova_tech.provisioning.form_layouts.sync_form_layouts",
+    "rundinova_tech.rundinova_tech.bootstrap.ensure_team_users",
     "rundinova_tech.rundinova_tech.setup.sync_dashboards",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_workspaces",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_desktop_icons",
@@ -110,6 +111,7 @@ after_migrate = [
 # direct reads and writes for assigned operational and financial records.
 _access_control = "rundinova_tech.rundinova_tech.access_control."
 permission_query_conditions = {
+    "Workspace": _access_control + "workspace_query",
     "Dashboard": _access_control + "dashboard_query",
     "Dashboard Chart": _access_control + "dashboard_chart_query",
     "Number Card": _access_control + "number_card_query",
@@ -128,3 +130,4 @@ has_permission = {
     doctype: _access_control + "has_permission"
     for doctype in permission_query_conditions
 }
+has_permission["Page"] = _access_control + "has_permission"

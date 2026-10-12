@@ -13,7 +13,7 @@ frappe.ui.form.on("RundiNova Repository", {
         () => {
           frappe.confirm(
             __(
-              "Les noms, descriptions et fichiers source textuels de tous les dépôts accessibles à l’installation GitHub {0} seront envoyés à Google Gemini. L’analyse sera mise en file d’attente; aucun dépôt, issue, tâche ou code ne sera modifié. Continuer ?",
+              "Les noms, descriptions et fichiers source textuels de tous les dépôts accessibles à l’installation GitHub {0} seront envoyés au fournisseur IA configuré par RundiNova. L’analyse sera mise en file d’attente; aucun dépôt, issue, tâche ou code ne sera modifié. Continuer ?",
               [owner],
             ),
             () => {
@@ -45,7 +45,7 @@ frappe.ui.form.on("RundiNova Repository", {
       () => {
         frappe.confirm(
           __(
-            "Le code textuel retenu du dépôt sera envoyé à Google Gemini pour produire une analyse et une recherche de marché. Aucune tâche ou modification GitHub ne sera créée. Continuer ?",
+            "Le code textuel retenu du dépôt sera envoyé au fournisseur IA configuré par RundiNova pour produire une analyse. Aucune tâche ou modification GitHub ne sera créée. Continuer ?",
           ),
           () => {
             frappe.call({
@@ -54,7 +54,15 @@ frappe.ui.form.on("RundiNova Repository", {
               freeze: true,
               freeze_message: __("Analyse du dépôt et du marché en cours…"),
               callback(response) {
-                if (!response.message) return;
+                if (response.message?.ok === false) {
+                  frm.reload_doc();
+                  frm.set_intro(
+                    frappe.utils.escape_html(response.message.message),
+                    "orange",
+                  );
+                  return;
+                }
+                if (!response.message?.ok) return;
                 frm.reload_doc();
                 frappe.msgprint({
                   title: __("Analyse terminée — validation humaine requise"),
