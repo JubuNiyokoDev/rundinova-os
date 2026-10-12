@@ -5,11 +5,8 @@ import os
 import re
 
 import requests
-
-INSUFFICIENT_EVIDENCE_SUMMARY = (
-    "Le modèle n’a pas fourni de preuves vérifiables liées aux fichiers scannés. "
-    "Ne pas utiliser ce résumé pour juger la maturité ou la capacité de vente; "
-    "relancer l’analyse après correction du format des preuves."
+from rundinova_core.application.repository_review import (
+    prepare_repository_review,
 )
 
 
@@ -108,28 +105,7 @@ def review_repository(repository, source_context, commits):
         ) from exc
 
     web_sources = _web_sources(payload) if provider == "gemini" else []
-    verified_evidence = _verified_evidence(report, source_context)
-    report["evidence"] = verified_evidence
-    evidence_paths = {item["source_path"] for item in verified_evidence}
-    evidence_is_sufficient = len(verified_evidence) >= 3 and len(evidence_paths) >= 2
-    report["analysis_quality"] = (
-        "evidence_linked" if evidence_is_sufficient else "insufficient_evidence"
-    )
-    if not evidence_is_sufficient:
-        report["executive_summary"] = INSUFFICIENT_EVIDENCE_SUMMARY
-        report["readiness_score"] = None
-        report["sales_verdict"] = "À évaluer — preuves insuffisantes"
-        report["completed_capabilities"] = []
-    report["web_sources"] = web_sources
-    report["market_research_status"] = (
-        "grounded_sources_available" if web_sources else "not_performed"
-    )
-    if not web_sources:
-        report["market_opportunity"] = (
-            "Aucune recherche Web externe vérifiable n’a été fournie par cette analyse. "
-            "Ne pas traiter les affirmations de marché comme des faits; les clients cibles "
-            "restent des hypothèses à valider."
-        )
+    report = prepare_repository_review(report, source_context, web_sources)
 
     report["scan"] = {
         "branch": source_context["branch"],
@@ -140,7 +116,6 @@ def review_repository(repository, source_context, commits):
         "model": model,
         "provider": provider,
     }
-    report["web_sources"] = _web_sources(payload) if provider == "gemini" else []
     report["human_review_required"] = True
     return report
 
@@ -216,39 +191,6 @@ def render_markdown(report):
         ]
     )
     return "\n".join(lines)
-
-
-def _verified_evidence(report, source_context):
-    """Keep only evidence excerpts that exactly match files included in the scan."""
-    files = {
-        entry.get("path"): " ".join(entry.get("content", "").split()).casefold()
-        for entry in source_context.get("files", [])
-        if isinstance(entry, dict) and isinstance(entry.get("path"), str)
-    }
-    evidence = report.get("evidence")
-    if not isinstance(evidence, list):
-        return []
-
-    verified = []
-    for item in evidence:
-        if not isinstance(item, dict):
-            continue
-        path = item.get("source_path")
-        excerpt = item.get("excerpt")
-        claim = item.get("claim")
-        if not all(
-            isinstance(value, str) and value.strip() for value in (path, excerpt, claim)
-        ):
-            continue
-        normalized_excerpt = " ".join(excerpt.split()).casefold()
-        if len(normalized_excerpt) < 24 or normalized_excerpt not in files.get(
-            path, ""
-        ):
-            continue
-        verified.append(
-            {"claim": claim.strip(), "source_path": path, "excerpt": excerpt.strip()}
-        )
-    return verified
 
 
 def _web_sources(payload):

@@ -6,11 +6,8 @@ import unittest
 from unittest.mock import Mock, patch
 
 import requests
-from rundinova_tech.ai_review import (
-    INSUFFICIENT_EVIDENCE_SUMMARY,
-    render_markdown,
-    review_repository,
-)
+from rundinova_core.application.repository_review import INSUFFICIENT_EVIDENCE_SUMMARY
+from rundinova_tech.ai_review import render_markdown, review_repository
 
 
 class TestAIReview(unittest.TestCase):
