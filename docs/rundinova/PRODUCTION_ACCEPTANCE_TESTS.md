@@ -23,7 +23,7 @@ vérifier; ils ne donnent pas implicitement accès aux données confidentielles.
 | Elvis Presira         | `presira857@gmail.com`         | Communication et activités CRM autorisées                             |
 | Franck Maniranyibutse | `maniranyibutsef@gmail.com`    | Croissance, prospects et opportunités                                 |
 | Fanuel Mandela        | `mandela.fanuel.1@gmail.com`   | Relations communautaires, activités et impact                         |
-| Housekeeping          | `housekeeping@rundinova.com`   | Opérations de son poste et libre-service limité                       |
+| Housekeeping          | `vyamungucharif410@gmail.com` | Opérations de son poste et libre-service limité                       |
 
 Le rôle `RundiNova Director` ne transforme pas Joffre en compte système
 `Administrator`. La recette doit confirmer les autorisations effectives de
@@ -90,7 +90,7 @@ Compte : `presira857@gmail.com`.
 
 ### Housekeeping — RundiNova Team Member
 
-- Se connecter avec l’identifiant `housekeeping@rundinova.com`.
+- Se connecter avec l’identifiant `vyamungucharif410@gmail.com`.
 - Vérifier que la fiche Housekeeping est liée au compte et que le membre ne voit pas les dossiers RH confidentiels de l’équipe.
 - Confirmer que seuls les raccourcis opérationnels du rôle Team Member sont accessibles.
 

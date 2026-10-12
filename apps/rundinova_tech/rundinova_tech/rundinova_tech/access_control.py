@@ -13,6 +13,7 @@ ROLES = (
     "RundiNova Team Member",
     "RundiNova Communications",
     "RundiNova People & Culture",
+    "RundiNova Developer",
 )
 
 READ = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 1}
@@ -64,7 +65,12 @@ DASHBOARD_ROLE_ACCESS = {
         {"RundiNova Director", "RundiNova People & Culture"}
     ),
     "RundiNova Delivery Dashboard": frozenset(
-        {"RundiNova Director", "RundiNova Project Lead", "RundiNova Operations"}
+        {
+            "RundiNova Director",
+            "RundiNova Project Lead",
+            "RundiNova Operations",
+            "RundiNova Developer",
+        }
     ),
     "RundiNova Ecosystem Dashboard": frozenset(
         {
@@ -144,6 +150,7 @@ def get_custom_doctype_permissions():
             "RundiNova Community Relations",
             "RundiNova People & Culture",
             "RundiNova Team Member",
+            "RundiNova Developer",
         ),
         READ,
     )
@@ -258,6 +265,8 @@ def get_standard_doctype_permissions():
         WRITE,
     )
     grant(("Task",), ("RundiNova Team Member",), WRITE)
+    grant(("Task",), ("RundiNova Developer",), WRITE)
+    grant(("Project",), ("RundiNova Developer",), READ)
     dashboard_roles = set().union(*DASHBOARD_ROLE_ACCESS.values())
     grant(("Dashboard", "Dashboard Chart", "Number Card"), dashboard_roles, READ)
     grant(
@@ -319,6 +328,8 @@ def _team_member_is_scoped(user, doctype=None):
         return False
     roles = set(frappe.get_roles(user))
     if "RundiNova Team Member" not in roles or "System Manager" in roles:
+        return False
+    if "RundiNova Developer" in roles and doctype in PROJECT_DOCTYPES + ("Project", "Task"):
         return False
     if doctype in FINANCIAL_DOCTYPES or doctype == "RundiNova Food Budget Item":
         return not roles.intersection(
@@ -475,6 +486,32 @@ def number_card_query(user=None):
     return _dashboard_widget_query("Number Card", "Number Card Link", "card", user)
 
 
+def workspace_query(user=None):
+    """Keep hidden and role-restricted workspaces out of Desk list responses."""
+    user = user or frappe.session.user
+    roles = set(frappe.get_roles(user))
+    if user == "Administrator" or "System Manager" in roles:
+        return ""
+    escaped_user = frappe.db.escape(user)
+    role_clause = "1=0"
+    if roles:
+        escaped_roles = ", ".join(frappe.db.escape(role) for role in sorted(roles))
+        role_clause = (
+            "NOT EXISTS (SELECT 1 FROM `tabHas Role` any_workspace_role "
+            "WHERE any_workspace_role.parent = `tabWorkspace`.name "
+            "AND any_workspace_role.parenttype = 'Workspace') OR EXISTS ("
+            "SELECT 1 FROM `tabHas Role` workspace_role "
+            "WHERE workspace_role.parent = `tabWorkspace`.name "
+            "AND workspace_role.parenttype = 'Workspace' "
+            f"AND workspace_role.role IN ({escaped_roles}))"
+        )
+    return (
+        "(`tabWorkspace`.is_hidden = 0 AND "
+        f"(`tabWorkspace`.for_user = {escaped_user} OR `tabWorkspace`.public = 1) AND "
+        f"({role_clause}))"
+    )
+
+
 def food_expense_query(user=None):
     return _query_for("RundiNova Food Expense", user)
 
@@ -499,6 +536,42 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
     """Enforce the assignment boundary on both direct reads and writes."""
     user = user or frappe.session.user
     permission_type = permission_type or ptype
+    if doc.doctype == "Workspace":
+        roles = set(frappe.get_roles(user))
+        if user == "Administrator" or roles.intersection(
+            {"System Manager", "RundiNova Director"}
+        ):
+            return True
+        if permission_type not in ("read", "select") or doc.get("is_hidden"):
+            return False
+        if doc.get("for_user") and doc.for_user != user:
+            return False
+        required_roles = {row.role for row in doc.get("roles", [])}
+        if required_roles:
+            return bool(roles.intersection(required_roles))
+        return bool(doc.get("public") or doc.get("for_user") == user)
+    if doc.doctype == "Page":
+        roles = set(frappe.get_roles(user))
+        if user == "Administrator" or roles.intersection(
+            {"System Manager", "RundiNova Director"}
+        ):
+            return True
+        if permission_type not in ("read", "select"):
+            return False
+        required_roles = {row.role for row in doc.get("roles", [])}
+        return not required_roles or bool(roles.intersection(required_roles))
+    if doc.doctype == "Workspace":
+        roles = set(frappe.get_roles(user))
+        if user == "Administrator" or "System Manager" in roles:
+            return True
+        if doc.get("is_hidden"):
+            return False
+        workspace_roles = {row.role for row in doc.get("roles", [])}
+        if workspace_roles:
+            return bool(roles.intersection(workspace_roles))
+        if doc.get("for_user"):
+            return doc.for_user == user
+        return bool(doc.get("public"))
     if doc.doctype in (
         "Dashboard",
         "Dashboard Chart",

@@ -43,6 +43,7 @@ UNUSED_WORKSPACES = [
 VISIBLE_DESKTOP_ICONS = {
     "RundiNova Tech",
     "RundiNova Team",
+    "RundiNova Developer",
     "RundiNova Finance",
     "RundiNova Operations",
     "RundiNova Delivery",
@@ -56,6 +57,7 @@ VISIBLE_DESKTOP_ICONS = {
 
 DEFAULT_WORKSPACE_BY_ROLE = (
     ("RundiNova Director", "RundiNova Tech"),
+    ("RundiNova Developer", "RundiNova Developer"),
     ("RundiNova Finance Manager", "RundiNova Finance"),
     ("RundiNova Operations", "RundiNova Operations"),
     ("RundiNova Project Lead", "RundiNova Delivery"),
@@ -235,8 +237,6 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
     ]
     team_links = [
         ("DocType", "RundiNova Office", "Hub & organisation", "building"),
-        ("DocType", "Project", "Projets", "project"),
-        ("DocType", "Task", "Tâches", "tasks"),
         ("DocType", "RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Food Progress", "Progression Food", "chart"),
@@ -393,6 +393,17 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
     )
 
     role_workspaces = [
+        (
+            "RundiNova Developer",
+            "Développement & livraison",
+            "code",
+            ("RundiNova Developer",),
+            [
+                ("DocType", "Project", "Projets", "project"),
+                ("DocType", "Task", "Tâches assignées", "tasks"),
+                ("DocType", "RundiNova Repository", "Dépôts GitHub", "github"),
+            ],
+        ),
         (
             "RundiNova Operations",
             "Opérations & budget",

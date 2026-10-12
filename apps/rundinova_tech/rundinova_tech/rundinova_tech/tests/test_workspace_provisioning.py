@@ -153,6 +153,30 @@ class TestWorkspaceProvisioning(UnitTestCase):
         self.assertIn('frappe.router.on("change"', script)
         self.assertIn("frappe.get_route?.()", script)
 
+    def test_developers_have_a_dedicated_non_destructive_workspace(self):
+        workspace = frappe.get_doc("Workspace", "RundiNova Developer")
+        roles = {row.role for row in workspace.roles}
+        links = {(row.type, row.link_to) for row in workspace.shortcuts}
+        self.assertEqual(roles, {"RundiNova Developer"})
+        self.assertTrue(
+            {
+                ("DocType", "Project"),
+                ("DocType", "Task"),
+                ("DocType", "RundiNova Repository"),
+            }
+            <= links
+        )
+
+        from rundinova_tech.rundinova_tech.access_control import (
+            get_standard_doctype_permissions,
+        )
+
+        task_access = get_standard_doctype_permissions()[("Task", "RundiNova Developer")]
+        project_access = get_standard_doctype_permissions()[("Project", "RundiNova Developer")]
+        self.assertEqual(task_access["write"], 1)
+        self.assertEqual(task_access["delete"], 0)
+        self.assertEqual(project_access["write"], 0)
+
     def test_dashboard_views_restore_the_workspace_sidebar(self):
         script = (
             Path(__file__).resolve().parents[2] / "public/js/workspace_sidebar.js"

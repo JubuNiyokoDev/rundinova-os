@@ -4,6 +4,7 @@ import frappe
 
 LEGACY_TEAM_LOGIN_REPLACEMENTS = {
     "1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com",
+    "housekeeping@rundinova.com": "vyamungucharif410@gmail.com",
 }
 
 TEAM_USERS = [
@@ -24,31 +25,31 @@ TEAM_USERS = [
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
         "employee_name": "NDABUBAHA Janvier",
-        "roles": ["Employee", "RundiNova Ecosystem Lead", "RundiNova Team Member"],
+        "roles": ["Employee", "RundiNova Ecosystem Lead", "RundiNova Developer", "RundiNova Team Member"],
     },
     {
         "email": "maniranyibutsef@gmail.com",
         "first_name": "Franck",
         "last_name": "Maniranyibutse",
         "employee_name": "MANIRANYIBUTSE Franck",
-        "roles": ["RundiNova Growth Lead", "RundiNova Team Member"],
+        "roles": ["RundiNova Growth Lead", "RundiNova Developer", "RundiNova Team Member"],
     },
     {
         "email": "presira857@gmail.com",
         "first_name": "Elvis",
         "last_name": "Irambona",
         "employee_name": "IRAMBONA Elvis",
-        "roles": ["RundiNova Communications", "RundiNova Team Member"],
+        "roles": ["RundiNova Communications", "RundiNova Developer", "RundiNova Team Member"],
     },
     {
         "email": "mandela.fanuel.1@gmail.com",
         "first_name": "Fanuel",
         "last_name": "Kasumba Mandela",
         "employee_name": "KASUMBA Fanuel",
-        "roles": ["RundiNova Community Relations", "RundiNova Team Member"],
+        "roles": ["RundiNova Community Relations", "RundiNova Developer", "RundiNova Team Member"],
     },
     {
-        "email": "housekeeping@rundinova.com",
+        "email": "vyamungucharif410@gmail.com",
         "first_name": "Housekeeping",
         "last_name": "",
         "employee_name": "Housekeeping",
@@ -94,6 +95,12 @@ def ensure_team_users(temporary_password=None):
             for row in user.roles
             if row.role.startswith("RundiNova ") and row.role not in desired_roles
         }
+        if "RundiNova Director" not in desired_roles:
+            stale_roles.update(
+                row.role
+                for row in user.roles
+                if row.role in {"Workspace Manager", "System Manager"}
+            )
         if stale_roles:
             user.set(
                 "roles",

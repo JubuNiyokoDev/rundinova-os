@@ -1,20 +1,15 @@
-"""Human-in-the-loop repository and startup review through Gemini."""
+"""Human-in-the-loop repository and startup review through configured AI."""
 
 import json
 import os
 import re
-from urllib.parse import quote
 
 import requests
 
 
 def review_repository(repository, source_context, commits):
     """Analyze supplied GitHub text and grounded market context; never mutate GitHub."""
-    api_key = os.environ.get("RUNDINOVA_GEMINI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("Gemini AI is not configured on this deployment.")
-
-    model = os.environ.get("RUNDINOVA_GEMINI_MODEL", "gemini-2.5-flash").strip()
+    provider = os.environ.get("RUNDINOVA_AI_PROVIDER", "gemini").strip().lower()
     prompt = {
         "repository": {
             "name": repository.get("full_name"),
@@ -40,42 +35,58 @@ def review_repository(repository, source_context, commits):
             "readiness_score (0-100), sales_verdict, evidence, completed_capabilities, "
             "gaps, risks, target_customers, market_opportunity, recommended_features, "
             "first_30_days, questions_for_founders. Pour chaque fait externe, fournis "
-            "des sources URL vérifiables dans market_opportunity ou target_customers."
+            "des sources URL vérifiables dans market_opportunity ou target_customers. "
+            "Sans recherche Web effective, indique clairement les hypothèses et n'invente "
+            "aucun fait externe."
         ),
     }
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{quote(model, safe='')}:generateContent"
-    )
+    prompt_json = json.dumps(prompt, ensure_ascii=False)
     try:
-        response = requests.post(
-            url,
-            headers={"x-goog-api-key": api_key},
-            json={
-                "contents": [
-                    {
-                        "role": "user",
-                        "parts": [{"text": json.dumps(prompt, ensure_ascii=False)}],
-                    }
-                ],
-                "tools": [{"google_search": {}}],
-                # Gemini 2.5 does not support a constrained JSON MIME type at
-                # the same time as Google Search grounding. The prompt still
-                # requests JSON, and the response is parsed/validated below.
-                "generationConfig": {"temperature": 0.2},
-            },
-            timeout=90,
-        )
+        if provider == "cohere":
+            api_key = os.environ.get("COHERE_API_KEY", "").strip()
+            model = os.environ.get("COHERE_MODEL", "command-r7b-12-2024").strip()
+            if not api_key:
+                raise RuntimeError("Cohere AI is not configured on this deployment.")
+            response = requests.post(
+                "https://api.cohere.com/v2/chat",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt_json}],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.2,
+                },
+                timeout=90,
+            )
+        elif provider == "gemini":
+            api_key = os.environ.get("RUNDINOVA_GEMINI_API_KEY", "").strip()
+            model = os.environ.get("RUNDINOVA_GEMINI_MODEL", "gemini-2.5-flash").strip()
+            if not api_key:
+                raise RuntimeError("Gemini AI is not configured on this deployment.")
+            response = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                headers={"x-goog-api-key": api_key},
+                json={
+                    "contents": [{"role": "user", "parts": [{"text": prompt_json}]}],
+                    "generationConfig": {"temperature": 0.2},
+                },
+                timeout=90,
+            )
+        else:
+            raise RuntimeError("Unsupported RundiNova AI provider.")
         response.raise_for_status()
         payload = response.json()
-        text = payload["candidates"][0]["content"]["parts"][0]["text"]
+        if provider == "cohere":
+            text = payload["message"]["content"][0]["text"]
+        else:
+            text = payload["candidates"][0]["content"]["parts"][0]["text"]
         report = json.loads(re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip()))
         if not isinstance(report, dict):
-            raise TypeError("Gemini response was not a JSON object")
+            raise TypeError(f"{provider} response was not a JSON object")
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", None)
         detail = f"HTTP {status}" if status else type(exc).__name__
-        raise RuntimeError(f"Gemini repository analysis failed ({detail}).") from exc
+        raise RuntimeError(f"{provider.title()} repository analysis failed ({detail}).") from exc
 
     report["scan"] = {
         "branch": source_context["branch"],
@@ -84,8 +95,9 @@ def review_repository(repository, source_context, commits):
         "files_read": source_context["files_read"],
         "truncated": source_context["truncated"],
         "model": model,
+        "provider": provider,
     }
-    report["web_sources"] = _web_sources(payload)
+    report["web_sources"] = _web_sources(payload) if provider == "gemini" else []
     report["human_review_required"] = True
     return report
 

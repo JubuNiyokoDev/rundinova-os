@@ -14,12 +14,12 @@ rôle possède des responsabilités et des accès distincts dans l'application.
 
 | Personne               | Titre                        | Rôles dans l'application                                              | Mission en une phrase                                                     |
 | ---------------------- | ---------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Joffre Niyondiko       | **CEO / Direction**          | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead | Dirige l'entreprise, contrôle les finances et voit le répertoire d'équipe |
-| Janvier Ndabubaha      | **Ecosystem Lead**           | RundiNova Ecosystem Lead, RundiNova Team Member                       | Suit les partenariats, l'écosystème et les opportunités                   |
-| Franck Maniranyibutse  | **Growth Lead**              | RundiNova Growth Lead, RundiNova Team Member                          | Suit la croissance, les opportunités et le pipeline CRM                   |
-| Elvis Irambona         | **Communication Lead**       | RundiNova Communications, RundiNova Team Member                       | Porte la communication interne/externe et l'image de RundiNova            |
-| Fanuel Kasumba Mandela | **Community Relations Lead** | RundiNova Community Relations, RundiNova Team Member                  | Suit les activités, bénéficiaires et impacts communautaires               |
-| Housekeeping           | **Housekeeping**             | Employee, RundiNova Team Member                                       | Accède à son profil et aux fonctions opérationnelles minimales            |
+| Joffre Niyondiko       | **CEO / Co-Founder**         | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead, RundiNova Team Member | Direction, finances, priorités et accès complet aux opérations RundiNova |
+| Janvier Ndabubaha      | **Ecosystem Lead / Developer** | RundiNova Ecosystem Lead, RundiNova Developer, RundiNova Team Member | Partenariats et développement des projets                                |
+| Franck Maniranyibutse  | **Growth Lead / Developer**  | RundiNova Growth Lead, RundiNova Developer, RundiNova Team Member     | Croissance, pipeline CRM et développement des projets                    |
+| Elvis Irambona         | **Communication Lead / Developer** | RundiNova Communications, RundiNova Developer, RundiNova Team Member | Communication et développement des projets                              |
+| Fanuel Kasumba Mandela | **Community Relations Lead / Developer** | RundiNova Community Relations, RundiNova Developer, RundiNova Team Member | Impact communautaire et développement des projets                       |
+| Housekeeping           | **Housekeeping**             | Employee, RundiNova Team Member                                       | Accès limité aux opérations de son poste                                 |
 
 Chris Clement Igiraneza est **Founder** et réside en Suède. Joffre
 Niyondiko est **Co-Founder & CEO** et dirige les opérations au quotidien.
@@ -29,7 +29,11 @@ l'application déterminent séparément les droits techniques.
 Identifiants d'application : Joffre `joffre.niyondiko@kit-hub.com`, Janvier
 `ndabubahajanvier@gmail.com`, Elvis `presira857@gmail.com`, Franck
 `maniranyibutsef@gmail.com`, Fanuel `mandela.fanuel.1@gmail.com`. Housekeeping
-utilise `housekeeping@rundinova.com`.
+utilise `vyamungucharif410@gmail.com`.
+
+Les quatre responsables de domaine ont aussi accès à l’espace Développement &
+livraison : ils lisent les projets et dépôts, et peuvent créer ou mettre à jour
+des tâches sans pouvoir les supprimer. Les droits financiers restent séparés.
 
 ---
 

@@ -1,10 +1,13 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
 from frappe.tests import UnitTestCase
+from frappe import _dict
 from rundinova_tech import hooks
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
+    has_permission,
+    workspace_query,
 )
 from rundinova_tech.rundinova_tech.site_bootstrap.team import (
     LEGACY_TEAM_LOGIN_REPLACEMENTS,
@@ -29,7 +32,7 @@ class TestRolePolicy(UnitTestCase):
                 "presira857@gmail.com",
                 "maniranyibutsef@gmail.com",
                 "mandela.fanuel.1@gmail.com",
-                "housekeeping@rundinova.com",
+                "vyamungucharif410@gmail.com",
             },
         )
         self.assertIn("RundiNova Director", users["joffre.niyondiko@kit-hub.com"])
@@ -40,13 +43,60 @@ class TestRolePolicy(UnitTestCase):
             "RundiNova Community Relations", users["mandela.fanuel.1@gmail.com"]
         )
         self.assertEqual(
-            users["housekeeping@rundinova.com"],
+            users["vyamungucharif410@gmail.com"],
             {"Employee", "RundiNova Team Member"},
         )
+        for developer in (
+            "ndabubahajanvier@gmail.com",
+            "presira857@gmail.com",
+            "maniranyibutsef@gmail.com",
+            "mandela.fanuel.1@gmail.com",
+        ):
+            self.assertIn("RundiNova Developer", users[developer])
         self.assertEqual(
             LEGACY_TEAM_LOGIN_REPLACEMENTS,
-            {"1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com"},
+            {
+                "1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com",
+                "housekeeping@rundinova.com": "vyamungucharif410@gmail.com",
+            },
         )
+
+    def test_only_non_director_team_accounts_lose_workspace_admin_bypass(self):
+        self.assertIn(
+            "rundinova_tech.rundinova_tech.bootstrap.ensure_team_users",
+            hooks.after_migrate,
+        )
+
+    def test_stale_workspace_and_page_routes_are_denied_server_side(self):
+        user = "developer@example.test"
+        workspace = _dict(doctype="Workspace", is_hidden=1, roles=[])
+        page = _dict(
+            doctype="Page",
+            name="build",
+            roles=[_dict(role="System Manager")],
+        )
+        with patch(
+            "rundinova_tech.rundinova_tech.access_control.frappe.get_roles",
+            return_value=["RundiNova Developer"],
+        ):
+            self.assertFalse(has_permission(workspace, user=user, ptype="read"))
+            self.assertFalse(has_permission(page, user=user, ptype="read"))
+
+    def test_workspace_list_filter_uses_role_rows_without_nonexistent_columns(self):
+        with (
+            patch(
+                "rundinova_tech.rundinova_tech.access_control.frappe.get_roles",
+                return_value=["RundiNova Developer"],
+            ),
+            patch(
+                "rundinova_tech.rundinova_tech.access_control.frappe.db.escape",
+                side_effect=lambda value: f"'{value}'",
+            ),
+        ):
+            condition = workspace_query("developer@example.test")
+        self.assertIn("tabHas Role", condition)
+        self.assertIn("is_hidden = 0", condition)
+        self.assertNotIn("tabWorkspace`.roles", condition)
 
     def test_growth_ecosystem_and_community_roles_are_separated(self):
         policy = get_custom_doctype_permissions()
