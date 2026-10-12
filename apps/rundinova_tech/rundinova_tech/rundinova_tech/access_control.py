@@ -539,6 +539,11 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
     """Enforce the assignment boundary on both direct reads and writes."""
     user = user or frappe.session.user
     permission_type = permission_type or ptype
+    if doc.doctype in DOCUMENT_DOCTYPES:
+        roles = set(frappe.get_roles(user))
+        return permission_type in {"read", "select", "write", "create"} and bool(
+            roles.intersection(ROLES)
+        )
     if doc.doctype == "Workspace":
         roles = set(frappe.get_roles(user))
         if user == "Administrator" or roles.intersection(
