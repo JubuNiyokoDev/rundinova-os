@@ -77,7 +77,9 @@ def update_rundinova_user_roles(user, roles):
     if not actor_roles.intersection({"System Manager"}) and current_roles.intersection(
         {"System Manager", "Workspace Manager"}
     ):
-        frappe.throw("Un administrateur système doit gérer ce compte.", frappe.PermissionError)
+        frappe.throw(
+            "Un administrateur système doit gérer ce compte.", frappe.PermissionError
+        )
 
     if (
         user == frappe.session.user
@@ -111,7 +113,11 @@ def update_rundinova_user_roles(user, roles):
         user_doc.default_workspace = default_workspace
     user_doc.save(ignore_permissions=True)
     frappe.clear_cache(user=user)
-    return {"user": user, "roles": sorted(roles), "default_workspace": default_workspace}
+    return {
+        "user": user,
+        "roles": sorted(roles),
+        "default_workspace": default_workspace,
+    }
 
 
 @frappe.whitelist()
@@ -302,7 +308,9 @@ def analyze_repository(repository_name):
         if "HTTP 401" in error or "HTTP 403" in error:
             message = "La clé du fournisseur IA est refusée. Vérifiez le fournisseur et la clé configurés côté serveur."
         elif "HTTP 429" in error:
-            message = "Le fournisseur IA a atteint sa limite temporaire. Réessayez plus tard."
+            message = (
+                "Le fournisseur IA a atteint sa limite temporaire. Réessayez plus tard."
+            )
         else:
             message = "L’analyse IA n’a pas abouti. Vérifiez son statut et la configuration du fournisseur, puis réessayez."
         return {"ok": False, "message": message}
@@ -331,7 +339,9 @@ def analyze_github_account(owner):
         else os.environ.get("RUNDINOVA_GEMINI_API_KEY", "")
     )
     if not api_key.strip():
-        frappe.throw(f"Le fournisseur IA {provider} n’est pas configuré sur ce serveur.")
+        frappe.throw(
+            f"Le fournisseur IA {provider} n’est pas configuré sur ce serveur."
+        )
 
     # Check the GitHub installation before queuing a potentially long job.
     repositories = fetch_installation_repositories(owner)

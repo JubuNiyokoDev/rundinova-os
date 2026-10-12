@@ -30,7 +30,9 @@ frappe.pages["rundinova-setup"].on_page_load = function (wrapper) {
     },
     {
       title: __("Accès à la plateforme"),
-      description: __("Consultez les comptes employés et leurs rôles RundiNova."),
+      description: __(
+        "Consultez les comptes employés et leurs rôles RundiNova.",
+      ),
       items: [],
     },
   ];
@@ -69,8 +71,8 @@ frappe.pages["rundinova-setup"].on_page_load = function (wrapper) {
 		`);
   }
 
-  const can_manage_access = ["RundiNova Director", "System Manager"].some((role) =>
-    frappe.user.has_role(role),
+  const can_manage_access = ["RundiNova Director", "System Manager"].some(
+    (role) => frappe.user.has_role(role),
   );
   if (!can_manage_access) return;
 
@@ -89,7 +91,9 @@ frappe.pages["rundinova-setup"].on_page_load = function (wrapper) {
       callback(response) {
         const data = response.message || { users: [], roles: [] };
         if (!data.users.length) {
-          directory.html(`<p class="text-muted">${__("Aucun compte employé associé.")}</p>`);
+          directory.html(
+            `<p class="text-muted">${__("Aucun compte employé associé.")}</p>`,
+          );
           return;
         }
         const options = data.roles
@@ -112,7 +116,9 @@ frappe.pages["rundinova-setup"].on_page_load = function (wrapper) {
             .join(""),
         );
         for (const account of data.users) {
-          const select = directory.find(`select[data-user="${CSS.escape(account.user)}"]`);
+          const select = directory.find(
+            `select[data-user="${CSS.escape(account.user)}"]`,
+          );
           for (const option of select.find("option")) {
             option.selected = account.roles.includes(option.value);
           }

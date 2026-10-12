@@ -26,7 +26,8 @@ function rundinova_normalize_alias(value) {
 const rundinova_current_route = rundinova_normalize_alias(
   window.location.pathname.split("/").filter(Boolean).pop() || "",
 );
-const rundinova_current_destination = rundinova_route_aliases[rundinova_current_route];
+const rundinova_current_destination =
+  rundinova_route_aliases[rundinova_current_route];
 if (rundinova_current_destination) {
   window.location.replace(rundinova_current_destination);
 }

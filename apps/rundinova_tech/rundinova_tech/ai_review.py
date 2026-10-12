@@ -86,7 +86,9 @@ def review_repository(repository, source_context, commits):
     except Exception as exc:
         status = getattr(getattr(exc, "response", None), "status_code", None)
         detail = f"HTTP {status}" if status else type(exc).__name__
-        raise RuntimeError(f"{provider.title()} repository analysis failed ({detail}).") from exc
+        raise RuntimeError(
+            f"{provider.title()} repository analysis failed ({detail})."
+        ) from exc
 
     report["scan"] = {
         "branch": source_context["branch"],

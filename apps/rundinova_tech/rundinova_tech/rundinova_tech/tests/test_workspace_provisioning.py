@@ -171,8 +171,12 @@ class TestWorkspaceProvisioning(UnitTestCase):
             get_standard_doctype_permissions,
         )
 
-        task_access = get_standard_doctype_permissions()[("Task", "RundiNova Developer")]
-        project_access = get_standard_doctype_permissions()[("Project", "RundiNova Developer")]
+        task_access = get_standard_doctype_permissions()[
+            ("Task", "RundiNova Developer")
+        ]
+        project_access = get_standard_doctype_permissions()[
+            ("Project", "RundiNova Developer")
+        ]
         self.assertEqual(task_access["write"], 1)
         self.assertEqual(task_access["delete"], 0)
         self.assertEqual(project_access["write"], 0)

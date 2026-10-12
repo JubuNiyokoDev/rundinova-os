@@ -1,7 +1,7 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
-from frappe.tests import UnitTestCase
 from frappe import _dict
+from frappe.tests import UnitTestCase
 from rundinova_tech import hooks
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,

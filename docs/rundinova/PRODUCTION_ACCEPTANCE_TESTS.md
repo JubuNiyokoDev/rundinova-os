@@ -23,7 +23,7 @@ vérifier; ils ne donnent pas implicitement accès aux données confidentielles.
 | Elvis Presira         | `presira857@gmail.com`         | Communication et activités CRM autorisées                             |
 | Franck Maniranyibutse | `maniranyibutsef@gmail.com`    | Croissance, prospects et opportunités                                 |
 | Fanuel Mandela        | `mandela.fanuel.1@gmail.com`   | Relations communautaires, activités et impact                         |
-| Housekeeping          | `vyamungucharif410@gmail.com` | Opérations de son poste et libre-service limité                       |
+| Housekeeping          | `vyamungucharif410@gmail.com`  | Opérations de son poste et libre-service limité                       |
 
 Le rôle `RundiNova Director` ne transforme pas Joffre en compte système
 `Administrator`. La recette doit confirmer les autorisations effectives de

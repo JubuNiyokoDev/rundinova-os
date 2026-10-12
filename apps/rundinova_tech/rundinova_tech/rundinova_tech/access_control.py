@@ -329,7 +329,10 @@ def _team_member_is_scoped(user, doctype=None):
     roles = set(frappe.get_roles(user))
     if "RundiNova Team Member" not in roles or "System Manager" in roles:
         return False
-    if "RundiNova Developer" in roles and doctype in PROJECT_DOCTYPES + ("Project", "Task"):
+    if "RundiNova Developer" in roles and doctype in PROJECT_DOCTYPES + (
+        "Project",
+        "Task",
+    ):
         return False
     if doctype in FINANCIAL_DOCTYPES or doctype == "RundiNova Food Budget Item":
         return not roles.intersection(

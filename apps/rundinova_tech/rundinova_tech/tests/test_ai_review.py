@@ -6,7 +6,6 @@ import unittest
 from unittest.mock import Mock, patch
 
 import requests
-
 from rundinova_tech.ai_review import review_repository
 
 
@@ -41,7 +40,9 @@ class TestAIReview(unittest.TestCase):
     def test_cohere_json_response_is_parsed_without_web_claims(self, post):
         post.return_value.json.return_value = {
             "message": {
-                "content": [{"type": "text", "text": json.dumps({"executive_summary": "ok"})}]
+                "content": [
+                    {"type": "text", "text": json.dumps({"executive_summary": "ok"})}
+                ]
             }
         }
         response = review_repository(self.repository, self.source, [])
@@ -51,7 +52,9 @@ class TestAIReview(unittest.TestCase):
         self.assertEqual(response["scan"]["model"], "command-r7b-12-2024")
         self.assertEqual(response["web_sources"], [])
         self.assertEqual(post.call_args.args[0], "https://api.cohere.com/v2/chat")
-        self.assertEqual(post.call_args.kwargs["headers"]["Authorization"], "Bearer test-key")
+        self.assertEqual(
+            post.call_args.kwargs["headers"]["Authorization"], "Bearer test-key"
+        )
         self.assertEqual(
             post.call_args.kwargs["json"]["response_format"], {"type": "json_object"}
         )
