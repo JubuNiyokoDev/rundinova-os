@@ -1,14 +1,24 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
 from frappe.tests import UnitTestCase
+from rundinova_tech import hooks
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
 )
-from rundinova_tech.rundinova_tech.site_bootstrap.team import TEAM_USERS
+from rundinova_tech.rundinova_tech.site_bootstrap.team import (
+    LEGACY_TEAM_LOGIN_REPLACEMENTS,
+    TEAM_USERS,
+)
 
 
 class TestRolePolicy(UnitTestCase):
+    def test_custom_roles_exist_before_migrate_syncs_workspace_fixtures(self):
+        self.assertIn(
+            "rundinova_tech.rundinova_tech.provisioning.roles.ensure_rundinova_roles",
+            hooks.before_migrate,
+        )
+
     def test_team_seed_uses_confirmed_login_addresses_and_business_roles(self):
         users = {row["email"]: set(row["roles"]) for row in TEAM_USERS}
         self.assertEqual(
@@ -23,6 +33,7 @@ class TestRolePolicy(UnitTestCase):
             },
         )
         self.assertIn("RundiNova Director", users["joffre.niyondiko@kit-hub.com"])
+        self.assertIn("Employee", users["ndabubahajanvier@gmail.com"])
         self.assertIn("RundiNova Ecosystem Lead", users["ndabubahajanvier@gmail.com"])
         self.assertIn("RundiNova Growth Lead", users["maniranyibutsef@gmail.com"])
         self.assertIn(
@@ -31,6 +42,10 @@ class TestRolePolicy(UnitTestCase):
         self.assertEqual(
             users["housekeeping@rundinova.com"],
             {"Employee", "RundiNova Team Member"},
+        )
+        self.assertEqual(
+            LEGACY_TEAM_LOGIN_REPLACEMENTS,
+            {"1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com"},
         )
 
     def test_growth_ecosystem_and_community_roles_are_separated(self):

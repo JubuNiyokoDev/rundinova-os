@@ -2,6 +2,10 @@
 
 import frappe
 
+LEGACY_TEAM_LOGIN_REPLACEMENTS = {
+    "1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com",
+}
+
 TEAM_USERS = [
     {
         "email": "joffre.niyondiko@kit-hub.com",
@@ -20,7 +24,7 @@ TEAM_USERS = [
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
         "employee_name": "NDABUBAHA Janvier",
-        "roles": ["RundiNova Ecosystem Lead", "RundiNova Team Member"],
+        "roles": ["Employee", "RundiNova Ecosystem Lead", "RundiNova Team Member"],
     },
     {
         "email": "maniranyibutsef@gmail.com",
@@ -116,7 +120,18 @@ def ensure_team_users(temporary_password=None):
             )
             if len(matches) == 1:
                 employee = matches[0]
-                if not employee.user_id:
+                previous_email = employee.user_id
+                if (
+                    previous_email in LEGACY_TEAM_LOGIN_REPLACEMENTS
+                    and LEGACY_TEAM_LOGIN_REPLACEMENTS[previous_email] == email
+                ):
+                    if frappe.db.exists("User", previous_email):
+                        old_user = frappe.get_doc("User", previous_email)
+                        if old_user.enabled:
+                            old_user.enabled = 0
+                            old_user.save(ignore_permissions=True)
+                    frappe.db.set_value("Employee", employee.name, "user_id", email)
+                elif not previous_email:
                     frappe.db.set_value("Employee", employee.name, "user_id", email)
                 if "RundiNova Director" not in desired_roles and not frappe.db.exists(
                     "User Permission",
