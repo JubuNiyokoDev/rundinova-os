@@ -153,7 +153,8 @@ def sync_all_repositories():
             doc = frappe.get_doc("RundiNova Repository", name)
             doc.sync_from_github()
             results.append({"repository": name, "status": "ok"})
-        except Exception as exc:  # noqa: BLE001 - keep the batch moving on individual repository errors
+        # Continue the sync batch when any single repository fails.
+        except Exception as exc:  # noqa: BLE001
             results.append({"repository": name, "status": "error", "message": str(exc)})
     return results
 
@@ -168,12 +169,8 @@ def analyze_repository(repository_name):
         )
 
     from rundinova_tech.ai_review import render_markdown, review_repository
-    from rundinova_tech.github_sync import (
-        fetch_repository_source_context,
-    )
-    from rundinova_tech.github_sync import (
-        sync_repository as fetch_metadata,
-    )
+    from rundinova_tech.github_sync import fetch_repository_source_context
+    from rundinova_tech.github_sync import sync_repository as fetch_metadata
 
     doc.custom_ai_review_status = "Analyzing"
     doc.save()
@@ -183,7 +180,9 @@ def analyze_repository(repository_name):
             info["owner"], info["repo"], info["default_branch"]
         )
         report = review_repository(info, source, info.get("recent_commits", []))
-    except Exception as exc:  # noqa: BLE001 - update the visible status before returning a safe error
+    # Save a visible failure state even when the upstream API returns an
+    # unexpected error.
+    except Exception as exc:  # noqa: BLE001
         doc.custom_ai_review_status = "Failed"
         doc.custom_ai_review = (
             "Analyse non terminée. Vérifier la configuration GitHub/Gemini "
@@ -262,12 +261,8 @@ def analyze_github_account(owner):
 def _analyze_github_repository_job(repository_name, requested_by):
     """Analyze one installed repository; account scans fan out into these jobs."""
     from rundinova_tech.ai_review import render_markdown, review_repository
-    from rundinova_tech.github_sync import (
-        fetch_repository_source_context,
-    )
-    from rundinova_tech.github_sync import (
-        sync_repository as fetch_metadata,
-    )
+    from rundinova_tech.github_sync import fetch_repository_source_context
+    from rundinova_tech.github_sync import sync_repository as fetch_metadata
 
     doc = frappe.get_doc("RundiNova Repository", repository_name)
     doc.custom_ai_review_status = "Analyzing"
@@ -298,7 +293,8 @@ def _analyze_github_repository_job(repository_name, requested_by):
         doc.last_synced_on = frappe.utils.now_datetime()
         doc.save(ignore_permissions=True)
         result = "complete"
-    except Exception as exc:  # noqa: BLE001 - mark this repository failed without stopping other jobs
+    # Each queued job records its own failure and leaves sibling jobs running.
+    except Exception as exc:  # noqa: BLE001
         doc.custom_ai_review_status = "Failed"
         doc.custom_ai_review = (
             "Analyse non terminée. Vérifier la configuration GitHub/Gemini "

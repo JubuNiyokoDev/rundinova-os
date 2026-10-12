@@ -143,16 +143,16 @@ dépenses sans autorisation.
 
 ## Accès dans l'application par rôle
 
-| Rôle                          | Accès principal                                                                     |
-| ----------------------------- | ----------------------------------------------------------------------------------- |
+| Rôle                          | Accès principal                                                                                 |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
 | RundiNova Director            | Toutes les fonctions métier RundiNova, tous les espaces de travail et toutes les fiches Employé |
-| RundiNova Finance Manager     | Budgets, dépenses, comptes et mouvements financiers                                 |
-| RundiNova Ecosystem Lead      | Espace Écosystème; écrit les partenariats et opportunités qui lui sont attribués    |
-| RundiNova Growth Lead         | Espace Croissance; écrit les opportunités et activités CRM                          |
-| RundiNova Project Lead        | Espace Livraison; projets, tâches, dépôts et KPI de livraison                       |
-| RundiNova Communications      | Activités CRM et communication                                                      |
-| RundiNova Community Relations | Activités, partenariats et impact communautaires                                    |
-| RundiNova Team Member         | Espace Équipe; tâches, dépenses et autres fiches affectées à la personne             |
+| RundiNova Finance Manager     | Budgets, dépenses, comptes et mouvements financiers                                             |
+| RundiNova Ecosystem Lead      | Espace Écosystème; écrit les partenariats et opportunités qui lui sont attribués                |
+| RundiNova Growth Lead         | Espace Croissance; écrit les opportunités et activités CRM                                      |
+| RundiNova Project Lead        | Espace Livraison; projets, tâches, dépôts et KPI de livraison                                   |
+| RundiNova Communications      | Activités CRM et communication                                                                  |
+| RundiNova Community Relations | Activités, partenariats et impact communautaires                                                |
+| RundiNova Team Member         | Espace Équipe; tâches, dépenses et autres fiches affectées à la personne                        |
 
 Chaque rôle dispose de son espace par défaut. Les espaces ne sont listés que
 pour les rôles autorisés. Les permissions DocType et les filtres d'affectation

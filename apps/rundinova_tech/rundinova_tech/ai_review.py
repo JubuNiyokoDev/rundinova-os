@@ -117,9 +117,11 @@ def render_markdown(report):
         lines.extend([f"## {title}"])
         if isinstance(value, list):
             lines.extend(
-                f"- {item}"
-                if isinstance(item, str)
-                else f"- {json.dumps(item, ensure_ascii=False)}"
+                (
+                    f"- {item}"
+                    if isinstance(item, str)
+                    else f"- {json.dumps(item, ensure_ascii=False)}"
+                )
                 for item in value
             )
         elif isinstance(value, dict):
@@ -132,9 +134,11 @@ def render_markdown(report):
         [
             "## Couverture du dépôt",
             f"Branche `{scan.get('branch', '')}` : {scan.get('files_read', 0)} fichiers texte lus sur {scan.get('candidate_files', 0)} détectés.",
-            "Le scan est partiel; consulter la couverture avant de prendre une décision."
-            if scan.get("truncated")
-            else "Tous les fichiers texte retenus par le scan ont été lus.",
+            (
+                "Le scan est partiel; consulter la couverture avant de prendre une décision."
+                if scan.get("truncated")
+                else "Tous les fichiers texte retenus par le scan ont été lus."
+            ),
         ]
     )
     return "\n".join(lines)

@@ -88,7 +88,8 @@ def _installation_token(app_id, installation_id, private_key_b64):
             cached = cache.get_value(cache_key)
             if cached:
                 return cached
-    except Exception:  # noqa: BLE001 - GitHub sync remains usable without a working Frappe cache
+    # Cache is optional in command-line sync and migration contexts.
+    except Exception:  # noqa: BLE001
         cache = None
 
     try:
@@ -184,9 +185,11 @@ def fetch_installation_repositories(owner):
     page = 1
     while True:
         response = requests.get(
-            f"{GITHUB_API_BASE}/installation/repositories"
-            if using_app
-            else f"{GITHUB_API_BASE}/user/repos",
+            (
+                f"{GITHUB_API_BASE}/installation/repositories"
+                if using_app
+                else f"{GITHUB_API_BASE}/user/repos"
+            ),
             params=(
                 {"per_page": 100, "page": page}
                 if using_app
