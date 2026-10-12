@@ -1,6 +1,5 @@
 import frappe
 
-from ..access_control import ROLES
 from .workspace_layout import OPERATION_SECTIONS, _workspace_content
 
 UNUSED_WORKSPACES = [
@@ -30,6 +29,7 @@ UNUSED_WORKSPACES = [
     "Tax & Benefits",
     "Tenure",
     # Misc
+    "Home",
     "Welcome Workspace",
     # Generic ERP setup / module entry points are replaced by role-aware
     # RundiNova operations and setup workspaces.
@@ -42,8 +42,30 @@ UNUSED_WORKSPACES = [
 
 VISIBLE_DESKTOP_ICONS = {
     "RundiNova Tech",
+    "RundiNova Team",
+    "RundiNova Finance",
+    "RundiNova Operations",
+    "RundiNova Delivery",
+    "RundiNova Ecosystem",
+    "RundiNova Growth",
+    "RundiNova Community",
+    "RundiNova Communications",
+    "RundiNova People",
     "Frappe CRM",
 }
+
+DEFAULT_WORKSPACE_BY_ROLE = (
+    ("RundiNova Director", "RundiNova Tech"),
+    ("RundiNova Finance Manager", "RundiNova Finance"),
+    ("RundiNova Operations", "RundiNova Operations"),
+    ("RundiNova Project Lead", "RundiNova Delivery"),
+    ("RundiNova Ecosystem Lead", "RundiNova Ecosystem"),
+    ("RundiNova Growth Lead", "RundiNova Growth"),
+    ("RundiNova Community Relations", "RundiNova Community"),
+    ("RundiNova Communications", "RundiNova Communications"),
+    ("RundiNova People & Culture", "RundiNova People"),
+    ("RundiNova Team Member", "RundiNova Team"),
+)
 
 
 def _sync_workspace(
@@ -240,17 +262,26 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ),
     ]
     finance_links = [
+        ("DocType", "RundiNova Food Budget", "Budgets alimentaires", "food"),
+        ("DocType", "RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
+        ("DocType", "RundiNova Budget Review", "Revues de budget", "check-circle"),
+        ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Cash Account", "Comptes de trésorerie", "bank"),
         ("DocType", "RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
+        (
+            "Dashboard",
+            "RundiNova Finance Dashboard",
+            "Tableau de bord Finance",
+            "accounting",
+        ),
     ]
     finance_workspace_roles = (
         "RundiNova Director",
         "RundiNova Finance Manager",
         "RundiNova Operations",
     )
-    privileged_roles = tuple(role for role in ROLES if role != "RundiNova Team Member")
-    dashboard_workspace_roles = privileged_roles
-    product_workspace_roles = tuple(ROLES)
+    dashboard_workspace_roles = ("RundiNova Director",)
+    product_workspace_roles = ("RundiNova Director",)
     _sync_workspace(
         "RundiNova Tech",
         "RundiNova Tech",
@@ -260,9 +291,10 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "briefcase",
         operations_links,
         "rundinova-home",
-        product_workspace_roles,
+        ("RundiNova Director",),
         charts=overview_charts,
         number_cards=overview_number_cards,
+        public=1,
     )
     _sync_workspace_sidebar(
         "RundiNova Tech",
@@ -319,8 +351,8 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         team_links,
         "rundinova-team",
         ("RundiNova Team Member",),
-        hidden=True,
-        public=0,
+        hidden=False,
+        public=1,
     )
     _sync_workspace_sidebar(
         "RundiNova Team",
@@ -356,9 +388,171 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         finance_links,
         "rundinova-finance",
         finance_workspace_roles,
-        hidden=True,
-        public=0,
+        hidden=False,
+        public=1,
     )
+
+    role_workspaces = [
+        (
+            "RundiNova Operations",
+            "Opérations & budget",
+            "briefcase",
+            ("RundiNova Director", "RundiNova Operations"),
+            [
+                *finance_links,
+                ("DocType", "RundiNova Office", "Bureaux", "building"),
+                ("DocType", "Project", "Projets", "project"),
+                ("DocType", "Task", "Tâches", "tasks"),
+                ("DocType", "RundiNova Document", "Documents", "file"),
+            ],
+        ),
+        (
+            "RundiNova Delivery",
+            "Projets & livraison",
+            "project",
+            ("RundiNova Director", "RundiNova Project Lead"),
+            [
+                (
+                    "Dashboard",
+                    "RundiNova Delivery Dashboard",
+                    "Tableau de bord Livraison",
+                    "project",
+                ),
+                ("DocType", "Project", "Projets", "project"),
+                ("DocType", "Task", "Tâches", "tasks"),
+                ("DocType", "RundiNova Repository", "Dépôts GitHub", "github"),
+                ("DocType", "RundiNova Risk", "Risques projet", "alert-triangle"),
+            ],
+        ),
+        (
+            "RundiNova Ecosystem",
+            "Écosystème & partenariats",
+            "handshake",
+            ("RundiNova Director", "RundiNova Ecosystem Lead"),
+            [
+                (
+                    "Dashboard",
+                    "RundiNova Ecosystem Dashboard",
+                    "Tableau de bord Écosystème",
+                    "crm",
+                ),
+                ("DocType", "RundiNova Partnership", "Partenariats", "handshake"),
+                ("DocType", "RundiNova Growth Opportunity", "Opportunités", "star"),
+                ("DocType", "RundiNova Decision", "Décisions", "note"),
+                ("DocType", "RundiNova Document", "Documents", "file"),
+            ],
+        ),
+        (
+            "RundiNova Growth",
+            "Croissance & prospection",
+            "growth",
+            ("RundiNova Director", "RundiNova Growth Lead"),
+            [
+                (
+                    "Dashboard",
+                    "RundiNova Ecosystem Dashboard",
+                    "Tableau de bord Croissance",
+                    "crm",
+                ),
+                ("DocType", "RundiNova Growth Opportunity", "Opportunités", "star"),
+                ("DocType", "CRM Lead", "Prospects", "crm"),
+                ("DocType", "CRM Deal", "Affaires", "deal"),
+                ("DocType", "Task", "Tâches", "tasks"),
+            ],
+        ),
+        (
+            "RundiNova Community",
+            "Communauté & impact",
+            "heart",
+            ("RundiNova Director", "RundiNova Community Relations"),
+            [
+                (
+                    "Dashboard",
+                    "RundiNova Ecosystem Dashboard",
+                    "Tableau de bord Impact",
+                    "crm",
+                ),
+                (
+                    "DocType",
+                    "RundiNova Community Impact",
+                    "Activités communautaires",
+                    "heart",
+                ),
+                ("DocType", "RundiNova Decision", "Décisions", "note"),
+                ("DocType", "RundiNova Document", "Documents", "file"),
+                ("DocType", "RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
+            ],
+        ),
+        (
+            "RundiNova Communications",
+            "Communication & CRM",
+            "chat",
+            ("RundiNova Director", "RundiNova Communications"),
+            [
+                ("URL", "/crm", "CRM & communications", "crm"),
+                ("DocType", "CRM Lead", "Contacts et prospects", "crm"),
+                ("DocType", "CRM Call Log", "Journal de communication", "phone"),
+                ("DocType", "Task", "Tâches", "tasks"),
+                ("DocType", "RundiNova Document", "Documents", "file"),
+            ],
+        ),
+        (
+            "RundiNova People",
+            "Équipe & personnes",
+            "users",
+            ("RundiNova Director", "RundiNova People & Culture"),
+            [
+                (
+                    "Dashboard",
+                    "RundiNova People Dashboard",
+                    "Tableau de bord Équipe",
+                    "users",
+                ),
+                ("DocType", "Employee", "Équipe", "users"),
+                ("DocType", "HR Settings", "Paramètres RH", "settings"),
+                ("DocType", "RundiNova Office", "Bureaux", "building"),
+                ("DocType", "RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
+            ],
+        ),
+    ]
+    for index, (name, title, icon, roles, links) in enumerate(role_workspaces, start=2):
+        _sync_workspace(
+            name,
+            title,
+            "RundiNova Tech",
+            "rundinova_tech",
+            index,
+            icon,
+            links,
+            name.lower().replace(" ", "-"),
+            roles,
+            hidden=False,
+            public=1,
+        )
+        sidebar_items = [
+            {
+                "type": "Link",
+                "label": "Accueil " + title,
+                "link_type": "Workspace",
+                "link_to": name,
+                "icon": "home",
+            },
+            {"type": "Section Break", "label": title, "collapsible": 0},
+        ]
+        sidebar_items.extend(
+            {
+                "type": "Link",
+                "label": label,
+                "link_type": link_type,
+                "link_to": target if link_type != "URL" else None,
+                "url": target if link_type == "URL" else None,
+                "icon": link_icon,
+            }
+            for link_type, target, label, link_icon in links
+        )
+        _sync_workspace_sidebar(name, icon, sidebar_items)
+        _ensure_workspace_desktop_icon(name, icon, roles, True, name)
+
     _sync_workspace(
         "RundiNova Dashboards",
         "RundiNova Dashboards",
@@ -472,7 +666,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
             "RundiNova Team",
             "users",
             ("RundiNova Team Member",),
-            False,
+            True,
             "RundiNova Team",
         ),
         # Finance and dashboard destinations already live in the main app
@@ -482,7 +676,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
             "RundiNova Finance",
             "bank",
             finance_workspace_roles,
-            False,
+            True,
             "RundiNova Finance",
         ),
         (
@@ -501,12 +695,17 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "User", filters={"user_type": "System User"}, pluck="name"
     ):
         user_roles = set(frappe.get_roles(user))
+        default_workspace = next(
+            (
+                workspace
+                for role, workspace in DEFAULT_WORKSPACE_BY_ROLE
+                if role in user_roles
+            ),
+            None,
+        )
         current_default = frappe.db.get_value("User", user, "default_workspace")
-        if (
-            user_roles.intersection(product_workspace_roles)
-            and current_default != "RundiNova Tech"
-        ):
-            frappe.db.set_value("User", user, "default_workspace", "RundiNova Tech")
+        if default_workspace and current_default != default_workspace:
+            frappe.db.set_value("User", user, "default_workspace", default_workspace)
 
 
 def hide_unused_desktop_icons():
@@ -520,14 +719,8 @@ def hide_unused_desktop_icons():
         frappe.cache.hdel("desktop_icons", user)
         frappe.cache.hdel("bootinfo", user)
 
-    # Older iterations exposed separate Setup and Team tiles. Keep one obvious
-    # RundiNova entry point; setup and team actions live inside its navigation.
-    for label in (
-        "RundiNova Setup",
-        "RundiNova Team",
-        "RundiNova Finance",
-        "RundiNova Dashboards",
-    ):
+    # Older setup aliases are retired; role-specific workspaces remain visible.
+    for label in ("RundiNova Setup", "RundiNova Dashboards"):
         if frappe.db.exists("Desktop Icon", label):
             frappe.db.set_value(
                 "Desktop Icon", label, "hidden", 1, update_modified=False

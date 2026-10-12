@@ -10,6 +10,7 @@ import json
 import os
 import re
 import time
+from urllib.parse import quote
 
 import requests
 
@@ -49,20 +50,24 @@ def _github_access_token(owner):
     """
     app_id = os.environ.get("RUNDINOVA_GITHUB_APP_ID", "").strip()
     installation_id = os.environ.get("RUNDINOVA_GITHUB_INSTALLATION_ID", "").strip()
-    installations_json = os.environ.get("RUNDINOVA_GITHUB_INSTALLATIONS_JSON", "").strip()
-    private_key_b64 = os.environ.get(
-        "RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64", ""
+    installations_json = os.environ.get(
+        "RUNDINOVA_GITHUB_INSTALLATIONS_JSON", ""
     ).strip()
+    private_key_b64 = os.environ.get("RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64", "").strip()
     if installations_json:
         try:
             installations = json.loads(installations_json)
         except (TypeError, ValueError) as exc:
-            raise RuntimeError("GitHub App installations must be a JSON object.") from exc
+            raise RuntimeError(
+                "GitHub App installations must be a JSON object."
+            ) from exc
         if not isinstance(installations, dict):
             raise RuntimeError("GitHub App installations must be a JSON object.")
         installation_id = str(installations.get(owner, "")).strip()
         if not installation_id:
-            raise RuntimeError(f"No GitHub App installation configured for owner {owner}.")
+            raise RuntimeError(
+                f"No GitHub App installation configured for owner {owner}."
+            )
     app_values = (app_id, installation_id, private_key_b64)
     if any(app_values) and not all(app_values):
         raise RuntimeError("GitHub App configuration is incomplete.")
@@ -83,7 +88,7 @@ def _installation_token(app_id, installation_id, private_key_b64):
             cached = cache.get_value(cache_key)
             if cached:
                 return cached
-    except Exception:
+    except Exception:  # noqa: BLE001 - GitHub sync remains usable without a working Frappe cache
         cache = None
 
     try:
@@ -161,6 +166,201 @@ def fetch_recent_commits(owner, repo, limit=5):
             }
         )
     return commits
+
+
+def fetch_installation_repositories(owner):
+    """List repositories granted to a GitHub App installation or configured PAT."""
+    app_id = os.environ.get("RUNDINOVA_GITHUB_APP_ID", "").strip()
+    private_key = os.environ.get("RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64", "").strip()
+    installation_id = os.environ.get("RUNDINOVA_GITHUB_INSTALLATION_ID", "").strip()
+    installations = os.environ.get("RUNDINOVA_GITHUB_INSTALLATIONS_JSON", "").strip()
+    using_app = bool(app_id and private_key and (installation_id or installations))
+    if not _github_access_token(owner):
+        raise RuntimeError(
+            "Configure a GitHub App installation or a read-only GitHub token first."
+        )
+
+    repositories = []
+    page = 1
+    while True:
+        response = requests.get(
+            f"{GITHUB_API_BASE}/installation/repositories"
+            if using_app
+            else f"{GITHUB_API_BASE}/user/repos",
+            params=(
+                {"per_page": 100, "page": page}
+                if using_app
+                else {
+                    "visibility": "all",
+                    "affiliation": "owner,organization_member,collaborator",
+                    "per_page": 100,
+                    "page": page,
+                }
+            ),
+            headers=_api_headers(owner),
+            timeout=TIMEOUT_SECONDS,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        page_repositories = payload.get("repositories", []) if using_app else payload
+        repositories.extend(
+            {
+                "full_name": item.get("full_name", ""),
+                "html_url": item.get("html_url", ""),
+                "description": item.get("description") or "",
+                "default_branch": item.get("default_branch", "main"),
+                "private": bool(item.get("private")),
+            }
+            for item in page_repositories
+            if item.get("full_name") and item.get("html_url")
+        )
+        if len(page_repositories) < 100:
+            return repositories
+        page += 1
+
+
+def fetch_repository_source_context(
+    owner, repo, branch, max_files=80, max_chars=180_000
+):
+    """Read bounded text source from the whole tree; never clone or execute it."""
+    tree_response = requests.get(
+        f"{GITHUB_API_BASE}/repos/{owner}/{repo}/git/trees/{quote(branch, safe='')}",
+        params={"recursive": 1},
+        headers=_api_headers(owner),
+        timeout=TIMEOUT_SECONDS,
+    )
+    tree_response.raise_for_status()
+    tree = tree_response.json()
+    ignored_dirs = {
+        ".git",
+        ".next",
+        ".venv",
+        "__pycache__",
+        "build",
+        "coverage",
+        "dist",
+        "node_modules",
+        "target",
+        "vendor",
+    }
+    text_names = {
+        "dockerfile",
+        "makefile",
+        "readme",
+        "readme.md",
+        "pyproject.toml",
+        "package.json",
+        "go.mod",
+        "cargo.toml",
+        "pubspec.yaml",
+    }
+    text_extensions = {
+        ".c",
+        ".cpp",
+        ".cs",
+        ".dart",
+        ".go",
+        ".html",
+        ".java",
+        ".js",
+        ".jsx",
+        ".md",
+        ".php",
+        ".py",
+        ".rb",
+        ".rs",
+        ".sh",
+        ".sql",
+        ".toml",
+        ".ts",
+        ".tsx",
+        ".txt",
+        ".xml",
+        ".yaml",
+        ".yml",
+    }
+    candidates = []
+    for entry in tree.get("tree", []):
+        path = entry.get("path", "")
+        if entry.get("type") != "blob" or entry.get("size", 0) > 200_000:
+            continue
+        parts = path.lower().split("/")
+        basename = parts[-1]
+        if any(part in ignored_dirs for part in parts):
+            continue
+        if basename.startswith(".env") or any(
+            marker in basename for marker in ("secret", "credential", "private_key")
+        ):
+            continue
+        if basename in {
+            "package-lock.json",
+            "pnpm-lock.yaml",
+            "yarn.lock",
+            "poetry.lock",
+        }:
+            continue
+        if basename not in text_names and not any(
+            basename.endswith(extension) for extension in text_extensions
+        ):
+            continue
+        candidates.append(entry)
+    candidates.sort(
+        key=lambda item: (
+            0 if item["path"].lower().split("/")[-1].startswith("readme") else 1,
+            0 if item["path"].lower().split("/")[-1] in text_names else 1,
+            item["path"],
+        )
+    )
+
+    files = []
+    used_chars = 0
+    for entry in candidates[:max_files]:
+        response = requests.get(
+            entry["url"], headers=_api_headers(owner), timeout=TIMEOUT_SECONDS
+        )
+        response.raise_for_status()
+        blob = response.json()
+        if blob.get("encoding") != "base64":
+            continue
+        content = base64.b64decode(blob.get("content", "")).decode(
+            "utf-8", errors="replace"
+        )
+        remaining = max_chars - used_chars
+        if remaining <= 0:
+            break
+        content = content[:remaining]
+        # Do not transmit credentials accidentally committed in source files.
+        content = re.sub(
+            r"(?im)([A-Z0-9_]*(?:API[_-]?KEY|ACCESS[_-]?TOKEN|CLIENT[_-]?SECRET|"
+            r"PASSWORD|DATABASE[_-]?URL|PRIVATE[_-]?KEY|SECRET)[A-Z0-9_]*)"
+            r"(\s*[:=]\s*)(['\"]?)[^\s'\"]+",
+            r"\1\2\3[REDACTED]",
+            content,
+        )
+        content = re.sub(
+            r"(?i)\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
+            r"AIza[A-Za-z0-9_-]{30,}|sk-[A-Za-z0-9]{20,})\b",
+            "[REDACTED_TOKEN]",
+            content,
+        )
+        content = re.sub(
+            r"(?s)-----BEGIN(?: RSA| EC| OPENSSH)? PRIVATE KEY-----.*?"
+            r"-----END(?: RSA| EC| OPENSSH)? PRIVATE KEY-----",
+            "[REDACTED_PRIVATE_KEY]",
+            content,
+        )
+        used_chars += len(content)
+        files.append({"path": entry["path"], "content": content})
+    return {
+        "branch": branch,
+        "tree_files": len(tree.get("tree", [])),
+        "candidate_files": len(candidates),
+        "files_read": len(files),
+        "truncated": bool(tree.get("truncated"))
+        or len(candidates) > max_files
+        or used_chars >= max_chars,
+        "files": files,
+    }
 
 
 def sync_repository(github_url):

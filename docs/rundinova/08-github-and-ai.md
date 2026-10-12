@@ -48,7 +48,14 @@ The AI may not create tasks, assign people, edit GitHub issues, push code, or
 merge pull requests without a person approving the specific action. The first
 release should create selected approved tasks inside RundiNova only.
 
-No model provider or API credential is currently configured for the production
-site. Before enabling AI reviews, choose a provider and configure its key in a
-protected integration setting. Send only the repository information needed for
-the review and document the selected provider's data-retention terms.
+The implementation uses Gemini through `RUNDINOVA_GEMINI_API_KEY` and
+`RUNDINOVA_GEMINI_MODEL`. A Director can start an account-wide scan from a
+repository record. RundiNova discovers repositories granted to that GitHub App
+installation and queues a separate analysis job per repository. Project Leads
+can review one repository at a time. Each repository record shows whether the
+analysis is queued, running, complete, or failed. It reads bounded text files from the linked repository,
+redacts common credential patterns, and uses Google Search grounding for market
+claims. The user starts each review from the repository form and confirms that
+source text will be sent to Google. The report records scan coverage and web
+sources; a human must review it. The endpoint never creates or assigns work.
+The exposed test key must be revoked and replaced before enabling this feature.
