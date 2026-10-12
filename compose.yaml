@@ -18,6 +18,15 @@ x-backend-defaults: &backend_defaults
   volumes:
     - sites:/home/frappe/frappe-bench/sites
 
+x-rundinova-github-environment: &rundinova_github_environment
+  RUNDINOVA_GITHUB_TOKEN: ${RUNDINOVA_GITHUB_TOKEN:-}
+  RUNDINOVA_GITHUB_APP_ID: ${RUNDINOVA_GITHUB_APP_ID:-}
+  RUNDINOVA_GITHUB_INSTALLATION_ID: ${RUNDINOVA_GITHUB_INSTALLATION_ID:-}
+  RUNDINOVA_GITHUB_INSTALLATIONS_JSON: ${RUNDINOVA_GITHUB_INSTALLATIONS_JSON:-}
+  RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64: ${RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64:-}
+  RUNDINOVA_GEMINI_API_KEY: ${RUNDINOVA_GEMINI_API_KEY:-}
+  RUNDINOVA_GEMINI_MODEL: ${RUNDINOVA_GEMINI_MODEL:-gemini-2.5-flash}
+
 services:
   configurator:
     <<: *backend_defaults
@@ -59,6 +68,7 @@ services:
       retries: 5
       start_period: 90s
     environment:
+      <<: *rundinova_github_environment
       GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
       GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
@@ -100,16 +110,19 @@ services:
     <<: *backend_defaults
     platform: linux/amd64
     command: bench worker --queue short,default
+    environment: *rundinova_github_environment
 
   queue-long:
     <<: *backend_defaults
     platform: linux/amd64
     command: bench worker --queue long,default,short
+    environment: *rundinova_github_environment
 
   scheduler:
     <<: *backend_defaults
     platform: linux/amd64
     command: bench schedule
+    environment: *rundinova_github_environment
 
 # ERPNext requires local assets access (Frappe does not)
 volumes:

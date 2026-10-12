@@ -17,6 +17,7 @@ static website and it does not store production secrets.
 - [Approved V1 scope and acceptance checklist](04-v1-scope.md)
 - [Roles and responsibilities](06-roles-and-responsibilities.md)
 - [Production team acceptance tests](PRODUCTION_ACCEPTANCE_TESTS.md)
+- [GitHub access and AI project reviews](08-github-and-ai.md)
 - [Self-hosted releases and controlled upstream updates](07-self-hosted-release.md)
 
 ## First deployment profile

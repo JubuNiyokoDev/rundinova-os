@@ -55,11 +55,33 @@ CRM_LOOKUP_DOCTYPES = (
     "CRM Lost Reason",
 )
 OFFICE_DOCTYPES = ("RundiNova Office",)
+DASHBOARD_ROLE_ACCESS = {
+    "RundiNova Executive Dashboard": frozenset({"RundiNova Director"}),
+    "RundiNova Finance Dashboard": frozenset(
+        {"RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"}
+    ),
+    "RundiNova People Dashboard": frozenset(
+        {"RundiNova Director", "RundiNova People & Culture"}
+    ),
+    "RundiNova Delivery Dashboard": frozenset(
+        {"RundiNova Director", "RundiNova Project Lead", "RundiNova Operations"}
+    ),
+    "RundiNova Ecosystem Dashboard": frozenset(
+        {
+            "RundiNova Director",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
+            "RundiNova Communications",
+            "RundiNova Community Relations",
+        }
+    ),
+}
 
-ASSIGNED_DOCTYPES = frozenset(FINANCIAL_DOCTYPES)
+ASSIGNED_DOCTYPES = frozenset(
+    FINANCIAL_DOCTYPES + PROJECT_DOCTYPES + ("Project", "Task")
+)
 ASSIGNED_CHILD_DOCTYPES = frozenset(("RundiNova Food Budget Item",))
 TEAM_MEMBER_CREATE_DOCTYPES = frozenset(("RundiNova Food Expense", "RundiNova Expense"))
-PRIVILEGED_RUNDINOVA_ROLES = frozenset(ROLES) - {"RundiNova Team Member"}
 
 
 def get_custom_doctype_permissions():
@@ -89,18 +111,7 @@ def get_custom_doctype_permissions():
     grant(
         FINANCIAL_DOCTYPES, ("RundiNova Finance Manager", "RundiNova Operations"), WRITE
     )
-    grant(
-        FINANCIAL_DOCTYPES,
-        (
-            "RundiNova Project Lead",
-            "RundiNova Ecosystem Lead",
-            "RundiNova Growth Lead",
-            "RundiNova Communications",
-            "RundiNova Community Relations",
-            "RundiNova People & Culture",
-        ),
-        READ,
-    )
+    grant(FINANCIAL_DOCTYPES, ("RundiNova Project Lead",), READ)
     grant(FINANCIAL_DOCTYPES, ("RundiNova Team Member",), ASSIGNED_READ)
     for doctype in TEAM_MEMBER_CREATE_DOCTYPES:
         permissions[(doctype, "RundiNova Team Member")] = dict(CREATE_EXPENSE)
@@ -228,36 +239,39 @@ def get_standard_doctype_permissions():
             for role in roles:
                 permissions[(doctype, role)] = dict(rule)
 
-    grant(
-        (
-            "Branch",
-            "Cost Center",
-            "Company",
-            "Department",
-            "Designation",
-            "Item",
-            "Warehouse",
-            "UOM",
-        ),
-        ROLES,
+    setup_doctypes = (
+        "Branch",
+        "Cost Center",
+        "Company",
+        "Department",
+        "Designation",
+        "Item",
+        "Warehouse",
+        "UOM",
     )
+    grant(setup_doctypes, ROLES, READ)
+    grant(setup_doctypes, ("RundiNova Director",), WRITE)
+    grant(("Project", "Task"), ROLES, READ)
     grant(
         ("Project", "Task"),
-        (
-            "RundiNova Director",
-            "RundiNova Operations",
-            "RundiNova Project Lead",
-            "RundiNova Communications",
-            "RundiNova People & Culture",
-            "RundiNova Team Member",
-        ),
+        ("RundiNova Director", "RundiNova Operations", "RundiNova Project Lead"),
+        WRITE,
+    )
+    grant(("Task",), ("RundiNova Team Member",), WRITE)
+    dashboard_roles = set().union(*DASHBOARD_ROLE_ACCESS.values())
+    grant(("Dashboard", "Dashboard Chart", "Number Card"), dashboard_roles, READ)
+    grant(
+        ("Dashboard", "Dashboard Chart", "Number Card"),
+        ("RundiNova Director",),
+        WRITE,
     )
     grant(
         ("Supplier",),
         ("RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"),
     )
-    grant(("Employee",), ("RundiNova Director", "RundiNova People & Culture"))
-    grant(("HR Settings",), ("RundiNova Director", "RundiNova People & Culture"))
+    grant(("Employee",), ("RundiNova People & Culture",), WRITE)
+    grant(("HR Settings",), ("RundiNova People & Culture",), WRITE)
+    grant(("Employee", "HR Settings"), ("RundiNova Director",), WRITE)
     grant(
         CRM_OPERATIONAL_DOCTYPES,
         (
@@ -296,18 +310,25 @@ def get_standard_doctype_permissions():
             "delete": 0,
             "report": 0,
         }
+    permissions[("Page", "RundiNova Director")] = dict(WRITE)
     return permissions
 
 
-def _team_member_is_scoped(user):
+def _team_member_is_scoped(user, doctype=None):
     if not user or user == "Administrator":
         return False
     roles = set(frappe.get_roles(user))
-    return (
-        "RundiNova Team Member" in roles
-        and not roles.intersection(PRIVILEGED_RUNDINOVA_ROLES)
-        and "System Manager" not in roles
-    )
+    if "RundiNova Team Member" not in roles or "System Manager" in roles:
+        return False
+    if doctype in FINANCIAL_DOCTYPES or doctype == "RundiNova Food Budget Item":
+        return not roles.intersection(
+            {"RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"}
+        )
+    if doctype in PROJECT_DOCTYPES or doctype in {"Project", "Task"}:
+        return not roles.intersection(
+            {"RundiNova Director", "RundiNova Operations", "RundiNova Project Lead"}
+        )
+    return "RundiNova Director" not in roles
 
 
 def _assigned_to_user(doctype, name, user):
@@ -341,13 +362,12 @@ def _assigned_parent_tables(child_doctype):
 
 
 def get_permission_query_conditions(user=None, doctype=None):
-    """Restrict team-member list queries to owned or assigned financial records."""
+    """Restrict team-member list queries to owned or assigned records."""
     user = user or frappe.session.user
-    if not _team_member_is_scoped(user):
-        return ""
-
-    escaped_user = frappe.db.escape(user)
     if doctype in ASSIGNED_DOCTYPES:
+        if not _team_member_is_scoped(user, doctype):
+            return ""
+        escaped_user = frappe.db.escape(user)
         escaped_doctype = frappe.db.escape(doctype)
         table = f"`tab{doctype}`"
         return (
@@ -362,8 +382,16 @@ def get_permission_query_conditions(user=None, doctype=None):
     parents = (
         _assigned_parent_tables(doctype) if doctype in ASSIGNED_CHILD_DOCTYPES else []
     )
+    if not parents:
+        return ""
+    escaped_user = frappe.db.escape(user)
     conditions = []
     for parent in parents:
+        if not _team_member_is_scoped(user, parent):
+            conditions.append(
+                f"(`tab{doctype}`.`parenttype` = {frappe.db.escape(parent)})"
+            )
+            continue
         parent_table = f"`tab{parent}`"
         escaped_parent = frappe.db.escape(parent)
         conditions.append(
@@ -386,6 +414,65 @@ def _query_for(doctype, user=None):
 
 def food_budget_query(user=None):
     return _query_for("RundiNova Food Budget", user)
+
+
+def project_query(user=None):
+    return _query_for("Project", user)
+
+
+def task_query(user=None):
+    return _query_for("Task", user)
+
+
+def repository_query(user=None):
+    return _query_for("RundiNova Repository", user)
+
+
+def risk_query(user=None):
+    return _query_for("RundiNova Risk", user)
+
+
+def dashboard_query(user=None):
+    user = user or frappe.session.user
+    roles = set(frappe.get_roles(user))
+    if "System Manager" in roles or "RundiNova Director" in roles:
+        return ""
+    allowed = [
+        frappe.db.escape(name)
+        for name, permitted_roles in DASHBOARD_ROLE_ACCESS.items()
+        if roles.intersection(permitted_roles)
+    ]
+    if not allowed:
+        return "1=0"
+    return f"`tabDashboard`.`name` in ({', '.join(allowed)})"
+
+
+def _dashboard_widget_query(doctype, child_doctype, child_field, user=None):
+    user = user or frappe.session.user
+    roles = set(frappe.get_roles(user))
+    if "System Manager" in roles or "RundiNova Director" in roles:
+        return ""
+    dashboards = [
+        frappe.db.escape(name)
+        for name, permitted_roles in DASHBOARD_ROLE_ACCESS.items()
+        if roles.intersection(permitted_roles)
+    ]
+    if not dashboards:
+        return "1=0"
+    return (
+        f"`tab{doctype}`.`name` in (SELECT `{child_field}` FROM `tab{child_doctype}` "
+        f"WHERE `parent` in ({', '.join(dashboards)}))"
+    )
+
+
+def dashboard_chart_query(user=None):
+    return _dashboard_widget_query(
+        "Dashboard Chart", "Dashboard Chart Link", "chart", user
+    )
+
+
+def number_card_query(user=None):
+    return _dashboard_widget_query("Number Card", "Number Card Link", "card", user)
 
 
 def food_expense_query(user=None):
@@ -411,19 +498,52 @@ def food_budget_item_query(user=None):
 def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
     """Enforce the assignment boundary on both direct reads and writes."""
     user = user or frappe.session.user
-    if not _team_member_is_scoped(user):
+    permission_type = permission_type or ptype
+    if doc.doctype in (
+        "Dashboard",
+        "Dashboard Chart",
+        "Number Card",
+    ) and permission_type in (
+        "read",
+        "select",
+    ):
+        roles = set(frappe.get_roles(user))
+        if "System Manager" in roles or "RundiNova Director" in roles:
+            return True
+        if doc.doctype == "Dashboard":
+            return bool(roles.intersection(DASHBOARD_ROLE_ACCESS.get(doc.name, ())))
+        links = (
+            "Dashboard Chart Link"
+            if doc.doctype == "Dashboard Chart"
+            else "Number Card Link"
+        )
+        field = "chart" if doc.doctype == "Dashboard Chart" else "card"
+        permitted_dashboards = [
+            name
+            for name, permitted_roles in DASHBOARD_ROLE_ACCESS.items()
+            if roles.intersection(permitted_roles)
+        ]
+        return bool(
+            permitted_dashboards
+            and frappe.db.exists(
+                links,
+                {field: doc.name, "parent": ["in", permitted_dashboards]},
+            )
+        )
+    if not _team_member_is_scoped(user, doc.doctype):
         # Frappe 16 treats a falsy controller hook result (including None)
         # as an explicit denial. Users outside the restricted team-member
         # cohort must therefore pass this controller check explicitly.
         return True
 
-    permission_type = permission_type or ptype
     if permission_type == "create":
         return doc.doctype in TEAM_MEMBER_CREATE_DOCTYPES
 
     if permission_type == "write":
         # Team members may submit their own expense records, but cannot edit
         # budgets, approvals, progress snapshots, or existing expenses.
+        if doc.doctype == "Task":
+            return _assigned_to_user(doc.doctype, doc.name, user)
         return False
 
     if permission_type not in ("read", "select"):
@@ -436,6 +556,8 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
         parent_type = doc.parenttype
         if parent_type not in ASSIGNED_DOCTYPES:
             return False
+        if not _team_member_is_scoped(user, parent_type):
+            return True
         return _assigned_to_user(parent_type, doc.parent, user)
 
     return None

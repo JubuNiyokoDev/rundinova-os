@@ -33,6 +33,7 @@ doctype_js = {
     "RundiNova Food Budget": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Progress": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Expense": "public/js/rundinova_food_purchase.js",
+    "RundiNova Repository": "public/js/rundinova_repository.js",
 }
 
 doctype_list_js = {
@@ -105,10 +106,17 @@ after_migrate = [
 ]
 
 # List and document permission checks share the same assignment boundary.
-# Frappe's permission_query_conditions protects get_list; has_permission
-# covers direct document reads and writes for assigned financial records.
+# Frappe's permission_query_conditions protects lists; has_permission covers
+# direct reads and writes for assigned operational and financial records.
 _access_control = "rundinova_tech.rundinova_tech.access_control."
 permission_query_conditions = {
+    "Dashboard": _access_control + "dashboard_query",
+    "Dashboard Chart": _access_control + "dashboard_chart_query",
+    "Number Card": _access_control + "number_card_query",
+    "Project": _access_control + "project_query",
+    "Task": _access_control + "task_query",
+    "RundiNova Repository": _access_control + "repository_query",
+    "RundiNova Risk": _access_control + "risk_query",
     "RundiNova Food Budget": _access_control + "food_budget_query",
     "RundiNova Food Expense": _access_control + "food_expense_query",
     "RundiNova Food Progress": _access_control + "food_progress_query",
