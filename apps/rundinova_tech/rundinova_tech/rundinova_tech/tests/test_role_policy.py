@@ -1,5 +1,7 @@
 """Role-policy checks for the real RundiNova team responsibilities."""
 
+from unittest.mock import patch
+
 from frappe import _dict
 from frappe.tests import UnitTestCase
 from rundinova_tech import hooks
@@ -81,6 +83,23 @@ class TestRolePolicy(UnitTestCase):
         ):
             self.assertFalse(has_permission(workspace, user=user, ptype="read"))
             self.assertFalse(has_permission(page, user=user, ptype="read"))
+
+    def test_documents_are_available_to_rundinova_roles_but_not_unrelated_users(self):
+        document = _dict(doctype="RundiNova Document")
+        with patch(
+            "rundinova_tech.rundinova_tech.access_control.frappe.get_roles",
+            return_value=["RundiNova Developer", "RundiNova Team Member"],
+        ):
+            self.assertTrue(
+                has_permission(document, user="developer@example.test", ptype="read")
+            )
+        with patch(
+            "rundinova_tech.rundinova_tech.access_control.frappe.get_roles",
+            return_value=["Employee"],
+        ):
+            self.assertFalse(
+                has_permission(document, user="employee@example.test", ptype="read")
+            )
 
     def test_workspace_list_filter_uses_role_rows_without_nonexistent_columns(self):
         with (
