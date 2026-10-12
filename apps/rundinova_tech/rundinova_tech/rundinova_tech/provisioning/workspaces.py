@@ -97,7 +97,11 @@ def _sync_workspace(
         {
             "label": title,
             "title": title,
-            "module": module,
+            # These are database-managed public workspaces, not file-backed
+            # standard workspaces. Frappe 16.36 removes public workspaces
+            # that have both module and app set when their JSON files are
+            # absent, so keep module unset for this app-owned provisioner.
+            "module": None if app == "rundinova_tech" else module,
             "app": app,
             "type": "Workspace",
             "sequence_id": sequence,
