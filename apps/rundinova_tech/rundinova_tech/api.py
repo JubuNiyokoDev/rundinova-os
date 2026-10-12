@@ -222,6 +222,7 @@ def analyze_github_account(owner):
             existing[tuple(part.lower() for part in parsed)] = entry.name
 
     jobs = []
+    already_running = 0
     for repository in repositories:
         parsed = parse_github_url(repository["html_url"])
         if not parsed:
@@ -230,6 +231,9 @@ def analyze_github_account(owner):
         name = existing.get(key)
         if name:
             doc = frappe.get_doc("RundiNova Repository", name)
+            if doc.custom_ai_review_status in {"Queued", "Analyzing"}:
+                already_running += 1
+                continue
         else:
             doc = frappe.get_doc(
                 {
@@ -255,7 +259,7 @@ def analyze_github_account(owner):
             enqueue_after_commit=True,
         )
         jobs.append(doc.name)
-    return {"repository_count": len(jobs)}
+    return {"repository_count": len(jobs), "already_running": already_running}
 
 
 def _analyze_github_repository_job(repository_name, requested_by):

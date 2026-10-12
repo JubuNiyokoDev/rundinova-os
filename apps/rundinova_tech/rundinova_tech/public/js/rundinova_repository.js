@@ -24,10 +24,11 @@ frappe.ui.form.on("RundiNova Repository", {
                 freeze_message: __("Chargement des dépôts GitHub…"),
                 callback(response) {
                   const count = response.message?.repository_count || 0;
+                  const running = response.message?.already_running || 0;
                   frappe.msgprint(
                     __(
-                      "{0} dépôt(s) ont été mis en file d’analyse. Leur état et leur rapport apparaîtront sur chaque fiche.",
-                      [count],
+                      "{0} dépôt(s) mis en file. {1} déjà en cours. L’état et le rapport apparaîtront sur chaque fiche.",
+                      [count, running],
                     ),
                   );
                 },
