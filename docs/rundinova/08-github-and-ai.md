@@ -14,7 +14,9 @@ The preferred production credential is a GitHub App installation. Configure
 these values in the private production environment file:
 
 - `RUNDINOVA_GITHUB_APP_ID`
-- `RUNDINOVA_GITHUB_INSTALLATION_ID`
+- `RUNDINOVA_GITHUB_INSTALLATIONS_JSON`, a private JSON map from GitHub owner
+  (user or organization) to that owner's installation ID. For a single owner,
+  the legacy `RUNDINOVA_GITHUB_INSTALLATION_ID` remains supported.
 - `RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64` (base64-encoded PEM private key)
 
 Install the app on each GitHub owner that holds RundiNova repositories. For the

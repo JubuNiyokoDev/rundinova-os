@@ -6,6 +6,7 @@ private repositories. This module never writes to GitHub.
 """
 
 import base64
+import json
 import os
 import re
 import time
@@ -26,21 +27,21 @@ def parse_github_url(url):
     return match.group(1), match.group(2)
 
 
-def _api_headers():
+def _api_headers(owner):
     """Build request headers without exposing credentials in sync results."""
     headers = {
         "Accept": "application/vnd.github+json",
         "User-Agent": "RundiNova-OS",
         "X-GitHub-Api-Version": API_VERSION,
     }
-    token = _github_access_token()
+    token = _github_access_token(owner)
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
 
 
-def _github_access_token():
-    """Return one centrally configured GitHub token for every repository.
+def _github_access_token(owner):
+    """Return a centrally configured token for the repository owner.
 
     GitHub App credentials are preferred because they mint short-lived tokens
     for the repositories granted to the installation. A fine-grained PAT stays
@@ -48,9 +49,20 @@ def _github_access_token():
     """
     app_id = os.environ.get("RUNDINOVA_GITHUB_APP_ID", "").strip()
     installation_id = os.environ.get("RUNDINOVA_GITHUB_INSTALLATION_ID", "").strip()
+    installations_json = os.environ.get("RUNDINOVA_GITHUB_INSTALLATIONS_JSON", "").strip()
     private_key_b64 = os.environ.get(
         "RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64", ""
     ).strip()
+    if installations_json:
+        try:
+            installations = json.loads(installations_json)
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError("GitHub App installations must be a JSON object.") from exc
+        if not isinstance(installations, dict):
+            raise RuntimeError("GitHub App installations must be a JSON object.")
+        installation_id = str(installations.get(owner, "")).strip()
+        if not installation_id:
+            raise RuntimeError(f"No GitHub App installation configured for owner {owner}.")
     app_values = (app_id, installation_id, private_key_b64)
     if any(app_values) and not all(app_values):
         raise RuntimeError("GitHub App configuration is incomplete.")
@@ -109,7 +121,7 @@ def fetch_repository_info(owner, repo):
     """GET /repos/{owner}/{repo} - returns parsed dict or raises on error."""
     response = requests.get(
         f"{GITHUB_API_BASE}/repos/{owner}/{repo}",
-        headers=_api_headers(),
+        headers=_api_headers(owner),
         timeout=TIMEOUT_SECONDS,
     )
     response.raise_for_status()
@@ -133,7 +145,7 @@ def fetch_recent_commits(owner, repo, limit=5):
     response = requests.get(
         f"{GITHUB_API_BASE}/repos/{owner}/{repo}/commits",
         params={"per_page": limit},
-        headers=_api_headers(),
+        headers=_api_headers(owner),
         timeout=TIMEOUT_SECONDS,
     )
     response.raise_for_status()
