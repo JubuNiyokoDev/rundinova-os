@@ -21,6 +21,10 @@ class TestWorkspaceProvisioning(UnitTestCase):
     def test_operations_home_contains_dashboards_and_daily_work(self):
         workspace = frappe.get_doc("Workspace", "RundiNova Tech")
         self.assertFalse(workspace.is_hidden)
+        self.assertFalse(
+            workspace.module,
+            "Site-managed public workspaces must not be treated as orphanable app fixtures.",
+        )
 
         shortcuts = {(row.type, row.link_to) for row in workspace.shortcuts}
         dashboard_links = {target for kind, target in shortcuts if kind == "Dashboard"}
