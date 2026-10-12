@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timezone
 
 import frappe
 from frappe import _
@@ -54,7 +55,7 @@ class RundiNovaRepository(Document):
         self.forks_count = info.get("forks_count", 0)
         self.default_branch = info.get("default_branch", "")
         self.primary_language = info.get("language", "")
-        self.last_push_date = info.get("pushed_at", "")
+        self.last_push_date = _github_datetime(info.get("pushed_at"))
         self.last_synced_on = now_datetime()
         self.save()
         frappe.msgprint(_("Repository synced from GitHub successfully."))
@@ -65,3 +66,11 @@ class RundiNovaRepository(Document):
         """Redirect to Task list filtered by this repository."""
         frappe.response.type = "redirect"
         frappe.response.location = f"/app/task?rundinova_repository={self.name}"
+
+
+def _github_datetime(value):
+    """Convert GitHub's ISO 8601 UTC timestamp to a MariaDB-safe datetime."""
+    if not value:
+        return None
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return parsed.astimezone(timezone.utc).replace(tzinfo=None)

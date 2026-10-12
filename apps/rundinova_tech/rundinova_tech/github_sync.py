@@ -5,8 +5,10 @@ RUNDINOVA_GITHUB_TOKEN environment variable enables the same GET-only sync for
 private repositories. This module never writes to GitHub.
 """
 
+import base64
 import os
 import re
+import time
 
 import requests
 
@@ -31,10 +33,76 @@ def _api_headers():
         "User-Agent": "RundiNova-OS",
         "X-GitHub-Api-Version": API_VERSION,
     }
-    token = os.environ.get("RUNDINOVA_GITHUB_TOKEN", "").strip()
+    token = _github_access_token()
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
+
+
+def _github_access_token():
+    """Return one centrally configured GitHub token for every repository.
+
+    GitHub App credentials are preferred because they mint short-lived tokens
+    for the repositories granted to the installation. A fine-grained PAT stays
+    available as a migration path for existing self-hosted deployments.
+    """
+    app_id = os.environ.get("RUNDINOVA_GITHUB_APP_ID", "").strip()
+    installation_id = os.environ.get("RUNDINOVA_GITHUB_INSTALLATION_ID", "").strip()
+    private_key_b64 = os.environ.get(
+        "RUNDINOVA_GITHUB_APP_PRIVATE_KEY_B64", ""
+    ).strip()
+    app_values = (app_id, installation_id, private_key_b64)
+    if any(app_values) and not all(app_values):
+        raise RuntimeError("GitHub App configuration is incomplete.")
+    if app_id and installation_id and private_key_b64:
+        return _installation_token(app_id, installation_id, private_key_b64)
+    return os.environ.get("RUNDINOVA_GITHUB_TOKEN", "").strip()
+
+
+def _installation_token(app_id, installation_id, private_key_b64):
+    """Mint/cache an installation token; its secret never leaves this module."""
+    cache = None
+    cache_key = f"rundinova:github:installation-token:{installation_id}"
+    try:
+        import frappe
+
+        if getattr(frappe.local, "site", None):
+            cache = frappe.cache()
+            cached = cache.get_value(cache_key)
+            if cached:
+                return cached
+    except Exception:
+        cache = None
+
+    try:
+        import jwt
+
+        private_key = base64.b64decode(private_key_b64, validate=True).decode("utf-8")
+        now = int(time.time())
+        app_jwt = jwt.encode(
+            {"iat": now - 30, "exp": now + 540, "iss": app_id},
+            private_key,
+            algorithm="RS256",
+        )
+        response = requests.post(
+            f"{GITHUB_API_BASE}/app/installations/{installation_id}/access_tokens",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {app_jwt}",
+                "User-Agent": "RundiNova-OS",
+                "X-GitHub-Api-Version": API_VERSION,
+            },
+            timeout=TIMEOUT_SECONDS,
+        )
+        response.raise_for_status()
+        token = response.json()["token"]
+        if cache:
+            cache.set_value(cache_key, token, expires_in_sec=50 * 60)
+        return token
+    except Exception as exc:
+        raise RuntimeError(
+            "GitHub App authentication failed; check its installation settings."
+        ) from exc
 
 
 def fetch_repository_info(owner, repo):
