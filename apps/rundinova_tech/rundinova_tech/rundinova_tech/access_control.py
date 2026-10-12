@@ -82,14 +82,6 @@ ASSIGNED_DOCTYPES = frozenset(
 )
 ASSIGNED_CHILD_DOCTYPES = frozenset(("RundiNova Food Budget Item",))
 TEAM_MEMBER_CREATE_DOCTYPES = frozenset(("RundiNova Food Expense", "RundiNova Expense"))
-UNSCOPED_ROLES = frozenset(
-    {
-        "RundiNova Director",
-        "RundiNova Finance Manager",
-        "RundiNova Operations",
-        "RundiNova Project Lead",
-    }
-)
 
 
 def get_custom_doctype_permissions():
@@ -322,15 +314,21 @@ def get_standard_doctype_permissions():
     return permissions
 
 
-def _team_member_is_scoped(user):
+def _team_member_is_scoped(user, doctype=None):
     if not user or user == "Administrator":
         return False
     roles = set(frappe.get_roles(user))
-    return (
-        "RundiNova Team Member" in roles
-        and not roles.intersection(UNSCOPED_ROLES)
-        and "System Manager" not in roles
-    )
+    if "RundiNova Team Member" not in roles or "System Manager" in roles:
+        return False
+    if doctype in FINANCIAL_DOCTYPES or doctype == "RundiNova Food Budget Item":
+        return not roles.intersection(
+            {"RundiNova Director", "RundiNova Finance Manager", "RundiNova Operations"}
+        )
+    if doctype in PROJECT_DOCTYPES or doctype in {"Project", "Task"}:
+        return not roles.intersection(
+            {"RundiNova Director", "RundiNova Operations", "RundiNova Project Lead"}
+        )
+    return "RundiNova Director" not in roles
 
 
 def _assigned_to_user(doctype, name, user):
@@ -366,11 +364,10 @@ def _assigned_parent_tables(child_doctype):
 def get_permission_query_conditions(user=None, doctype=None):
     """Restrict team-member list queries to owned or assigned records."""
     user = user or frappe.session.user
-    if not _team_member_is_scoped(user):
-        return ""
-
-    escaped_user = frappe.db.escape(user)
     if doctype in ASSIGNED_DOCTYPES:
+        if not _team_member_is_scoped(user, doctype):
+            return ""
+        escaped_user = frappe.db.escape(user)
         escaped_doctype = frappe.db.escape(doctype)
         table = f"`tab{doctype}`"
         return (
@@ -385,8 +382,16 @@ def get_permission_query_conditions(user=None, doctype=None):
     parents = (
         _assigned_parent_tables(doctype) if doctype in ASSIGNED_CHILD_DOCTYPES else []
     )
+    if not parents:
+        return ""
+    escaped_user = frappe.db.escape(user)
     conditions = []
     for parent in parents:
+        if not _team_member_is_scoped(user, parent):
+            conditions.append(
+                f"(`tab{doctype}`.`parenttype` = {frappe.db.escape(parent)})"
+            )
+            continue
         parent_table = f"`tab{parent}`"
         escaped_parent = frappe.db.escape(parent)
         conditions.append(
@@ -525,7 +530,7 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
                 {field: doc.name, "parent": ["in", permitted_dashboards]},
             )
         )
-    if not _team_member_is_scoped(user):
+    if not _team_member_is_scoped(user, doc.doctype):
         # Frappe 16 treats a falsy controller hook result (including None)
         # as an explicit denial. Users outside the restricted team-member
         # cohort must therefore pass this controller check explicitly.
@@ -551,6 +556,8 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
         parent_type = doc.parenttype
         if parent_type not in ASSIGNED_DOCTYPES:
             return False
+        if not _team_member_is_scoped(user, parent_type):
+            return True
         return _assigned_to_user(parent_type, doc.parent, user)
 
     return None
