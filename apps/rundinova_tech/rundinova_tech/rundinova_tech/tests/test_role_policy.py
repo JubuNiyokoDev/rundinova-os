@@ -14,6 +14,7 @@ from rundinova_tech.rundinova_tech.access_control import (
 from rundinova_tech.rundinova_tech.site_bootstrap.team import (
     LEGACY_TEAM_LOGIN_REPLACEMENTS,
     TEAM_USERS,
+    _clear_orphaned_default_workspace,
 )
 
 
@@ -23,6 +24,24 @@ class TestRolePolicy(UnitTestCase):
             "rundinova_tech.rundinova_tech.provisioning.roles.ensure_rundinova_roles",
             hooks.before_migrate,
         )
+
+    def test_team_bootstrap_clears_workspace_links_removed_by_migration(self):
+        user = _dict(default_workspace="RundiNova Ecosystem")
+        with patch(
+            "rundinova_tech.rundinova_tech.site_bootstrap.team.frappe.db.exists",
+            return_value=False,
+        ):
+            self.assertTrue(_clear_orphaned_default_workspace(user))
+        self.assertIsNone(user.default_workspace)
+
+    def test_team_bootstrap_preserves_existing_workspace_links(self):
+        user = _dict(default_workspace="RundiNova Tech")
+        with patch(
+            "rundinova_tech.rundinova_tech.site_bootstrap.team.frappe.db.exists",
+            return_value=True,
+        ):
+            self.assertFalse(_clear_orphaned_default_workspace(user))
+        self.assertEqual(user.default_workspace, "RundiNova Tech")
 
     def test_team_seed_uses_confirmed_login_addresses_and_business_roles(self):
         users = {row["email"]: set(row["roles"]) for row in TEAM_USERS}
