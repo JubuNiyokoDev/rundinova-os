@@ -4,12 +4,16 @@ from unittest.mock import patch
 
 from frappe import _dict
 from frappe.tests import UnitTestCase
+
 from rundinova_tech import hooks
 from rundinova_tech.rundinova_tech.access_control import (
     get_custom_doctype_permissions,
     get_standard_doctype_permissions,
     has_permission,
     workspace_query,
+)
+from rundinova_tech.rundinova_tech.provisioning.workspaces import (
+    DEFAULT_WORKSPACE_BY_ROLE,
 )
 from rundinova_tech.rundinova_tech.site_bootstrap.team import (
     LEGACY_TEAM_LOGIN_REPLACEMENTS,
@@ -59,6 +63,7 @@ class TestRolePolicy(UnitTestCase):
         self.assertIn("RundiNova Director", users["joffre.niyondiko@kit-hub.com"])
         self.assertIn("Employee", users["ndabubahajanvier@gmail.com"])
         self.assertIn("RundiNova Ecosystem Lead", users["ndabubahajanvier@gmail.com"])
+        self.assertIn("RundiNova Project Lead", users["maniranyibutsef@gmail.com"])
         self.assertIn("RundiNova Growth Lead", users["maniranyibutsef@gmail.com"])
         self.assertIn(
             "RundiNova Community Relations", users["mandela.fanuel.1@gmail.com"]
@@ -81,6 +86,39 @@ class TestRolePolicy(UnitTestCase):
                 "housekeeping@rundinova.com": "vyamungucharif410@gmail.com",
             },
         )
+
+    def test_role_specific_home_takes_priority_over_shared_developer_workspace(self):
+        role_order = [role for role, _workspace in DEFAULT_WORKSPACE_BY_ROLE]
+        developer_index = role_order.index("RundiNova Developer")
+        for role in (
+            "RundiNova Project Lead",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Growth Lead",
+            "RundiNova Community Relations",
+            "RundiNova Communications",
+        ):
+            self.assertLess(role_order.index(role), developer_index)
+
+    def test_developer_and_project_lead_project_task_permissions_exclude_delete(self):
+        policy = get_standard_doctype_permissions()
+        developer_project = policy[("Project", "RundiNova Developer")]
+        developer_task = policy[("Task", "RundiNova Developer")]
+        project_lead_project = policy[("Project", "RundiNova Project Lead")]
+        project_lead_task = policy[("Task", "RundiNova Project Lead")]
+
+        self.assertEqual(developer_project["read"], 1)
+        self.assertEqual(developer_project["write"], 0)
+        self.assertEqual(developer_task["write"], 1)
+        self.assertEqual(developer_task["create"], 1)
+        for permission in (
+            developer_project,
+            developer_task,
+            project_lead_project,
+            project_lead_task,
+        ):
+            self.assertEqual(permission["delete"], 0)
+        self.assertEqual(project_lead_project["write"], 1)
+        self.assertEqual(project_lead_task["write"], 1)
 
     def test_only_non_director_team_accounts_lose_workspace_admin_bypass(self):
         self.assertIn(

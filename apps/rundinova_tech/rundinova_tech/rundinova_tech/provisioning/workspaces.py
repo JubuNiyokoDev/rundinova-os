@@ -57,7 +57,6 @@ VISIBLE_DESKTOP_ICONS = {
 
 DEFAULT_WORKSPACE_BY_ROLE = (
     ("RundiNova Director", "RundiNova Tech"),
-    ("RundiNova Developer", "RundiNova Developer"),
     ("RundiNova Finance Manager", "RundiNova Finance"),
     ("RundiNova Operations", "RundiNova Operations"),
     ("RundiNova Project Lead", "RundiNova Delivery"),
@@ -66,6 +65,7 @@ DEFAULT_WORKSPACE_BY_ROLE = (
     ("RundiNova Community Relations", "RundiNova Community"),
     ("RundiNova Communications", "RundiNova Communications"),
     ("RundiNova People & Culture", "RundiNova People"),
+    ("RundiNova Developer", "RundiNova Developer"),
     ("RundiNova Team Member", "RundiNova Team"),
 )
 

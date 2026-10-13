@@ -38,6 +38,7 @@ TEAM_USERS = [
         "last_name": "Maniranyibutse",
         "employee_name": "MANIRANYIBUTSE Franck",
         "roles": [
+            "RundiNova Project Lead",
             "RundiNova Growth Lead",
             "RundiNova Developer",
             "RundiNova Team Member",
