@@ -75,6 +75,15 @@ TEAM_USERS = [
 ]
 
 
+def _clear_orphaned_default_workspace(user):
+    """Drop stale links so migration can recreate role-aware workspaces later."""
+    workspace = user.default_workspace
+    if workspace and not frappe.db.exists("Workspace", workspace):
+        user.default_workspace = None
+        return True
+    return False
+
+
 def ensure_team_users(temporary_password=None):
     """Provision the real team identities and keep their role assignments exact."""
     results = {}
@@ -86,7 +95,13 @@ def ensure_team_users(temporary_password=None):
             if user.user_type != "System User":
                 user.user_type = "System User"
                 user_changed = True
-            if not user.default_workspace:
+            user_changed |= _clear_orphaned_default_workspace(user)
+            # Workspace provisioning runs later in after_migrate. Only assign
+            # a fallback when it exists; sync_dashboards assigns the
+            # role-specific workspace after creating it.
+            if not user.default_workspace and frappe.db.exists(
+                "Workspace", "RundiNova Tech"
+            ):
                 user.default_workspace = "RundiNova Tech"
                 user_changed = True
         else:
@@ -97,7 +112,8 @@ def ensure_team_users(temporary_password=None):
                 "last_name": spec["last_name"],
                 "enabled": 1,
                 "user_type": "System User",
-                "default_workspace": "RundiNova Tech",
+                # The workspace fixtures may not exist yet during migration.
+                "default_workspace": None,
                 "send_welcome_email": 0,
             }
             if temporary_password:
