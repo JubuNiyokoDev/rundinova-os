@@ -169,6 +169,7 @@ def ensure_team_users(temporary_password=None):
                         old_user = frappe.get_doc("User", previous_email)
                         if old_user.enabled:
                             old_user.enabled = 0
+                            _clear_orphaned_default_workspace(old_user)
                             old_user.save(ignore_permissions=True)
                     frappe.db.set_value("Employee", employee.name, "user_id", email)
                 elif not previous_email:
