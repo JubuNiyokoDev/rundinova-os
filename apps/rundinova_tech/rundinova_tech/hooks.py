@@ -147,4 +147,6 @@ has_permission = {
     for doctype in permission_query_conditions
 }
 has_permission["Page"] = _access_control + "has_permission"
-has_permission["RundiNova Daily Update"] = _access_control + "has_daily_update_permission"
+has_permission["RundiNova Daily Update"] = (
+    _access_control + "has_daily_update_permission"
+)

@@ -179,7 +179,11 @@ def get_custom_doctype_permissions():
     # retain the complete delivery view and can review reports.
     grant(
         DAILY_UPDATE_DOCTYPES,
-        ("RundiNova Operations", "RundiNova Project Lead", "RundiNova People & Culture"),
+        (
+            "RundiNova Operations",
+            "RundiNova Project Lead",
+            "RundiNova People & Culture",
+        ),
         WRITE,
     )
     grant(DAILY_UPDATE_DOCTYPES, ("RundiNova Team Member",), {**WRITE, "report": 0})
@@ -559,7 +563,9 @@ def daily_update_query(user=None):
     return f"`tabRundiNova Daily Update`.employee = {frappe.db.escape(employee)}"
 
 
-def has_daily_update_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
+def has_daily_update_permission(
+    doc, user=None, ptype=None, permission_type=None, **kwargs
+):
     """Allow a pure team member to create/read/update only their own report."""
     user = user or frappe.session.user
     if not _team_member_is_scoped(user):

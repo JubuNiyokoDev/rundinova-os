@@ -3,21 +3,50 @@
 import frappe
 from frappe import _
 from frappe.utils import getdate, nowdate
-
 from rundinova_tech.rundinova_tech.doctype.rundinova_daily_update.rundinova_daily_update import (
     employee_for_user,
 )
 
-
 PORTFOLIO = (
-    "AgriLink", "DialGo", "Signatures", "NjiaNet", "Umuragizi", "UMS",
-    "Gestion de Cooperatives", "eBIF", "Gestion des evenements",
-    "Suivi des malades chroniques", "GoalSage AI", "RundiNovaOS", "Vanish",
-    "StoryTus", "PartenerWanje", "Burundi KYCEngine", "DevBoost", "ShopSync",
-    "MenyaArena", "KYMix", "Ndabazi", "UmwugaHome", "JuneTechInscription",
-    "Iwanje", "CIVIX", "ComLab", "KitHub360", "UmugenziTech", "NOVARIS",
-    "Absence Tracker", "RundiCheck", "Table Yawe", "Havila Energy", "Adren",
-    "Ikigabo", "TechSafe", "REDA", "PharmaSync", "Imbonakazoza",
+    "AgriLink",
+    "DialGo",
+    "Signatures",
+    "NjiaNet",
+    "Umuragizi",
+    "UMS",
+    "Gestion de Cooperatives",
+    "eBIF",
+    "Gestion des evenements",
+    "Suivi des malades chroniques",
+    "GoalSage AI",
+    "RundiNovaOS",
+    "Vanish",
+    "StoryTus",
+    "PartenerWanje",
+    "Burundi KYCEngine",
+    "DevBoost",
+    "ShopSync",
+    "MenyaArena",
+    "KYMix",
+    "Ndabazi",
+    "UmwugaHome",
+    "JuneTechInscription",
+    "Iwanje",
+    "CIVIX",
+    "ComLab",
+    "KitHub360",
+    "UmugenziTech",
+    "NOVARIS",
+    "Absence Tracker",
+    "RundiCheck",
+    "Table Yawe",
+    "Havila Energy",
+    "Adren",
+    "Ikigabo",
+    "TechSafe",
+    "REDA",
+    "PharmaSync",
+    "Imbonakazoza",
 )
 ACTIVE_PORTFOLIO = frozenset(("NOVARIS", "Imbonakazoza", "ComLab"))
 
@@ -118,8 +147,13 @@ def get_daily_follow_up_compliance(update_date=None):
             "RundiNova Daily Update",
             filters={"update_date": update_date},
             fields=[
-                "employee", "name", "primary_task", "project", "review_status",
-                "blocker_status", "time_spent_hours",
+                "employee",
+                "name",
+                "primary_task",
+                "project",
+                "review_status",
+                "blocker_status",
+                "time_spent_hours",
             ],
         )
     }
@@ -144,7 +178,9 @@ def get_daily_follow_up_compliance(update_date=None):
 
 def _director_user():
     directors = frappe.get_all(
-        "Has Role", filters={"role": "RundiNova Director", "parenttype": "User"}, pluck="parent"
+        "Has Role",
+        filters={"role": "RundiNova Director", "parenttype": "User"},
+        pluck="parent",
     )
     return directors[0] if directors else None
 
@@ -153,8 +189,12 @@ def _ensure_project_field(fieldname, label, fieldtype="Data", options=None):
     if frappe.db.exists("Custom Field", {"dt": "Project", "fieldname": fieldname}):
         return
     doc = {
-        "doctype": "Custom Field", "dt": "Project", "fieldname": fieldname,
-        "label": label, "fieldtype": fieldtype, "insert_after": "rundinova_repository",
+        "doctype": "Custom Field",
+        "dt": "Project",
+        "fieldname": fieldname,
+        "label": label,
+        "fieldtype": fieldtype,
+        "insert_after": "rundinova_repository",
         "module": "RundiNova Tech",
     }
     if options:
@@ -164,11 +204,15 @@ def _ensure_project_field(fieldname, label, fieldtype="Data", options=None):
 
 def ensure_portfolio_project_fields():
     _ensure_project_field(
-        "rundinova_portfolio_status", "Portfolio Status", "Select",
+        "rundinova_portfolio_status",
+        "Portfolio Status",
+        "Select",
         "Active\nBacklog\nPaused\nArchived",
     )
     _ensure_project_field("rundinova_business_owner", "Business Owner", "Link", "User")
-    _ensure_project_field("rundinova_technical_owner", "Technical Owner", "Link", "User")
+    _ensure_project_field(
+        "rundinova_technical_owner", "Technical Owner", "Link", "User"
+    )
 
 
 @frappe.whitelist()
@@ -183,12 +227,16 @@ def seed_rundinova_portfolio(create_initial_tasks=False):
     ensure_portfolio_project_fields()
     owner = _director_user()
     if not owner:
-        frappe.throw(_("A RundiNova Director user is required before seeding the portfolio."))
+        frappe.throw(
+            _("A RundiNova Director user is required before seeding the portfolio.")
+        )
     result = {"created": [], "updated": [], "tasks_created": []}
     for project_name in PORTFOLIO:
         project = frappe.db.exists("Project", {"project_name": project_name})
         values = {
-            "rundinova_portfolio_status": "Active" if project_name in ACTIVE_PORTFOLIO else "Backlog",
+            "rundinova_portfolio_status": (
+                "Active" if project_name in ACTIVE_PORTFOLIO else "Backlog"
+            ),
             "rundinova_business_owner": owner,
             "rundinova_technical_owner": owner,
         }
@@ -198,19 +246,28 @@ def seed_rundinova_portfolio(create_initial_tasks=False):
         else:
             doc = frappe.get_doc(
                 {
-                    "doctype": "Project", "project_name": project_name,
-                    "status": "Open", "project_manager": owner, **values,
+                    "doctype": "Project",
+                    "project_name": project_name,
+                    "status": "Open",
+                    "project_manager": owner,
+                    **values,
                 }
             ).insert(ignore_permissions=True)
             project = doc.name
             result["created"].append(project_name)
         if create_initial_tasks and project_name in ACTIVE_PORTFOLIO:
-            subject = "Define product scope, repository links and first delivery backlog"
+            subject = (
+                "Define product scope, repository links and first delivery backlog"
+            )
             if not frappe.db.exists("Task", {"project": project, "subject": subject}):
                 frappe.get_doc(
                     {
-                        "doctype": "Task", "project": project, "subject": subject,
-                        "status": "Open", "priority": "High", "exp_end_date": nowdate(),
+                        "doctype": "Task",
+                        "project": project,
+                        "subject": subject,
+                        "status": "Open",
+                        "priority": "High",
+                        "exp_end_date": nowdate(),
                     }
                 ).insert(ignore_permissions=True)
                 result["tasks_created"].append(project_name)
