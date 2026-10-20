@@ -57,6 +57,7 @@ doctype_list_js = {
         "RundiNova Expense",
         "RundiNova Cash Account",
         "RundiNova Document",
+        "RundiNova Daily Update",
     )
 }
 doctype_list_js["RundiNova Food Progress"] = "public/js/rundinova_food_purchase.js"
@@ -78,6 +79,20 @@ doc_events = {
         "on_submit": "rundinova_tech.rundinova_tech.doctype.rundinova_food_expense.rundinova_food_expense.sync_purchase_invoice",
         "on_cancel": "rundinova_tech.rundinova_tech.doctype.rundinova_food_expense.rundinova_food_expense.cancel_purchase_invoice_expenses",
     },
+}
+
+# Server time is UTC; these weekday jobs run at 07:00 and 09:30 in
+# Africa/Bujumbura (UTC+2). They create an actionable ToDo only when the
+# employee has not yet recorded today's required update.
+scheduler_events = {
+    "cron": {
+        "0 5 * * 1-5": [
+            "rundinova_tech.rundinova_tech.daily_follow_up.create_daily_follow_up_reminders"
+        ],
+        "30 7 * * 1-5": [
+            "rundinova_tech.rundinova_tech.daily_follow_up.create_missing_daily_follow_up_escalations"
+        ],
+    }
 }
 
 fixtures = [
@@ -109,8 +124,10 @@ permission_query_conditions = {
     "RundiNova Budget Review": _access_control + "budget_review_query",
     "RundiNova Expense": _access_control + "expense_query",
     "RundiNova Food Budget Item": _access_control + "food_budget_item_query",
+    "RundiNova Daily Update": _access_control + "daily_update_query",
 }
 has_permission = {
     doctype: _access_control + "has_permission"
     for doctype in permission_query_conditions
 }
+has_permission["RundiNova Daily Update"] = _access_control + "has_daily_update_permission"

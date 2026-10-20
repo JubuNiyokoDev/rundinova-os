@@ -1,0 +1,132 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Daily Update",
+  "module": "RundiNova Tech",
+  "custom": 0,
+  "title_field": "employee",
+  "show_title_field_in_link": 1,
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "update_date",
+      "fieldtype": "Date",
+      "label": "Date",
+      "default": "Today",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "employee",
+      "fieldtype": "Link",
+      "options": "Employee",
+      "label": "Employee",
+      "reqd": 1,
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "primary_task",
+      "fieldtype": "Link",
+      "options": "Task",
+      "label": "Primary Task",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "project",
+      "fieldtype": "Link",
+      "options": "Project",
+      "label": "Project",
+      "fetch_from": "primary_task.project",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "section_work",
+      "fieldtype": "Section Break",
+      "label": "Work completed"
+    },
+    {
+      "fieldname": "work_summary",
+      "fieldtype": "Small Text",
+      "label": "Work completed today",
+      "reqd": 1
+    },
+    {
+      "fieldname": "time_spent_hours",
+      "fieldtype": "Float",
+      "label": "Time spent (hours)",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "progress_percent",
+      "fieldtype": "Percent",
+      "label": "Task progress after this update",
+      "reqd": 1
+    },
+    {
+      "fieldname": "section_next",
+      "fieldtype": "Section Break",
+      "label": "Next action and blockers"
+    },
+    {
+      "fieldname": "next_action",
+      "fieldtype": "Small Text",
+      "label": "Next concrete action",
+      "reqd": 1
+    },
+    {
+      "fieldname": "blocker_status",
+      "fieldtype": "Select",
+      "label": "Blocker status",
+      "options": "No blocker\nBlocked",
+      "default": "No blocker",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "blocker_details",
+      "fieldtype": "Small Text",
+      "label": "What is blocked and what help is needed?",
+      "depends_on": "eval:doc.blocker_status == 'Blocked'"
+    },
+    {
+      "fieldname": "section_review",
+      "fieldtype": "Section Break",
+      "label": "Manager review"
+    },
+    {
+      "fieldname": "review_status",
+      "fieldtype": "Select",
+      "label": "Review status",
+      "options": "Submitted\nReviewed",
+      "default": "Submitted",
+      "read_only": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reviewed_by",
+      "fieldtype": "Link",
+      "options": "User",
+      "label": "Reviewed by",
+      "read_only": 1
+    },
+    {
+      "fieldname": "reviewed_on",
+      "fieldtype": "Datetime",
+      "label": "Reviewed on",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1},
+    {"role": "RundiNova Director", "read": 1, "write": 1, "create": 1, "report": 1},
+    {"role": "RundiNova Operations", "read": 1, "write": 1, "create": 1, "report": 1},
+    {"role": "RundiNova Project Lead", "read": 1, "write": 1, "create": 1, "report": 1},
+    {"role": "RundiNova People & Culture", "read": 1, "write": 1, "create": 1, "report": 1},
+    {"role": "RundiNova Team Member", "read": 1, "write": 1, "create": 1}
+  ],
+  "sort_field": "update_date",
+  "sort_order": "DESC"
+}

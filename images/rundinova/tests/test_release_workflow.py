@@ -35,9 +35,9 @@ class TestReleaseWorkflow(unittest.TestCase):
         self.assertIn('"$RELEASE_TAG" == latest', self.release)
 
     def test_private_base_failure_explains_the_required_package_access(self):
-        self.assertIn("GHCR access failed", self.release)
-        self.assertIn("Manage Actions access", self.release)
-        self.assertIn("rundinova-erpnext/settings", self.release)
+        self.assertIn("Pinned base pull failed", self.release)
+        self.assertIn("Check package access", self.release)
+        self.assertIn("digest validity", self.release)
 
     def test_candidate_never_deploys_or_changes_production(self):
         self.assertIn("images/rundinova/Overlay.Containerfile", self.release)
