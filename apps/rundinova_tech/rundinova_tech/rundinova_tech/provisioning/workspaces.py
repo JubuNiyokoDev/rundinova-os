@@ -219,6 +219,13 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Office", "Hub & organisation", "building"),
         ("DocType", "Project", "Projets", "project"),
         ("DocType", "Task", "Tâches", "tasks"),
+        ("DocType", "RundiNova Daily Update", "Suivi quotidien", "calendar"),
+        (
+            "Report",
+            "RundiNova Daily Follow-up Compliance",
+            "Conformité du suivi quotidien",
+            "check",
+        ),
         ("URL", "/crm", "CRM & communications", "crm"),
         ("DocType", "RundiNova Growth Opportunity", "Opportunités", "star"),
         ("DocType", "RundiNova Partnership", "Partenariats", "handshake"),
@@ -241,6 +248,9 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
     ]
     team_links = [
         ("DocType", "RundiNova Office", "Hub & organisation", "building"),
+        ("DocType", "Project", "Projets", "project"),
+        ("DocType", "Task", "Tâches", "tasks"),
+        ("DocType", "RundiNova Daily Update", "Mon suivi quotidien", "calendar"),
         ("DocType", "RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Food Progress", "Progression Food", "chart"),
