@@ -33,6 +33,7 @@ ASSET_DOCTYPES = ("RundiNova Asset",)
 PROJECT_DOCTYPES = ("RundiNova Repository", "RundiNova Risk")
 DECISION_DOCTYPES = ("RundiNova Decision",)
 DOCUMENT_DOCTYPES = ("RundiNova Document",)
+DAILY_UPDATE_DOCTYPES = ("RundiNova Daily Update",)
 KPI_DOCTYPES = ("RundiNova Goal", "RundiNova KPI Definition", "RundiNova KPI Snapshot")
 CRM_DOCTYPES = (
     "RundiNova Growth Opportunity",
@@ -106,6 +107,7 @@ def get_custom_doctype_permissions():
         + PROJECT_DOCTYPES
         + DECISION_DOCTYPES
         + DOCUMENT_DOCTYPES
+        + DAILY_UPDATE_DOCTYPES
         + KPI_DOCTYPES
         + CRM_DOCTYPES
         + OFFICE_DOCTYPES
@@ -172,6 +174,15 @@ def get_custom_doctype_permissions():
 
     # The role table marks shared documents as available to the full team.
     grant(DOCUMENT_DOCTYPES, ROLES[1:], WRITE)
+
+    # Each employee creates and manages only their own daily report. Leads
+    # retain the complete delivery view and can review reports.
+    grant(
+        DAILY_UPDATE_DOCTYPES,
+        ("RundiNova Operations", "RundiNova Project Lead", "RundiNova People & Culture"),
+        WRITE,
+    )
+    grant(DAILY_UPDATE_DOCTYPES, ("RundiNova Team Member",), {**WRITE, "report": 0})
 
     grant(KPI_DOCTYPES, ("RundiNova Project Lead",), WRITE)
     grant(
@@ -533,6 +544,35 @@ def expense_query(user=None):
 
 def food_budget_item_query(user=None):
     return _query_for("RundiNova Food Budget Item", user)
+
+
+def daily_update_query(user=None):
+    """Limit a pure team member to their own daily reports."""
+    user = user or frappe.session.user
+    if not _team_member_is_scoped(user):
+        return ""
+    employee = frappe.db.get_value(
+        "Employee", {"user_id": user, "status": "Active"}, "name"
+    )
+    if not employee:
+        return "1=0"
+    return f"`tabRundiNova Daily Update`.employee = {frappe.db.escape(employee)}"
+
+
+def has_daily_update_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
+    """Allow a pure team member to create/read/update only their own report."""
+    user = user or frappe.session.user
+    if not _team_member_is_scoped(user):
+        return True
+    employee = frappe.db.get_value(
+        "Employee", {"user_id": user, "status": "Active"}, "name"
+    )
+    if not employee:
+        return False
+    action = permission_type or ptype
+    if action == "create":
+        return True
+    return doc.employee == employee
 
 
 def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
