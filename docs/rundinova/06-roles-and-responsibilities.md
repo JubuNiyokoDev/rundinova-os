@@ -8,28 +8,32 @@ Structure opérationnelle de l'équipe RundiNova : Direction, Écosystème,
 Croissance, Communication, Relations communautaires et Housekeeping. Chaque
 rôle possède des responsabilités et des accès distincts dans l'application.
 
-> Dernière mise à jour : 2026-10-04
+> Dernière mise à jour : 2026-10-12
 
 ## Vue d'ensemble
 
-| Personne               | Titre                        | Rôles dans l'application                                              | Mission en une phrase                                                     |
-| ---------------------- | ---------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Joffre Niyondiko       | **CEO / Direction**          | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead | Dirige l'entreprise, contrôle les finances et voit le répertoire d'équipe |
-| Janvier Ndabubaha      | **Ecosystem Lead**           | RundiNova Ecosystem Lead, RundiNova Team Member                       | Suit les partenariats, l'écosystème et les opportunités                   |
-| Franck Maniranyibutse  | **Growth Lead**              | RundiNova Growth Lead, RundiNova Team Member                          | Suit la croissance, les opportunités et le pipeline CRM                   |
-| Elvis Irambona         | **Communication Lead**       | RundiNova Communications, RundiNova Team Member                       | Porte la communication interne/externe et l'image de RundiNova            |
-| Fanuel Kasumba Mandela | **Community Relations Lead** | RundiNova Community Relations, RundiNova Team Member                  | Suit les activités, bénéficiaires et impacts communautaires               |
-| Housekeeping           | **Housekeeping**             | Employee, RundiNova Team Member                                       | Accède à son profil et aux fonctions opérationnelles minimales            |
+| Personne               | Titre                                    | Rôles dans l'application                                                                     | Mission en une phrase                                                    |
+| ---------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Joffre Niyondiko       | **CEO / Co-Founder**                     | RundiNova Director, RundiNova Finance Manager, RundiNova Project Lead, RundiNova Team Member | Direction, finances, priorités et accès complet aux opérations RundiNova |
+| Janvier Ndabubaha      | **Ecosystem Lead / Developer**           | RundiNova Ecosystem Lead, RundiNova Developer, RundiNova Team Member                         | Partenariats et développement des projets                                |
+| Franck Maniranyibutse  | **Growth Lead / Developer**              | RundiNova Growth Lead, RundiNova Developer, RundiNova Team Member                            | Croissance, pipeline CRM et développement des projets                    |
+| Elvis Irambona         | **Communication Lead / Developer**       | RundiNova Communications, RundiNova Developer, RundiNova Team Member                         | Communication et développement des projets                               |
+| Fanuel Kasumba Mandela | **Community Relations Lead / Developer** | RundiNova Community Relations, RundiNova Developer, RundiNova Team Member                    | Impact communautaire et développement des projets                        |
+| Housekeeping           | **Housekeeping**                         | Employee, RundiNova Team Member                                                              | Accès limité aux opérations de son poste                                 |
 
-Fondateur (basé en Suède) : **Founder & Chairman** — compte créé plus tard.
-Le titre « Founder » est un statut d'origine (qui a créé la boîte) ; le titre
-« CEO » est la fonction de direction quotidienne. Les deux sont portés par des
-personnes différentes, c'est un schéma classique et professionnel.
+Chris Clement Igiraneza est **Founder** et réside en Suède. Joffre
+Niyondiko est **Co-Founder & CEO** et dirige les opérations au quotidien.
+L'intitulé fondateur décrit l'histoire de l'entreprise; les rôles dans
+l'application déterminent séparément les droits techniques.
 
 Identifiants d'application : Joffre `joffre.niyondiko@kit-hub.com`, Janvier
 `ndabubahajanvier@gmail.com`, Elvis `presira857@gmail.com`, Franck
 `maniranyibutsef@gmail.com`, Fanuel `mandela.fanuel.1@gmail.com`. Housekeeping
-utilise `housekeeping@rundinova.com`.
+utilise `vyamungucharif410@gmail.com`.
+
+Les quatre responsables de domaine ont aussi accès à l’espace Développement &
+livraison : ils lisent les projets et dépôts, et peuvent créer ou mettre à jour
+des tâches sans pouvoir les supprimer. Les droits financiers restent séparés.
 
 ---
 
@@ -143,16 +147,23 @@ dépenses sans autorisation.
 
 ## Accès dans l'application par rôle
 
-| Rôle                          | Accès principal                                                                     |
-| ----------------------------- | ----------------------------------------------------------------------------------- |
-| RundiNova Director            | Pilotage et écriture des données métier ; consultation de toutes les fiches Employé |
-| RundiNova Finance Manager     | Budgets, dépenses, comptes et mouvements financiers                                 |
-| RundiNova Ecosystem Lead      | Écriture des partenariats et opportunités ; lecture des projets et indicateurs      |
-| RundiNova Growth Lead         | Écriture des opportunités et activités CRM ; lecture des partenariats et projets    |
-| RundiNova Project Lead        | Projets, tâches, dépôts et KPI de livraison                                         |
-| RundiNova Communications      | Activités CRM et communication                                                      |
-| RundiNova Community Relations | Activités, partenariats et impact communautaires                                    |
-| RundiNova Team Member         | Fonctions communes et documents financiers affectés à la personne                   |
+| Rôle                          | Accès principal                                                                                 |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| RundiNova Director            | Toutes les fonctions métier RundiNova, tous les espaces de travail et toutes les fiches Employé |
+| RundiNova Finance Manager     | Budgets, dépenses, comptes et mouvements financiers                                             |
+| RundiNova Ecosystem Lead      | Espace Écosystème; écrit les partenariats et opportunités qui lui sont attribués                |
+| RundiNova Growth Lead         | Espace Croissance; écrit les opportunités et activités CRM                                      |
+| RundiNova Project Lead        | Espace Livraison; projets, tâches, dépôts et KPI de livraison                                   |
+| RundiNova Communications      | Activités CRM et communication                                                                  |
+| RundiNova Community Relations | Activités, partenariats et impact communautaires                                                |
+| RundiNova Team Member         | Espace Équipe; tâches, dépenses et autres fiches affectées à la personne                        |
+
+Chaque rôle dispose de son espace par défaut. Les espaces ne sont listés que
+pour les rôles autorisés. Les permissions DocType et les filtres d'affectation
+restent appliqués par le serveur; masquer un lien ne constitue jamais une
+permission de données. Joffre porte le rôle `RundiNova Director`, qui donne
+accès à toutes les fonctions métier RundiNova. Cette politique ne transforme
+pas son compte en administrateur technique `System Manager`.
 
 > Les permissions techniques exactes sont appliquées dans l'application par
 > `rundinova_tech.rundinova_tech.setup.seed()` ; ce tableau décrit l'intention

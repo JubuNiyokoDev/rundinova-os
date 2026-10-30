@@ -16,21 +16,21 @@ the checklist for configuration and acceptance before production deployment.
 
 ## Approved V1 modules
 
-| Module | Purpose | Current status | First acceptance test |
-| --- | --- | --- | --- |
-| Users, team and roles | Five named users with least-privilege access | Configure | Each user sees only their workspace |
-| Projects and tasks | Daily work, owners, deadlines, status, progress | Configure | A project shows completed and remaining work |
-| GitHub integration | Repositories, issues, pull requests, commits | Build | A repository activity is linked to a project |
-| Food budget and purchases | Monthly budget of 1,150,000 FBu and itemized purchases | Available + Configure | Every purchase updates the remaining balance |
-| General expenses | Non-food operating costs and approvals | Configure | A submitted expense has evidence and an approver |
-| Treasury and basic accounting | Cash, bank, income, payments, debts and receivables | Configure | Cash movement reconciles to a report |
-| Assets and equipment | Computers, furniture, software and ownership | Configure | Every asset has a custodian and status |
-| CRM | Clients, prospects, partners, opportunities and activities | Available + Configure | A contact has a complete activity history |
-| Internal communication | Announcements, meetings, decisions and notifications | Configure | A decision is searchable and linked to a project |
-| Documents and files | Contracts, invoices, reports, media and templates | Configure | A document has an owner, category and project |
-| KPI, goals and impact | Objectives, indicators, progress and outcomes | Available + Configure | A monthly KPI snapshot is reviewable |
-| Executive dashboard | Money, work, risks, assets, opportunities and progress | Configure | A director can review the monthly position |
-| Security, audit and backups | Permissions, history, recovery and accountability | Configure | A change is attributable and a backup restores |
+| Module                        | Purpose                                                    | Current status        | First acceptance test                            |
+| ----------------------------- | ---------------------------------------------------------- | --------------------- | ------------------------------------------------ |
+| Users, team and roles         | Five named users with least-privilege access               | Configure             | Each user sees only their workspace              |
+| Projects and tasks            | Daily work, owners, deadlines, status, progress            | Configure             | A project shows completed and remaining work     |
+| GitHub integration            | Repositories, issues, pull requests, commits               | Build                 | A repository activity is linked to a project     |
+| Food budget and purchases     | Monthly budget of 1,150,000 FBu and itemized purchases     | Available + Configure | Every purchase updates the remaining balance     |
+| General expenses              | Non-food operating costs and approvals                     | Configure             | A submitted expense has evidence and an approver |
+| Treasury and basic accounting | Cash, bank, income, payments, debts and receivables        | Configure             | Cash movement reconciles to a report             |
+| Assets and equipment          | Computers, furniture, software and ownership               | Configure             | Every asset has a custodian and status           |
+| CRM                           | Clients, prospects, partners, opportunities and activities | Available + Configure | A contact has a complete activity history        |
+| Internal communication        | Announcements, meetings, decisions and notifications       | Configure             | A decision is searchable and linked to a project |
+| Documents and files           | Contracts, invoices, reports, media and templates          | Configure             | A document has an owner, category and project    |
+| KPI, goals and impact         | Objectives, indicators, progress and outcomes              | Available + Configure | A monthly KPI snapshot is reviewable             |
+| Executive dashboard           | Money, work, risks, assets, opportunities and progress     | Configure             | A director can review the monthly position       |
+| Security, audit and backups   | Permissions, history, recovery and accountability          | Configure             | A change is attributable and a backup restores   |
 
 ## Food budget rule
 

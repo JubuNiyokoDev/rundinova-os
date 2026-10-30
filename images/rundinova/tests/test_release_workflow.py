@@ -34,10 +34,19 @@ class TestReleaseWorkflow(unittest.TestCase):
         self.assertIn("Refusing to overwrite existing image tag", self.release)
         self.assertIn('"$RELEASE_TAG" == latest', self.release)
 
-    def test_private_base_failure_explains_the_required_package_access(self):
+    def test_private_base_failure_does_not_assume_package_access_is_the_cause(
+        self,
+    ):
         self.assertIn("Pinned base pull failed", self.release)
-        self.assertIn("Check package access", self.release)
-        self.assertIn("digest validity", self.release)
+        self.assertIn(
+            "package access, digest validity, and runner image-store depth",
+            self.release,
+        )
+
+    def test_candidate_uses_containerd_image_store_for_deep_base_images(self):
+        self.assertIn("docker/setup-docker-action@v5", self.release)
+        self.assertIn('"containerd-snapshotter": true', self.release)
+        self.assertIn("io.containerd.snapshotter.v1", self.release)
 
     def test_candidate_never_deploys_or_changes_production(self):
         self.assertIn("images/rundinova/Overlay.Containerfile", self.release)

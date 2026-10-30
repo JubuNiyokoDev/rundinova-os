@@ -33,6 +33,7 @@ doctype_js = {
     "RundiNova Food Budget": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Progress": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Expense": "public/js/rundinova_food_purchase.js",
+    "RundiNova Repository": "public/js/rundinova_repository.js",
     "Task": "public/js/rundinova_task_form.js",
 }
 
@@ -63,11 +64,11 @@ doctype_list_js = {
         "Task",
     )
 }
-doctype_list_js["Task"] = "public/js/rundinova_task_list.js"
 doctype_list_js["RundiNova Food Progress"] = "public/js/rundinova_food_purchase.js"
-doctype_list_js["RundiNova Document"] = "public/js/rundinova_document_list.js"
 doctype_list_js["RundiNova Food Budget"] = "public/js/rundinova_food_purchase.js"
 doctype_list_js["RundiNova Food Expense"] = "public/js/rundinova_food_purchase.js"
+doctype_list_js["Task"] = "public/js/rundinova_task_list.js"
+doctype_list_js["RundiNova Document"] = "public/js/rundinova_document_list.js"
 doctype_list_js["Item"] = "public/js/rundinova_food_purchase.js"
 
 doc_events = {
@@ -111,11 +112,18 @@ fixtures = [
 
 after_install = "rundinova_tech.rundinova_tech.setup.seed"
 
+# Workspace fixtures can reference custom roles while `bench migrate` syncs
+# them, so create the role records before Frappe processes fixtures.
+before_migrate = [
+    "rundinova_tech.rundinova_tech.provisioning.roles.ensure_rundinova_roles",
+]
+
 # `bench migrate` re-syncs standard workspaces and resets is_hidden, so the
 # module hiding must be re-applied after every migrate to stay effective.
 after_migrate = [
     "rundinova_tech.rundinova_tech.provisioning.branding.sync_branding",
     "rundinova_tech.rundinova_tech.provisioning.form_layouts.sync_form_layouts",
+    "rundinova_tech.rundinova_tech.bootstrap.ensure_team_users",
     "rundinova_tech.rundinova_tech.setup.sync_dashboards",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_workspaces",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_desktop_icons",
@@ -123,10 +131,18 @@ after_migrate = [
 ]
 
 # List and document permission checks share the same assignment boundary.
-# Frappe's permission_query_conditions protects get_list; has_permission
-# covers direct document reads and writes for assigned financial records.
+# Frappe's permission_query_conditions protects lists; has_permission covers
+# direct reads and writes for assigned operational and financial records.
 _access_control = "rundinova_tech.rundinova_tech.access_control."
 permission_query_conditions = {
+    "Workspace": _access_control + "workspace_query",
+    "Dashboard": _access_control + "dashboard_query",
+    "Dashboard Chart": _access_control + "dashboard_chart_query",
+    "Number Card": _access_control + "number_card_query",
+    "Project": _access_control + "project_query",
+    "Task": _access_control + "task_query",
+    "RundiNova Repository": _access_control + "repository_query",
+    "RundiNova Risk": _access_control + "risk_query",
     "RundiNova Food Budget": _access_control + "food_budget_query",
     "RundiNova Food Expense": _access_control + "food_expense_query",
     "RundiNova Food Progress": _access_control + "food_progress_query",
@@ -139,4 +155,7 @@ has_permission = {
     doctype: _access_control + "has_permission"
     for doctype in permission_query_conditions
 }
-has_permission["RundiNova Daily Update"] = _access_control + "has_daily_update_permission"
+has_permission["Page"] = _access_control + "has_permission"
+has_permission["RundiNova Daily Update"] = (
+    _access_control + "has_daily_update_permission"
+)

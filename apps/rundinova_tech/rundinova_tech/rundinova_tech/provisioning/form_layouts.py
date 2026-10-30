@@ -275,6 +275,42 @@ def sync_form_layouts():
             }
             for label, anchor, fieldname in sections
         ]
+    if frappe.db.exists("DocType", "RundiNova Repository"):
+        custom_fields.setdefault("RundiNova Repository", []).extend(
+            [
+                {
+                    "fieldname": "custom_ai_review_section",
+                    "label": "Analyse IA du dépôt",
+                    "fieldtype": "Section Break",
+                    "insert_after": "notes",
+                    "collapsible": 1,
+                },
+                {
+                    "fieldname": "custom_ai_review_status",
+                    "label": "État de l’analyse IA",
+                    "fieldtype": "Select",
+                    "options": "Not Started\nQueued\nAnalyzing\nComplete\nFailed",
+                    "default": "Not Started",
+                    "read_only": 1,
+                    "in_list_view": 1,
+                    "insert_after": "custom_ai_review_section",
+                },
+                {
+                    "fieldname": "custom_ai_reviewed_on",
+                    "label": "Dernière analyse IA",
+                    "fieldtype": "Datetime",
+                    "read_only": 1,
+                    "insert_after": "custom_ai_review_status",
+                },
+                {
+                    "fieldname": "custom_ai_review",
+                    "label": "Rapport de revue (à valider par un humain)",
+                    "fieldtype": "Long Text",
+                    "read_only": 1,
+                    "insert_after": "custom_ai_reviewed_on",
+                },
+            ]
+        )
     create_custom_fields(custom_fields, update=True)
 
     updated_labels = 0

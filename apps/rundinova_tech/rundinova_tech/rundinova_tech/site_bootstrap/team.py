@@ -2,6 +2,11 @@
 
 import frappe
 
+LEGACY_TEAM_LOGIN_REPLACEMENTS = {
+    "1.ndabubahajanvier@gmail.com": "ndabubahajanvier@gmail.com",
+    "housekeeping@rundinova.com": "vyamungucharif410@gmail.com",
+}
+
 TEAM_USERS = [
     {
         "email": "joffre.niyondiko@kit-hub.com",
@@ -20,37 +25,64 @@ TEAM_USERS = [
         "first_name": "Janvier",
         "last_name": "Ndabubaha",
         "employee_name": "NDABUBAHA Janvier",
-        "roles": ["RundiNova Ecosystem Lead", "RundiNova Team Member"],
+        "roles": [
+            "Employee",
+            "RundiNova Ecosystem Lead",
+            "RundiNova Developer",
+            "RundiNova Team Member",
+        ],
     },
     {
         "email": "maniranyibutsef@gmail.com",
         "first_name": "Franck",
         "last_name": "Maniranyibutse",
         "employee_name": "MANIRANYIBUTSE Franck",
-        "roles": ["RundiNova Growth Lead", "RundiNova Team Member"],
+        "roles": [
+            "RundiNova Project Lead",
+            "RundiNova Growth Lead",
+            "RundiNova Developer",
+            "RundiNova Team Member",
+        ],
     },
     {
         "email": "presira857@gmail.com",
         "first_name": "Elvis",
         "last_name": "Irambona",
         "employee_name": "IRAMBONA Elvis",
-        "roles": ["RundiNova Communications", "RundiNova Team Member"],
+        "roles": [
+            "RundiNova Communications",
+            "RundiNova Developer",
+            "RundiNova Team Member",
+        ],
     },
     {
         "email": "mandela.fanuel.1@gmail.com",
         "first_name": "Fanuel",
         "last_name": "Kasumba Mandela",
         "employee_name": "KASUMBA Fanuel",
-        "roles": ["RundiNova Community Relations", "RundiNova Team Member"],
+        "roles": [
+            "RundiNova Community Relations",
+            "RundiNova Developer",
+            "RundiNova Team Member",
+        ],
     },
     {
-        "email": "housekeeping@rundinova.com",
+        "email": "vyamungucharif410@gmail.com",
         "first_name": "Housekeeping",
         "last_name": "",
         "employee_name": "Housekeeping",
         "roles": ["Employee", "RundiNova Team Member"],
     },
 ]
+
+
+def _clear_orphaned_default_workspace(user):
+    """Drop stale links so migration can recreate role-aware workspaces later."""
+    workspace = user.default_workspace
+    if workspace and not frappe.db.exists("Workspace", workspace):
+        user.default_workspace = None
+        return True
+    return False
 
 
 def ensure_team_users(temporary_password=None):
@@ -64,7 +96,13 @@ def ensure_team_users(temporary_password=None):
             if user.user_type != "System User":
                 user.user_type = "System User"
                 user_changed = True
-            if not user.default_workspace:
+            user_changed |= _clear_orphaned_default_workspace(user)
+            # Workspace provisioning runs later in after_migrate. Only assign
+            # a fallback when it exists; sync_dashboards assigns the
+            # role-specific workspace after creating it.
+            if not user.default_workspace and frappe.db.exists(
+                "Workspace", "RundiNova Tech"
+            ):
                 user.default_workspace = "RundiNova Tech"
                 user_changed = True
         else:
@@ -75,7 +113,8 @@ def ensure_team_users(temporary_password=None):
                 "last_name": spec["last_name"],
                 "enabled": 1,
                 "user_type": "System User",
-                "default_workspace": "RundiNova Tech",
+                # The workspace fixtures may not exist yet during migration.
+                "default_workspace": None,
                 "send_welcome_email": 0,
             }
             if temporary_password:
@@ -90,6 +129,12 @@ def ensure_team_users(temporary_password=None):
             for row in user.roles
             if row.role.startswith("RundiNova ") and row.role not in desired_roles
         }
+        if "RundiNova Director" not in desired_roles:
+            stale_roles.update(
+                row.role
+                for row in user.roles
+                if row.role in {"Workspace Manager", "System Manager"}
+            )
         if stale_roles:
             user.set(
                 "roles",
@@ -116,7 +161,19 @@ def ensure_team_users(temporary_password=None):
             )
             if len(matches) == 1:
                 employee = matches[0]
-                if not employee.user_id:
+                previous_email = employee.user_id
+                if (
+                    previous_email in LEGACY_TEAM_LOGIN_REPLACEMENTS
+                    and LEGACY_TEAM_LOGIN_REPLACEMENTS[previous_email] == email
+                ):
+                    if frappe.db.exists("User", previous_email):
+                        old_user = frappe.get_doc("User", previous_email)
+                        if old_user.enabled:
+                            old_user.enabled = 0
+                            _clear_orphaned_default_workspace(old_user)
+                            old_user.save(ignore_permissions=True)
+                    frappe.db.set_value("Employee", employee.name, "user_id", email)
+                elif not previous_email:
                     frappe.db.set_value("Employee", employee.name, "user_id", email)
                 if "RundiNova Director" not in desired_roles and not frappe.db.exists(
                     "User Permission",
