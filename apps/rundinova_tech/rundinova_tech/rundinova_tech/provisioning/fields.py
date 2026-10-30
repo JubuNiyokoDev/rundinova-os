@@ -67,6 +67,100 @@ def ensure_task_repository_field():
     ).insert(ignore_permissions=True, ignore_if_duplicate=True)
 
 
+def ensure_task_test_fields():
+    """Provision the collaborative test fields and expose the result in Task lists."""
+    fields = [
+        {
+            "fieldname": "rundinova_test_section",
+            "label": "Recette RundiNova",
+            "fieldtype": "Section Break",
+            "insert_after": "rundinova_repository",
+        },
+        {
+            "fieldname": "rundinova_test_result",
+            "label": "Résultat de recette",
+            "fieldtype": "Select",
+            "options": "À tester\nValidé\nÀ corriger\nBloqué\nNon applicable",
+            "insert_after": "rundinova_test_section",
+            "in_list_view": 1,
+        },
+        {
+            "fieldname": "rundinova_last_updated_by",
+            "label": "Mis à jour par (technique)",
+            "fieldtype": "Link",
+            "options": "User",
+            "read_only": 1,
+            "hidden": 1,
+            "insert_after": "rundinova_test_result",
+        },
+        {
+            "fieldname": "rundinova_last_updated_by_name",
+            "label": "Mis à jour par",
+            "fieldtype": "Data",
+            "read_only": 1,
+            "insert_after": "rundinova_last_updated_by",
+            "in_list_view": 1,
+        },
+        {
+            "fieldname": "rundinova_test_summary",
+            "label": "Résumé de mise à jour",
+            "fieldtype": "Data",
+            "description": "Une phrase courte visible dans la liste des tâches.",
+            "insert_after": "rundinova_last_updated_by",
+            "in_list_view": 1,
+        },
+        {
+            "fieldname": "rundinova_test_evidence",
+            "label": "Preuve de recette (si pertinente)",
+            "fieldtype": "Attach",
+            "description": "Optionnelle : ajoutez une preuve seulement lorsqu'elle est utile.",
+            "insert_after": "rundinova_test_result",
+        },
+        {
+            "fieldname": "rundinova_test_notes",
+            "label": "Constat / anomalie",
+            "fieldtype": "Small Text",
+            "insert_after": "rundinova_test_evidence",
+        },
+        {
+            "fieldname": "rundinova_test_validated_by",
+            "label": "Validé par",
+            "fieldtype": "Link",
+            "options": "User",
+            "insert_after": "rundinova_test_notes",
+        },
+        {
+            "fieldname": "rundinova_test_validated_on",
+            "label": "Date de validation",
+            "fieldtype": "Datetime",
+            "insert_after": "rundinova_test_validated_by",
+        },
+    ]
+    for values in fields:
+        existing = frappe.db.get_value(
+            "Custom Field", {"dt": "Task", "fieldname": values["fieldname"]}
+        )
+        if existing:
+            field = frappe.get_doc("Custom Field", existing)
+            changed = False
+            for key, value in values.items():
+                if field.get(key) != value:
+                    field.set(key, value)
+                    changed = True
+            if changed:
+                field.save(ignore_permissions=True)
+            continue
+        frappe.get_doc(
+            {
+                "doctype": "Custom Field",
+                "dt": "Task",
+                "module": "RundiNova Tech",
+                **values,
+            }
+        ).insert(ignore_permissions=True, ignore_if_duplicate=True)
+    frappe.clear_cache(doctype="Task")
+
+
 def ensure_project_repository_field():
     """Add RundiNova Repository link to ERPNext Project."""
     fieldname = "rundinova_repository"

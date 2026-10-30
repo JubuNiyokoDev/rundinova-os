@@ -33,6 +33,7 @@ doctype_js = {
     "RundiNova Food Budget": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Progress": "public/js/rundinova_food_purchase.js",
     "RundiNova Food Expense": "public/js/rundinova_food_purchase.js",
+    "Task": "public/js/rundinova_task_form.js",
 }
 
 doctype_list_js = {
@@ -57,10 +58,14 @@ doctype_list_js = {
         "RundiNova Expense",
         "RundiNova Cash Account",
         "RundiNova Document",
+        "RundiNova Document Folder",
         "RundiNova Daily Update",
+        "Task",
     )
 }
+doctype_list_js["Task"] = "public/js/rundinova_task_list.js"
 doctype_list_js["RundiNova Food Progress"] = "public/js/rundinova_food_purchase.js"
+doctype_list_js["RundiNova Document"] = "public/js/rundinova_document_list.js"
 doctype_list_js["RundiNova Food Budget"] = "public/js/rundinova_food_purchase.js"
 doctype_list_js["RundiNova Food Expense"] = "public/js/rundinova_food_purchase.js"
 doctype_list_js["Item"] = "public/js/rundinova_food_purchase.js"
@@ -78,6 +83,10 @@ doc_events = {
     "Purchase Invoice": {
         "on_submit": "rundinova_tech.rundinova_tech.doctype.rundinova_food_expense.rundinova_food_expense.sync_purchase_invoice",
         "on_cancel": "rundinova_tech.rundinova_tech.doctype.rundinova_food_expense.rundinova_food_expense.cancel_purchase_invoice_expenses",
+    },
+    "Task": {
+        "after_insert": "rundinova_tech.rundinova_tech.task_notifications.notify_task_created",
+        "on_update": "rundinova_tech.rundinova_tech.task_notifications.notify_task_updated",
     },
 }
 

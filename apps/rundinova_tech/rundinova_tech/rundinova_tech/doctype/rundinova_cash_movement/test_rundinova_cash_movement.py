@@ -5,10 +5,49 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import UnitTestCase
 
-from .rundinova_cash_movement import RundiNovaCashMovement
+from .rundinova_cash_movement import RundiNovaCashMovement, sync_general_expense
 
 
 class TestRundiNovaCashMovement(UnitTestCase):
+    @patch(
+        "rundinova_tech.rundinova_tech.doctype.rundinova_cash_movement.rundinova_cash_movement.frappe.db.get_value",
+        return_value="Bank",
+    )
+    @patch(
+        "rundinova_tech.rundinova_tech.doctype.rundinova_cash_movement.rundinova_cash_movement.frappe.get_doc"
+    )
+    def test_approved_general_expense_creates_one_linked_expense(
+        self, get_doc, _get_value
+    ):
+        expense = frappe._dict({"name": "EXP-001"})
+        expense.insert = lambda **_kwargs: None
+        get_doc.return_value = expense
+        movement = frappe._dict(
+            {
+                "name": "CASH-001",
+                "movement_type": "Expense",
+                "food_expense": None,
+                "expense": None,
+                "status": "Approved",
+                "account": "KCB",
+                "movement_date": "2026-10-24",
+                "category": "Prime cofondateur",
+                "description": "Prime confirmée",
+                "movement_title": "Prime",
+                "amount": 1000000,
+                "approved_by": "joffre.niyondiko@kit-hub.com",
+                "project": "PROJ-0002",
+                "evidence": "/private/files/attestation.txt",
+            }
+        )
+        movement.db_set = lambda field, value, **_kwargs: setattr(movement, field, value)
+
+        sync_general_expense(movement)
+
+        self.assertEqual(movement.expense, "EXP-001")
+        self.assertEqual(get_doc.call_args.args[0]["category"], "Salaries & Allowances")
+        self.assertEqual(get_doc.call_args.args[0]["payment_method"], "Bank Transfer")
+
     @patch(
         "rundinova_tech.rundinova_tech.doctype.rundinova_cash_movement.rundinova_cash_movement.frappe.get_doc"
     )

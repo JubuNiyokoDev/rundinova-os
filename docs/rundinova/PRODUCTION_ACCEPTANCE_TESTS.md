@@ -156,9 +156,27 @@ tâches et ne modifie pas le dépôt.
 
 ## Compte rendu de chaque test
 
-| Date / heure | Utilisateur et rôle | Parcours | Résultat (OK / anomalie / bloqué) | URL ou référence | Détail sans secret |
-| ------------ | ------------------- | -------- | --------------------------------- | ---------------- | ------------------ |
-|              |                     |          |                                   |                  |                    |
+État initial des parcours démarrables : **À faire**. Les parcours **Bloqué**
+indiquent une dépendance à résoudre. Après un test, choisissez **Réussi**,
+**Anomalie** ou **Bloqué** et notez la date ainsi qu'une référence utile, sans
+mot de passe, jeton ni autre secret. Les opérations financières restent
+conditionnées à un achat ou paiement réel et à son justificatif.
+
+| ID | Parcours à valider | Testeur prévu | État | Date | Résultat / URL / anomalie (sans secret) |
+| -- | ----------------- | ------------- | ---- | ---- | --------------------------------------- |
+| U-01 | Connexion, profil et navigation du workspace | Joffre — Direction | À faire | | |
+| U-02 | Tableaux de bord, projets, tâches et contrôles de Direction | Joffre — Direction | À faire | | |
+| U-03 | Partenariats, opportunités et prochaine action | Janvier — Écosystème | À faire | | |
+| U-04 | Pipeline de croissance et tâches attribuées | Franck — Croissance | À faire | | |
+| U-05 | Programmes, activités et données d’impact | Fanuel — Relations communautaires | À faire | | |
+| U-06 | Contacts, activités et documents de communication | Elvis — Communication | À faire | | |
+| U-07 | Accès opérationnel et confidentialité RH | Housekeeping — Team Member | À faire | | |
+| M-01 | Projet réel, responsable, premières tâches et historique | Joffre + responsable du projet | À faire | | |
+| M-02 | Budget alimentaire, achat réel et justificatif | Joffre + acheteur | À faire | | |
+| M-03 | Dépense générale, caisse ou banque avec justificatif réel | Joffre + utilisateur habilité | À faire | | |
+| M-04 | Fiches employé, profil et limites d’accès RH | Joffre + chaque membre | À faire | | |
+| G-01 | Synchronisation du dépôt privé PartenerWanje | Joffre + Franck | Bloqué | | Configurer l’accès GitHub en lecture au dépôt |
+| C-01 | Envoi, réception et rattachement d’un courriel | Elvis + Joffre | Bloqué | | Configurer le service mail entrant et sortant |
 
 ## Critères de démarrage
 

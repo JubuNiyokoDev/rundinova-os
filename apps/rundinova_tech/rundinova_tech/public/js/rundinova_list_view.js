@@ -20,6 +20,7 @@ frappe.listview_settings = frappe.listview_settings || {};
   "RundiNova Expense",
   "RundiNova Cash Account",
   "RundiNova Document",
+  "RundiNova Document Folder",
 ].forEach((doctype) => {
   frappe.listview_settings[doctype] = {
     ...(frappe.listview_settings[doctype] || {}),

@@ -129,6 +129,11 @@ def _sync_workspace_sidebar(title, icon, items):
     sidebar.for_user = None
     sidebar.items = []
     for item in items:
+        # Workspace Sidebar Item has no safe URL link type in this Frappe
+        # version. URL entries are valid workspace shortcuts, but make sidebar
+        # validation look for a DocType named "URL".
+        if item.get("link_type") == "URL":
+            continue
         sidebar.append("items", item)
     sidebar.save(ignore_permissions=True)
 
@@ -205,6 +210,18 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Food Budget", "Budget alimentaire", "food"),
         ("DocType", "RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
         ("DocType", "RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
+        (
+            "URL",
+            "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20D%C3%A9tail%20tr%C3%A9sorerie",
+            "PAFEN / NOVARIS — détail trésorerie",
+            "report",
+        ),
+        (
+            "URL",
+            "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20Synth%C3%A8se%20tr%C3%A9sorerie",
+            "PAFEN / NOVARIS — synthèse",
+            "report",
+        ),
         ("DocType", "RundiNova Cash Account", "Comptes de trésorerie", "bank"),
         ("DocType", "RundiNova Food Progress", "Progression Food", "chart"),
         ("DocType", "RundiNova Budget Review", "Revues de budget", "check-circle"),
@@ -212,7 +229,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Asset", "Biens & équipements", "asset"),
         ("DocType", "RundiNova Decision", "Décisions & réunions", "note"),
-        ("DocType", "RundiNova Document", "Documents & fichiers", "file"),
+        ("Page", "rundinova-document-library", "Documents & fichiers", "file"),
         ("DocType", "RundiNova KPI Definition", "Définitions KPI", "target"),
         ("DocType", "RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
         ("DocType", "RundiNova Goal", "Objectifs & KPI", "target"),
@@ -227,7 +244,8 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Food Progress", "Progression Food", "chart"),
         ("DocType", "RundiNova Decision", "Décisions & réunions", "note"),
-        ("DocType", "RundiNova Document", "Documents & fichiers", "file"),
+        ("Page", "rundinova-document-library", "Documents & fichiers", "file"),
+        ("DocType", "RundiNova Document Folder", "Dossiers documentaires", "folder"),
         ("DocType", "RundiNova KPI Snapshot", "Mesures KPI", "analytics"),
     ]
     dashboard_links = [
@@ -293,6 +311,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
                     "icon": icon,
                 }
                 for link_type, target, label, icon in dashboard_links
+                if link_type != "URL"
             ],
             *[
                 item
@@ -309,7 +328,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
                             "icon": item_icon,
                         }
                         for link_type, target, label, item_icon in operations_links
-                        if target in targets
+                        if target in targets and link_type != "URL"
                     ]
                 )
             ],
@@ -405,6 +424,20 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
                 "link_type": "DocType",
                 "link_to": "RundiNova Cash Movement",
                 "icon": "money",
+            },
+            {
+                "type": "Link",
+                "label": "PAFEN / NOVARIS — détail trésorerie",
+                "link_type": "URL",
+                "link_to": "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20D%C3%A9tail%20tr%C3%A9sorerie",
+                "icon": "report",
+            },
+            {
+                "type": "Link",
+                "label": "PAFEN / NOVARIS — synthèse",
+                "link_type": "URL",
+                "link_to": "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20Synth%C3%A8se%20tr%C3%A9sorerie",
+                "icon": "report",
             },
             {
                 "type": "Link",

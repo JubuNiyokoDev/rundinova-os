@@ -62,6 +62,7 @@ class RundiNovaCashMovement(Document):
             self.approved_by = frappe.session.user
 
     def on_update(self):
+        sync_general_expense(self)
         refresh_accounts(self)
 
     def on_trash(self):
@@ -92,6 +93,53 @@ def sync_food_expense_fields(doc):
         setattr(doc, fieldname, value)
     if not doc.evidence:
         doc.evidence = receipt
+    return expense
+
+
+def sync_general_expense(doc):
+    """Create one general-expense record for an approved non-food cash outflow."""
+    if (
+        doc.movement_type != "Expense"
+        or doc.food_expense
+        or doc.expense
+        or doc.status not in ("Approved", "Reconciled")
+    ):
+        return None
+
+    account_type = frappe.db.get_value(
+        "RundiNova Cash Account", doc.account, "account_type"
+    )
+    payment_method = {
+        "Bank": "Bank Transfer",
+        "Cash": "Cash",
+        "Mobile Money": "Mobile Money",
+    }.get(account_type, "Other")
+    category = (
+        "Salaries & Allowances"
+        if "prime" in (doc.category or "").lower()
+        or "salary" in (doc.category or "").lower()
+        else "Other"
+    )
+    expense = frappe.get_doc(
+        {
+            "doctype": "RundiNova Expense",
+            "expense_date": doc.movement_date,
+            "category": category,
+            "description": doc.description or doc.movement_title,
+            "amount": doc.amount,
+            "paid_by": doc.approved_by or frappe.session.user,
+            "payment_method": payment_method,
+            "project": doc.project,
+            "receipt": doc.evidence,
+            "status": "Paid",
+            "approved_by": doc.approved_by or frappe.session.user,
+            "approval_notes": _(
+                "Created automatically from cash movement {0}."
+            ).format(doc.name),
+        }
+    )
+    expense.insert(ignore_permissions=True)
+    doc.db_set("expense", expense.name, update_modified=False)
     return expense
 
 

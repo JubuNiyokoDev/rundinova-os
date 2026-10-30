@@ -106,6 +106,38 @@ tab on `main`, keep the approved base digest, and choose a new tag such as
 `16.37.7-rn.78-next-change`. The job summary records the candidate digest and
 source commit for staging and review.
 
+### Pull a private candidate onto the VPS
+
+The VPS must authenticate to GHCR before it can pull a private image. Create a
+GitHub personal access token (classic) with only `read:packages`, then run the
+following on the VPS. The Docker credential file is isolated in a temporary
+directory and removed when the command exits; the token is not saved in the
+production environment file.
+
+```bash
+set -eu
+export DOCKER_CONFIG="$(mktemp -d)"
+cleanup() {
+  docker logout ghcr.io >/dev/null 2>&1 || true
+  rm -rf "$DOCKER_CONFIG"
+}
+trap cleanup EXIT
+
+read -rp 'Immutable RundiNova image tag: ' RELEASE_TAG
+read -rsp 'GitHub token (read:packages): ' GHCR_TOKEN
+printf '\n'
+printf '%s' "$GHCR_TOKEN" |
+  docker login ghcr.io --username JubuNiyokoDev --password-stdin
+unset GHCR_TOKEN
+docker pull "ghcr.io/jubuniyokodev/rundinova-erpnext:${RELEASE_TAG}"
+```
+
+After the pull succeeds, set the same immutable tag in the protected production
+environment file, validate the rendered Compose configuration, and start the
+stack with `--pull never`. Keep the previous image and pre-release backup for
+rollback. Do not paste the token into chat, a command argument, or a Compose
+environment file.
+
 The active local stack uses the release documented at the end of this file.
 Previous release records are retained as history.
 
@@ -1016,7 +1048,7 @@ VPS Compose project to pull the unique release tag before starting services.
   `/etc/rundinova/production.env.before-rn76-self-hosted-candidate`.
 - Status: deployed and verified; superseded by rn.77 below.
 
-## Active VPS release — rn.77 — 2026-10-10
+## Superseded VPS release — rn.77 — 2026-10-10
 
 - Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.77-professional-ux`
 - Image ID and published GHCR manifest digest (published and verified on
@@ -1057,8 +1089,50 @@ VPS Compose project to pull the unique release tag before starting services.
   `/etc/rundinova/production.env.before-rn77-professional-ux`.
 - A private staging stack remains on the VPS, bound to localhost port 28181
   with separate volumes. It must not be exposed publicly.
-- Status: deployed and health-checked; RundiNova team acceptance of daily
-  browser workflows remains pending.
+- Status: superseded by rn.84. RundiNova team acceptance of daily browser
+  workflows remains pending.
+
+## Active VPS release — rn.84 — 2026-10-11
+
+- Image: `ghcr.io/jubuniyokodev/rundinova-erpnext:16.37.7-rn.84-private-github-sync`
+- Pulled image and registry manifest digest:
+  `sha256:6c72c0a3ac1d3fffb544591296f6cd2a07faddcaab5e7d8b7bb41131bad98b53`.
+- Source: main commit
+  `5a88e45e8c25d61a5334549974a87ec9e22424f4`; candidate workflow run
+  [38152002464](https://github.com/JubuNiyokoDev/rundinova-os/actions/runs/38152002464)
+  completed successfully.
+- Release type: RundiNova app-only overlay on the approved rn.83 base; Frappe,
+  ERPNext, HRMS, and CRM revisions were not changed.
+- Change: add optional, read-only synchronization for a private GitHub
+  repository. It reads repository metadata and recent commits; it does not
+  create or modify GitHub issues, tasks, or repository content.
+- Staging: restored the pre-release production backup into the isolated
+  `rn77-staging` stack, ran `bench migrate`, and verified healthy services,
+  the RundiNova Tech workspace, 6 employees, and 1 food budget.
+- Production: updated `/etc/rundinova/production.env` to rn.84 with
+  `PULL_POLICY=never`, ran `bench migrate`, and verified the backend and
+  database report healthy. The migration log contains no traceback or error;
+  public HTTPS `/api/method/ping` returns `pong`.
+- Data comparison between the pre-deployment database backup and production
+  after migration: 6 employees, 1 RundiNova Food Budget, and 0 RundiNova Food
+  Expense records in both. No sample transactions were created. An older rn.77
+  entry reports 33 expenses; that is not the state in the rn.84 pre-deployment
+  backup.
+- Pre-deployment database and site-file backups are stored on the VPS under
+  `/opt/rundinova-releases/rn.84/pre-deploy/production/` with mode `600`.
+  Encrypted off-machine retention and a restoration rehearsal remain postponed
+  by explicit user decision.
+- Rollback image: rn.83 remains on the VPS. Previous production environment:
+  `/opt/rundinova-releases/rn.84/pre-deploy/production.env.before-rn84`.
+- GHCR authentication used a temporary Docker config. Its unencrypted auth file
+  was logged out and the temporary directory removed after the pull; the token
+  was not placed in the production environment. A future private image pull
+  will require authentication again. Normal restarts use the local image.
+- Pending: configure the separate read-only GitHub repository token before
+  testing PartenerWanje synchronization; configure inbound/outbound mail; run
+  the team browser acceptance checklist.
+- Status: deployed and health-checked. Team acceptance of daily browser
+  workflows remains pending.
 
 ## Local verification candidate — rn.76 — 2026-10-10
 

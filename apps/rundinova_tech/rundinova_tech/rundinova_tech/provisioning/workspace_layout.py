@@ -31,7 +31,7 @@ OPERATION_SECTIONS = (
             "RundiNova Food Progress",
             "RundiNova Asset",
             "RundiNova Decision",
-            "RundiNova Document",
+            "rundinova-document-library",
             "RundiNova KPI Definition",
             "RundiNova KPI Snapshot",
             "RundiNova Goal",

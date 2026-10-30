@@ -8,8 +8,10 @@ from .fields import (
     backfill_budget_titles,
     ensure_project_repository_field,
     ensure_purchase_invoice_budget_field,
+    ensure_task_test_fields,
     ensure_task_repository_field,
 )
+from .documents import sync_document_library
 from .permissions import ensure_crm_app_access_roles, ensure_rundinova_permissions
 from .workspaces import sync_workspaces
 
@@ -156,7 +158,9 @@ def sync_dashboards():
     ensure_rundinova_permissions()
     ensure_purchase_invoice_budget_field()
     ensure_task_repository_field()
+    ensure_task_test_fields()
     ensure_project_repository_field()
+    sync_document_library()
     backfill_budget_titles()
     cards = {
         "employees": _ensure_number_card(
