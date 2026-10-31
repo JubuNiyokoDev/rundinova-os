@@ -171,8 +171,8 @@ def create_document(document_title, document_type, file_url, folder=None, projec
         }
     )
     document.insert()
-    file_doc.attached_to_doctype = "RundiNova Document"
-    file_doc.attached_to_name = document.name
-    file_doc.save(ignore_permissions=True)
+    # The Attach field above links the uploaded File during document.insert().
+    # Saving the File object again would use the pre-insert modified timestamp
+    # and can raise a TimestampMismatchError.
     frappe.db.commit()
     return document.as_dict()

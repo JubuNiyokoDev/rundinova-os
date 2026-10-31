@@ -49,6 +49,8 @@ frappe.pages["rundinova-document-library"].on_page_load = function (wrapper) {
     </style>
     <div class="rn-library">
       <div class="rn-library-toolbar">
+        <button class="btn btn-default btn-sm rn-root"><i class="fa fa-home"></i> Racine</button>
+        <button class="btn btn-default btn-sm rn-refresh" title="Actualiser la bibliothèque"><i class="fa fa-refresh"></i></button>
         <div class="rn-library-search input-with-feedback"><input class="form-control rn-search" placeholder="Rechercher un dossier ou un document"></div>
         <select class="rn-library-select rn-type"><option value="">Tous les types</option></select>
         <select class="rn-library-select rn-project"><option value="">Tous les projets</option></select>
@@ -187,6 +189,8 @@ frappe.pages["rundinova-document-library"].on_page_load = function (wrapper) {
 
   let timer;
   $body.find(".rn-search").on("input", function () { clearTimeout(timer); timer = setTimeout(() => { state.search = this.value.trim(); load(); }, 280); });
+  $body.find(".rn-root").on("click", () => openFolder(null));
+  $body.find(".rn-refresh").on("click", load);
   $body.find(".rn-type").on("change", function () { state.document_type = this.value; load(); });
   $body.find(".rn-project").on("change", function () { state.project = this.value; load(); });
   $body.find(".rn-view").on("click", () => { state.view = state.view === "grid" ? "list" : "grid"; $body.find(".rn-view i").attr("class", `fa fa-${state.view === "grid" ? "th-large" : "list"}`); load(); });
