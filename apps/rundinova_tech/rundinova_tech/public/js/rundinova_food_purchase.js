@@ -350,3 +350,49 @@ frappe.listview_settings["Item"] = {
     },
   },
 };
+
+// A budget is a planning and control register, not a generic document list.
+// Keep the purchase shortcut above, then foreground its period, ceiling and
+// consumption level for finance and operations users.
+const previousFoodBudgetListSettings = frappe.listview_settings["RundiNova Food Budget"] || {};
+const previousFoodBudgetOnload = previousFoodBudgetListSettings.onload;
+frappe.listview_settings["RundiNova Food Budget"] = {
+  ...previousFoodBudgetListSettings,
+  hide_name_column: true,
+  add_fields: [
+    ...new Set([
+      ...(previousFoodBudgetListSettings.add_fields || []),
+      "period_start",
+      "period_end",
+      "branch",
+      "covered_people",
+      "approved_ceiling",
+      "total_planned_amount",
+      "committed_amount",
+      "actual_amount",
+      "balance_amount",
+      "consumed_percent",
+    ]),
+  ],
+  formatters: {
+    ...(previousFoodBudgetListSettings.formatters || {}),
+    consumed_percent(value) {
+      const percent = Math.max(0, Math.min(100, Number(value || 0)));
+      const color = percent >= 100 ? "#dc2626" : percent >= 80 ? "#d97706" : "#059669";
+      return `<div style="min-width:110px"><div class="text-muted" style="font-size:11px">${percent.toFixed(0)}% consommé</div><div style="height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden"><div style="height:100%;width:${percent}%;background:${color}"></div></div></div>`;
+    },
+    balance_amount(value) {
+      const amount = Number(value || 0);
+      return `<strong class="${amount < 0 ? "text-danger" : "text-success"}">${frappe.format(amount, { fieldtype: "Currency", options: "currency" })}</strong>`;
+    },
+  },
+  onload(listview) {
+    previousFoodBudgetOnload?.(listview);
+    if (listview.page.__rn_food_budget_filters) return;
+    listview.page.__rn_food_budget_filters = true;
+    listview.page.add_inner_button(__("Budgets dépassés"), () => {
+      frappe.route_options = { consumed_percent: [">", 100] };
+      frappe.set_route("List", "RundiNova Food Budget");
+    });
+  },
+};

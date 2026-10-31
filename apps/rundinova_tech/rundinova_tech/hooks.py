@@ -69,6 +69,15 @@ doctype_list_js["RundiNova Food Budget"] = "public/js/rundinova_food_purchase.js
 doctype_list_js["RundiNova Food Expense"] = "public/js/rundinova_food_purchase.js"
 doctype_list_js["Task"] = "public/js/rundinova_task_list.js"
 doctype_list_js["RundiNova Document"] = "public/js/rundinova_document_list.js"
+for _operational_doctype in (
+    "RundiNova Decision",
+    "RundiNova Expense",
+    "RundiNova Budget Review",
+    "RundiNova Cash Account",
+    "RundiNova Cash Movement",
+):
+    doctype_list_js[_operational_doctype] = "public/js/rundinova_operational_list_views.js"
+doctype_list_js["Employee"] = "public/js/rundinova_employee_list.js"
 doctype_list_js["Item"] = "public/js/rundinova_food_purchase.js"
 
 doc_events = {

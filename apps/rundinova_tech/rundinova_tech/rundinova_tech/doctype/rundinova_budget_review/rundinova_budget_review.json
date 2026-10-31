@@ -2,6 +2,9 @@
   "doctype": "DocType",
   "name": "RundiNova Budget Review",
   "module": "RundiNova Tech",
+  "title_field": "review_period",
+  "sort_field": "modified",
+  "sort_order": "DESC",
   "is_submittable": 1,
   "fields": [
     {

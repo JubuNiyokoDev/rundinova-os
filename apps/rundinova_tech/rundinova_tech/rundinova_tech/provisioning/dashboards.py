@@ -171,6 +171,14 @@ def sync_dashboards():
             color="#2563EB",
             background_color="#EFF6FF",
         ),
+        "daily_updates_to_review": _ensure_number_card(
+            "RundiNova Daily Updates To Review",
+            "Suivis à relire",
+            "RundiNova Daily Update",
+            filters=[["RundiNova Daily Update", "review_status", "=", "Submitted"]],
+            color="#D97706",
+            background_color="#FFFBEB",
+        ),
         "budgets": _ensure_number_card(
             "RundiNova Food Budgets",
             "Budgets alimentaires",
@@ -701,6 +709,14 @@ def sync_dashboards():
             group_by="gender",
             filters=[["Employee", "status", "=", "Active"]],
         ),
+        "daily_update_review": _ensure_chart(
+            "RundiNova Daily Update Review Status",
+            "État des suivis quotidiens",
+            "Group By",
+            "RundiNova Daily Update",
+            "Donut",
+            group_by="review_status",
+        ),
         "kpi_frequency": _ensure_chart(
             "RundiNova KPI by Frequency",
             "KPI par fréquence",
@@ -875,10 +891,16 @@ def sync_dashboards():
             (charts["employees_department"], "Half"),
             (charts["employee_designation"], "Full"),
             (charts["employee_gender"], "Half"),
+            (charts["daily_update_review"], "Half"),
             (charts["kpi_frequency"], "Half"),
-            (charts["opportunity_trend"], "Full"),
         ],
-        [cards["employees"], cards["goals"], cards["goals_achieved"], cards["kpis"]],
+        [
+            cards["employees"],
+            cards["daily_updates_to_review"],
+            cards["goals"],
+            cards["goals_achieved"],
+            cards["kpis"],
+        ],
     )
     _dashboard(
         "RundiNova Delivery Dashboard",
