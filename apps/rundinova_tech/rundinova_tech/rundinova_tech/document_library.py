@@ -108,6 +108,18 @@ def create_folder(folder_name, parent_folder=None, project=None):
     if not folder_name:
         frappe.throw(_("Le nom du dossier est obligatoire."))
 
+    existing = frappe.db.exists(
+        "RundiNova Document Folder",
+        {"folder_name": folder_name, "parent_folder": parent_folder},
+    )
+    if existing:
+        return {
+            "name": existing,
+            "label": folder_name,
+            "created": False,
+            "message": _("Ce dossier existe déjà dans cet emplacement."),
+        }
+
     confidentiality = "Internal"
     if parent_folder:
         parent = frappe.get_doc("RundiNova Document Folder", parent_folder)
@@ -127,7 +139,10 @@ def create_folder(folder_name, parent_folder=None, project=None):
         }
     )
     document.insert()
-    return {"name": document.name, "label": document.folder_name}
+    # This endpoint is also invoked from the Desk modal. Commit explicitly so
+    # the folder is immediately visible to the following library reload.
+    frappe.db.commit()
+    return {"name": document.name, "label": document.folder_name, "created": True}
 
 
 @frappe.whitelist()
@@ -159,4 +174,5 @@ def create_document(document_title, document_type, file_url, folder=None, projec
     file_doc.attached_to_doctype = "RundiNova Document"
     file_doc.attached_to_name = document.name
     file_doc.save(ignore_permissions=True)
+    frappe.db.commit()
     return document.as_dict()

@@ -139,14 +139,36 @@ frappe.pages["rundinova-document-library"].on_page_load = function (wrapper) {
   };
   const openFolder = (folder) => { state.folder = folder; state.search = ""; $body.find(".rn-search").val(""); load(); };
 
-  const createFolder = () => frappe.prompt([
-    { fieldname: "folder_name", label: "Nom du dossier", fieldtype: "Data", reqd: 1 },
-    { fieldname: "project", label: "Projet (facultatif)", fieldtype: "Link", options: "Project" },
-  ], async (values) => {
-    await frappe.call({ method: "rundinova_tech.rundinova_tech.document_library.create_folder", args: { ...values, parent_folder: state.folder } });
-    frappe.show_alert({ message: __("Dossier créé"), indicator: "green" });
-    load();
-  }, __("Nouveau dossier"), __("Créer"));
+  const createFolder = () => {
+    const dialog = new frappe.ui.Dialog({
+      title: __("Nouveau dossier"),
+      fields: [
+        { fieldname: "folder_name", label: "Nom du dossier", fieldtype: "Data", reqd: 1 },
+        { fieldname: "project", label: "Projet (facultatif)", fieldtype: "Link", options: "Project" },
+      ],
+      primary_action_label: __("Créer"),
+      primary_action: async (values) => {
+        dialog.disable_primary_action();
+        try {
+          const response = await frappe.call({
+            method: "rundinova_tech.rundinova_tech.document_library.create_folder",
+            args: { ...values, parent_folder: state.folder },
+          });
+          dialog.hide();
+          const result = response.message || {};
+          frappe.show_alert({
+            message: result.created === false ? (result.message || __("Dossier déjà présent")) : __("Dossier créé"),
+            indicator: result.created === false ? "orange" : "green",
+          });
+          await load();
+        } catch (error) {
+          dialog.enable_primary_action();
+          throw error;
+        }
+      },
+    });
+    dialog.show();
+  };
 
   const upload = () => frappe.prompt([
     { fieldname: "document_title", label: "Titre du document", fieldtype: "Data" },
