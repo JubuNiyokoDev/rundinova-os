@@ -9,6 +9,7 @@ app_include_js = [
     "/assets/rundinova_tech/js/workspace_sidebar.js",
     "/assets/rundinova_tech/js/rundinova_branding_2.js",
     "/assets/rundinova_tech/js/rundinova_route_aliases.js",
+    "/assets/rundinova_tech/js/rundinova_detail_mode.js",
 ]
 app_include_css = "/assets/rundinova_tech/css/rundinova_desk.css"
 web_include_js = ["/assets/rundinova_tech/js/rundinova_branding_2.js"]
