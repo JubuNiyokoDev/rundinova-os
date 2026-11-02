@@ -373,7 +373,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
                             "icon": item_icon,
                         }
                         for link_type, target, label, item_icon in operations_links
-                        if target in targets and link_type != "URL"
+                        if target in targets
                     ]
                 )
             ],
@@ -432,11 +432,11 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         public=1,
     )
     governance_links = [
-        ("DocType", "RundiNova Governance Meeting", "Réunions de direction", "calendar"),
-        ("DocType", "RundiNova Weekly Management Report", "Rapports hebdomadaires", "report"),
-        ("DocType", "RundiNova Decision", "Décisions de direction", "note"),
-        ("DocType", "RundiNova Risk", "Risques stratégiques", "alert-triangle"),
-        ("Dashboard", "RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
+        ("DocType", "RundiNova Governance Meeting", "Lundi — réunion de direction", "calendar"),
+        ("DocType", "RundiNova Weekly Management Report", "Vendredi — rapports à transmettre", "report"),
+        ("DocType", "RundiNova Decision", "Décisions et actions", "note"),
+        ("DocType", "RundiNova Risk", "Risques à escalader", "alert-triangle"),
+        ("Dashboard", "RundiNova Executive Dashboard", "Synthèse de direction", "dashboard"),
     ]
     _sync_workspace(
         "RundiNova Direction",
