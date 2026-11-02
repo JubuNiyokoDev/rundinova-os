@@ -257,6 +257,12 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Repository", "Dépôts GitHub", "github"),
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Asset", "Biens & équipements", "asset"),
+        (
+            "URL",
+            "/desk/Workspaces/RundiNova%20Direction",
+            "Direction & redevabilité",
+            "briefcase",
+        ),
         ("DocType", "RundiNova Decision", "Décisions & réunions", "note"),
         ("Page", "rundinova-document-library", "Documents & fichiers", "file"),
         ("DocType", "RundiNova KPI Definition", "Définitions KPI", "target"),
