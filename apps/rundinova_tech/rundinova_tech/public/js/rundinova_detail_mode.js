@@ -26,6 +26,9 @@ const rundinovaDetailDoctypes = [
   "RundiNova Risk",
   "RundiNova Asset",
   "RundiNova Office",
+  "RundiNova Governance Meeting",
+  "RundiNova Meeting Action",
+  "RundiNova Weekly Management Report",
 ];
 
 const rundinovaNonInputFields = new Set([
@@ -81,7 +84,7 @@ function rundinovaEnableDetailMode(frm) {
   );
   if (rundinovaCanEdit(frm) && !frm.page.__rundinova_edit_button) {
     frm.page.__rundinova_edit_button = true;
-    frm.add_custom_button(__("Modifier"), () => rundinovaEnableEditMode(frm), __("Actions"));
+    frm.add_custom_button(__("Modifier"), () => rundinovaEnableEditMode(frm));
   }
 }
 
