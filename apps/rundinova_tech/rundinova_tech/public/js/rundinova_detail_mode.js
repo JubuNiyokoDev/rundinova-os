@@ -41,6 +41,15 @@ const rundinovaNonInputFields = new Set([
   "Fold",
 ]);
 
+const rundinovaEditRouteKey = (doctype, name) => `${doctype}:${name}`;
+
+function rundinovaEditWasRequested(frm) {
+  const key = rundinovaEditRouteKey(frm.doctype, frm.doc.name);
+  if (sessionStorage.getItem("rundinova-edit-route") !== key) return false;
+  sessionStorage.removeItem("rundinova-edit-route");
+  return true;
+}
+
 function rundinovaSetFieldsReadOnly(frm, readOnly) {
   frm.__rundinova_original_read_only ||= {};
   (frm.meta.fields || []).forEach((df) => {
@@ -74,6 +83,10 @@ function rundinovaEnableDetailMode(frm) {
     frm.enable_save();
     return;
   }
+  if (rundinovaEditWasRequested(frm)) {
+    rundinovaEnableEditMode(frm);
+    return;
+  }
   if (frm.__rundinova_edit_mode) return;
 
   rundinovaSetFieldsReadOnly(frm, true);
@@ -94,4 +107,15 @@ rundinovaDetailDoctypes.forEach((doctype) => {
       rundinovaEnableDetailMode(frm);
     },
   });
+});
+
+// Frappe normally routes every record click to an editable Form. Intercept
+// existing RundiNova records before that Form is shown and use the separate
+// reader page instead. The explicit Modifier button marks one route as edit.
+frappe.router.on("change", () => {
+  const route = frappe.get_route();
+  const [view, doctype, name] = route;
+  if (view !== "Form" || !rundinovaDetailDoctypes.includes(doctype) || !name || name.startsWith("new-")) return;
+  if (sessionStorage.getItem("rundinova-edit-route") === rundinovaEditRouteKey(doctype, name)) return;
+  frappe.set_route("rundinova-record-view", doctype, name);
 });

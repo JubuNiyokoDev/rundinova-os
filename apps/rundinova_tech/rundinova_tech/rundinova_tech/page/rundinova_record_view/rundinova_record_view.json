@@ -1,0 +1,19 @@
+{
+  "content": null,
+  "doctype": "Page",
+  "module": "RundiNova Tech",
+  "name": "rundinova-record-view",
+  "page_name": "rundinova-record-view",
+  "roles": [
+    {"role": "RundiNova Director"},
+    {"role": "RundiNova Finance Manager"},
+    {"role": "RundiNova Operations"},
+    {"role": "RundiNova Executive Council"},
+    {"role": "System Manager"}
+  ],
+  "script": null,
+  "standard": "Yes",
+  "style": null,
+  "system_page": 0,
+  "title": "Détail"
+}

@@ -7,7 +7,7 @@ frappe.pages["rundinova-direction-center"].on_page_load = function (wrapper) {
   const parseDate = (value) => new Date(`${String(value).slice(0, 10)}T12:00:00`);
   const date = (value, options = { weekday: "short", day: "2-digit", month: "short" }) => value ? new Intl.DateTimeFormat("fr-BI", options).format(parseDate(value)) : "—";
   const time = (value) => String(value || "—").slice(0, 5);
-  const open = (doctype, name) => frappe.set_route("Form", doctype, name);
+  const open = (doctype, name) => frappe.set_route("rundinova-record-view", doctype, name);
   const tone = (status) => ({ "À préparer": "warning", "À corriger": "danger", Transmis: "success", Examiné: "success", Planifiée: "info", Tenue: "success", Annulée: "muted", Open: "warning", "In Progress": "info", Completed: "success", Closed: "success", Monitoring: "warning" }[status] || "muted");
   const badge = (status) => `<span class="rn-status ${tone(status)}">${escape(status)}</span>`;
   const eventKind = (event) => event.kind === "meeting" ? "meeting" : /finances/i.test(event.title) ? "finance" : "operations";
