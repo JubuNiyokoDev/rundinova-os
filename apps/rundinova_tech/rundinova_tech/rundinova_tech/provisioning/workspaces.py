@@ -52,6 +52,7 @@ VISIBLE_DESKTOP_ICONS = {
     "RundiNova Community",
     "RundiNova Communications",
     "RundiNova People",
+    "RundiNova Direction",
     "Frappe CRM",
 }
 
@@ -423,6 +424,41 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         finance_workspace_roles,
         hidden=False,
         public=1,
+    )
+    governance_links = [
+        ("DocType", "RundiNova Governance Meeting", "Réunions de direction", "calendar"),
+        ("DocType", "RundiNova Weekly Management Report", "Rapports hebdomadaires", "report"),
+        ("DocType", "RundiNova Decision", "Décisions de direction", "note"),
+        ("DocType", "RundiNova Risk", "Risques stratégiques", "alert-triangle"),
+        ("Dashboard", "RundiNova Executive Dashboard", "Pilotage exécutif", "dashboard"),
+    ]
+    _sync_workspace(
+        "RundiNova Direction",
+        "Direction & redevabilité",
+        "RundiNova Tech",
+        "rundinova_tech",
+        0.6,
+        "briefcase",
+        governance_links,
+        "rundinova-direction",
+        ("RundiNova Executive Council",),
+        hidden=False,
+        public=1,
+    )
+    _sync_workspace_sidebar(
+        "RundiNova Direction",
+        "briefcase",
+        [
+            {"type": "Link", "label": "Accueil Direction", "link_type": "Workspace", "link_to": "RundiNova Direction", "icon": "home"},
+            {"type": "Section Break", "label": "Cadre de gestion", "collapsible": 0},
+            *[
+                {"type": "Link", "label": label, "link_type": link_type, "link_to": target, "icon": icon}
+                for link_type, target, label, icon in governance_links
+            ],
+        ],
+    )
+    _ensure_workspace_desktop_icon(
+        "RundiNova Direction", "briefcase", ("RundiNova Executive Council",), True, "RundiNova Direction"
     )
 
     role_workspaces = [

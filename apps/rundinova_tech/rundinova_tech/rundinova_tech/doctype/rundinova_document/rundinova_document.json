@@ -55,6 +55,14 @@
       "reqd": 1
     },
     {
+      "fieldname": "access_scope",
+      "fieldtype": "Select",
+      "label": "Portée d’accès",
+      "options": "Standard\nExecutive Council",
+      "default": "Standard",
+      "reqd": 1
+    },
+    {
       "fieldname": "confidentiality",
       "fieldtype": "Select",
       "label": "Confidentialité",

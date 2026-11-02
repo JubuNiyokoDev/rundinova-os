@@ -30,7 +30,7 @@ class RundiNovaDocument(Document):
         folder = frappe.db.get_value(
             "RundiNova Document Folder",
             self.document_folder,
-            ["project", "default_confidentiality", "status"],
+            ["project", "default_confidentiality", "access_scope", "status"],
             as_dict=True,
         )
         if not folder or folder.status != "Active":
@@ -41,3 +41,5 @@ class RundiNovaDocument(Document):
         # take precedence over the generic document default.
         if folder.default_confidentiality:
             self.confidentiality = folder.default_confidentiality
+        if folder.access_scope:
+            self.access_scope = folder.access_scope

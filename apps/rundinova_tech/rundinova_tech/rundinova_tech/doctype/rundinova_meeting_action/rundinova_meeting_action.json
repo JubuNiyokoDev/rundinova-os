@@ -1,0 +1,15 @@
+{
+  "doctype": "DocType",
+  "name": "RundiNova Meeting Action",
+  "module": "RundiNova Tech",
+  "istable": 1,
+  "editable_grid": 1,
+  "fields": [
+    {"fieldname": "action_task", "fieldtype": "Link", "options": "Task", "label": "Tâche liée", "in_list_view": 1},
+    {"fieldname": "action_title", "fieldtype": "Data", "label": "Action / livrable", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "owner", "fieldtype": "Link", "options": "User", "label": "Responsable", "in_list_view": 1},
+    {"fieldname": "due_date", "fieldtype": "Date", "label": "Échéance", "in_list_view": 1},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Statut", "options": "À faire\nEn cours\nTerminé\nBloqué", "default": "À faire", "in_list_view": 1},
+    {"fieldname": "evidence_note", "fieldtype": "Small Text", "label": "Preuve / note"}
+  ]
+}

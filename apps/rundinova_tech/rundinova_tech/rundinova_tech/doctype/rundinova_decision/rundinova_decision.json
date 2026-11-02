@@ -28,6 +28,14 @@
       "reqd": 1
     },
     {
+      "fieldname": "governance_scope",
+      "fieldtype": "Select",
+      "label": "Portée d’accès",
+      "options": "Standard\nExecutive Council",
+      "default": "Standard",
+      "in_list_view": 1
+    },
+    {
       "fieldname": "project",
       "fieldtype": "Link",
       "options": "Project",

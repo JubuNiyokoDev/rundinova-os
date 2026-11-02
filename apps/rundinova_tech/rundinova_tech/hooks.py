@@ -107,7 +107,8 @@ doc_events = {
 scheduler_events = {
     "cron": {
         "0 5 * * 1-5": [
-            "rundinova_tech.rundinova_tech.daily_follow_up.create_daily_follow_up_reminders"
+            "rundinova_tech.rundinova_tech.daily_follow_up.create_daily_follow_up_reminders",
+            "rundinova_tech.rundinova_tech.governance.create_governance_reminders",
         ],
         "30 7 * * 1-5": [
             "rundinova_tech.rundinova_tech.daily_follow_up.create_missing_daily_follow_up_escalations"
@@ -135,6 +136,7 @@ after_migrate = [
     "rundinova_tech.rundinova_tech.provisioning.form_layouts.sync_form_layouts",
     "rundinova_tech.rundinova_tech.bootstrap.ensure_team_users",
     "rundinova_tech.rundinova_tech.setup.sync_dashboards",
+    "rundinova_tech.rundinova_tech.governance.ensure_governance_framework",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_workspaces",
     "rundinova_tech.rundinova_tech.bootstrap.hide_unused_desktop_icons",
     "rundinova_tech.rundinova_tech.setup.fix_company_currency",
@@ -153,6 +155,11 @@ permission_query_conditions = {
     "Task": _access_control + "task_query",
     "RundiNova Repository": _access_control + "repository_query",
     "RundiNova Risk": _access_control + "risk_query",
+    "RundiNova Decision": _access_control + "decision_query",
+    "RundiNova Document": _access_control + "document_query",
+    "RundiNova Document Folder": _access_control + "document_folder_query",
+    "RundiNova Governance Meeting": _access_control + "governance_query",
+    "RundiNova Weekly Management Report": _access_control + "governance_query",
     "RundiNova Food Budget": _access_control + "food_budget_query",
     "RundiNova Food Expense": _access_control + "food_expense_query",
     "RundiNova Food Progress": _access_control + "food_progress_query",

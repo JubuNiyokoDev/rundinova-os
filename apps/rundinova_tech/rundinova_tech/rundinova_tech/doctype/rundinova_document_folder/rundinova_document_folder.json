@@ -10,6 +10,7 @@
     {"fieldname": "parent_folder", "fieldtype": "Link", "options": "RundiNova Document Folder", "label": "Dossier parent", "in_list_view": 1},
     {"fieldname": "project", "fieldtype": "Link", "options": "Project", "label": "Projet", "in_list_view": 1},
     {"fieldname": "folder_owner", "fieldtype": "Link", "options": "User", "label": "Responsable", "reqd": 1, "in_list_view": 1},
+    {"fieldname": "access_scope", "fieldtype": "Select", "label": "Portée d’accès", "options": "Standard\nExecutive Council", "default": "Standard", "reqd": 1, "in_list_view": 1},
     {"fieldname": "default_confidentiality", "fieldtype": "Select", "label": "Confidentialité par défaut", "options": "Internal\nConfidential\nRestricted", "default": "Internal", "reqd": 1, "in_list_view": 1},
     {"fieldname": "status", "fieldtype": "Select", "label": "Statut", "options": "Active\nArchived", "default": "Active", "reqd": 1, "in_list_view": 1},
     {"fieldname": "description", "fieldtype": "Small Text", "label": "Description"}

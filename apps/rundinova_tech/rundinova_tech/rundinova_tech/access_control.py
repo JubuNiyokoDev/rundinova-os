@@ -1,6 +1,7 @@
 """RundiNova role policy and assignment-scoped access checks."""
 
 import frappe
+from .governance import EXECUTIVE_ROLE, has_governance_access
 
 ROLES = (
     "RundiNova Director",
@@ -14,6 +15,7 @@ ROLES = (
     "RundiNova Communications",
     "RundiNova People & Culture",
     "RundiNova Developer",
+    EXECUTIVE_ROLE,
 )
 
 READ = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 1}
@@ -32,7 +34,12 @@ CASH_DOCTYPES = ("RundiNova Cash Account", "RundiNova Cash Movement")
 ASSET_DOCTYPES = ("RundiNova Asset",)
 PROJECT_DOCTYPES = ("RundiNova Repository", "RundiNova Risk")
 DECISION_DOCTYPES = ("RundiNova Decision",)
+GOVERNANCE_DOCTYPES = (
+    "RundiNova Governance Meeting",
+    "RundiNova Weekly Management Report",
+)
 DOCUMENT_DOCTYPES = ("RundiNova Document",)
+DOCUMENT_FOLDER_DOCTYPES = ("RundiNova Document Folder",)
 DAILY_UPDATE_DOCTYPES = ("RundiNova Daily Update",)
 KPI_DOCTYPES = ("RundiNova Goal", "RundiNova KPI Definition", "RundiNova KPI Snapshot")
 CRM_DOCTYPES = (
@@ -113,6 +120,11 @@ def get_custom_doctype_permissions():
         + OFFICE_DOCTYPES
     )
     grant(all_doctypes, ("RundiNova Director",), WRITE)
+    # Executive records deliberately do not inherit Director or team access.
+    # The Council role is assigned only to the three approved members.
+    grant(GOVERNANCE_DOCTYPES, (EXECUTIVE_ROLE,), WRITE)
+    grant(("RundiNova Decision",), (EXECUTIVE_ROLE,), WRITE)
+    grant(DOCUMENT_FOLDER_DOCTYPES, (EXECUTIVE_ROLE,), WRITE)
 
     # Budget and expense records are assigned to individual team members;
     # the access hooks below filter those records by owner or active ToDo.
@@ -461,6 +473,28 @@ def risk_query(user=None):
     return _query_for("RundiNova Risk", user)
 
 
+def governance_query(user=None):
+    return "" if has_governance_access(user) else "1=0"
+
+
+def decision_query(user=None):
+    if has_governance_access(user):
+        return ""
+    return "COALESCE(`tabRundiNova Decision`.governance_scope, 'Standard') != 'Executive Council'"
+
+
+def document_query(user=None):
+    if has_governance_access(user):
+        return ""
+    return "COALESCE(`tabRundiNova Document`.access_scope, 'Standard') != 'Executive Council'"
+
+
+def document_folder_query(user=None):
+    if has_governance_access(user):
+        return ""
+    return "COALESCE(`tabRundiNova Document Folder`.access_scope, 'Standard') != 'Executive Council'"
+
+
 def dashboard_query(user=None):
     user = user or frappe.session.user
     roles = set(frappe.get_roles(user))
@@ -585,6 +619,17 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
     """Enforce the assignment boundary on both direct reads and writes."""
     user = user or frappe.session.user
     permission_type = permission_type or ptype
+    if doc.doctype in GOVERNANCE_DOCTYPES:
+        return has_governance_access(user)
+    if (
+        doc.doctype == "RundiNova Decision"
+        and doc.get("governance_scope") == "Executive Council"
+    ):
+        return has_governance_access(user)
+    if doc.doctype in DOCUMENT_DOCTYPES + DOCUMENT_FOLDER_DOCTYPES and doc.get(
+        "access_scope"
+    ) == "Executive Council":
+        return has_governance_access(user)
     if doc.doctype in DOCUMENT_DOCTYPES:
         roles = set(frappe.get_roles(user))
         return permission_type in {"read", "select", "write", "create"} and bool(
