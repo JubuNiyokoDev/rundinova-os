@@ -240,14 +240,14 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Food Expense", "Achats alimentaires", "shopping-cart"),
         ("DocType", "RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
         (
-            "URL",
-            "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20D%C3%A9tail%20tr%C3%A9sorerie",
+            "Report",
+            "NOVARIS — PAFEN — Détail trésorerie",
             "PAFEN / NOVARIS — détail trésorerie",
             "report",
         ),
         (
-            "URL",
-            "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20Synth%C3%A8se%20tr%C3%A9sorerie",
+            "Report",
+            "NOVARIS — PAFEN — Synthèse trésorerie",
             "PAFEN / NOVARIS — synthèse",
             "report",
         ),
@@ -307,6 +307,8 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         ("DocType", "RundiNova Expense", "Dépenses générales", "expense"),
         ("DocType", "RundiNova Cash Account", "Comptes de trésorerie", "bank"),
         ("DocType", "RundiNova Cash Movement", "Mouvements de trésorerie", "money"),
+        ("Report", "NOVARIS — PAFEN — Détail trésorerie", "PAFEN / NOVARIS — détail trésorerie", "report"),
+        ("Report", "NOVARIS — PAFEN — Synthèse trésorerie", "PAFEN / NOVARIS — synthèse", "report"),
         (
             "Dashboard",
             "RundiNova Finance Dashboard",
@@ -684,15 +686,15 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
             {
                 "type": "Link",
                 "label": "PAFEN / NOVARIS — détail trésorerie",
-                "link_type": "URL",
-                "link_to": "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20D%C3%A9tail%20tr%C3%A9sorerie",
+                "link_type": "Report",
+                "link_to": "NOVARIS — PAFEN — Détail trésorerie",
                 "icon": "report",
             },
             {
                 "type": "Link",
                 "label": "PAFEN / NOVARIS — synthèse",
-                "link_type": "URL",
-                "link_to": "/desk/query-report/NOVARIS%20%E2%80%94%20PAFEN%20%E2%80%94%20Synth%C3%A8se%20tr%C3%A9sorerie",
+                "link_type": "Report",
+                "link_to": "NOVARIS — PAFEN — Synthèse trésorerie",
                 "icon": "report",
             },
             {

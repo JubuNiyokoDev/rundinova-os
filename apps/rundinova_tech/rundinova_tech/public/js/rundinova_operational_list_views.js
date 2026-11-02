@@ -105,15 +105,20 @@ const operationalViews = {
   "RundiNova Cash Movement": {
     add_fields: ["movement_date", "movement_type", "account", "destination_account", "amount", "category", "project", "status"],
     get_indicator(doc) {
-      const types = {
-        Income: ["Entrée", "green"],
-        Expense: ["Sortie", "red"],
-        Transfer: ["Transfert", "blue"],
+      const statuses = {
+        Draft: ["Brouillon", "gray"],
+        Submitted: ["Soumis", "orange"],
+        Approved: ["Approuvé", "green"],
+        Reconciled: ["Rapproché", "blue"],
+        Cancelled: ["Annulé", "darkgrey"],
       };
-      const [label, color] = types[doc.movement_type] || [doc.movement_type || "—", "gray"];
-      return [__(label), color, `movement_type,=,${doc.movement_type}`];
+      const [label, color] = statuses[doc.status] || [doc.status || "Brouillon", "gray"];
+      return [__(label), color, `status,=,${doc.status || "Draft"}`];
     },
     formatters: {
+      status(value) {
+        return ({ Draft: __("Brouillon"), Submitted: __("Soumis"), Approved: __("Approuvé"), Reconciled: __("Rapproché"), Cancelled: __("Annulé") }[value] || value || "—");
+      },
       amount(value, df, doc) {
         const color = doc.movement_type === "Income" ? "text-success" : doc.movement_type === "Expense" ? "text-danger" : "text-primary";
         const sign = doc.movement_type === "Income" ? "+" : doc.movement_type === "Expense" ? "−" : "↔ ";
