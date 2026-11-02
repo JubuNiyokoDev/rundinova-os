@@ -431,8 +431,10 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         hidden=False,
         public=1,
     )
+    # The daily Centre is the single entry point in the sidebar below.  It must
+    # not be repeated in the workspace shortcuts, otherwise the two identical
+    # labels make the detailed registers look like the primary view.
     governance_links = [
-        ("Page", "rundinova-direction-center", "Centre de direction", "dashboard"),
         ("DocType", "RundiNova Governance Meeting", "Registre détaillé — réunions", "calendar"),
         ("DocType", "RundiNova Weekly Management Report", "Registre détaillé — rapports", "report"),
         ("DocType", "RundiNova Decision", "Décisions et actions", "note"),
