@@ -31,7 +31,7 @@ class TestRundiNovaCashMovement(UnitTestCase):
                 "status": "Approved",
                 "account": "KCB",
                 "movement_date": "2026-10-24",
-                "category": "Prime cofondateur",
+                "category": "Salaire mensuel",
                 "description": "Prime confirmée",
                 "movement_title": "Prime",
                 "amount": 1000000,

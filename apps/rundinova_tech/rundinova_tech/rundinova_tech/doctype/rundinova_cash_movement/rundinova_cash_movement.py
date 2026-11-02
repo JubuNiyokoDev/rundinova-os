@@ -114,10 +114,13 @@ def sync_general_expense(doc):
         "Cash": "Cash",
         "Mobile Money": "Mobile Money",
     }.get(account_type, "Other")
+    category_text = (doc.category or "").lower()
     category = (
         "Salaries & Allowances"
-        if "prime" in (doc.category or "").lower()
-        or "salary" in (doc.category or "").lower()
+        if any(
+            term in category_text
+            for term in ("prime", "salary", "salaire", "rémunération", "remuneration")
+        )
         else "Other"
     )
     expense = frappe.get_doc(
