@@ -433,8 +433,8 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
     )
     governance_links = [
         ("Page", "rundinova-direction-center", "Centre de direction", "dashboard"),
-        ("DocType", "RundiNova Governance Meeting", "Lundi — réunion de direction", "calendar"),
-        ("DocType", "RundiNova Weekly Management Report", "Vendredi — rapports à transmettre", "report"),
+        ("DocType", "RundiNova Governance Meeting", "Registre détaillé — réunions", "calendar"),
+        ("DocType", "RundiNova Weekly Management Report", "Registre détaillé — rapports", "report"),
         ("DocType", "RundiNova Decision", "Décisions et actions", "note"),
         ("DocType", "RundiNova Risk", "Risques à escalader", "alert-triangle"),
         ("Dashboard", "RundiNova Executive Dashboard", "Synthèse de direction", "dashboard"),
@@ -456,8 +456,8 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         "RundiNova Direction",
         "briefcase",
         [
-            {"type": "Link", "label": "Accueil Direction", "link_type": "Workspace", "link_to": "RundiNova Direction", "icon": "home"},
-            {"type": "Section Break", "label": "Cadre de gestion", "collapsible": 0},
+            {"type": "Link", "label": "Centre de direction", "link_type": "Page", "link_to": "rundinova-direction-center", "icon": "home"},
+            {"type": "Section Break", "label": "Pilotage et registres", "collapsible": 0},
             *[
                 {"type": "Link", "label": label, "link_type": link_type, "link_to": target, "icon": icon}
                 for link_type, target, label, icon in governance_links

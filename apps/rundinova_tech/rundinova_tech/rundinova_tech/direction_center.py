@@ -79,6 +79,20 @@ def get_direction_overview():
         {"governance_scope": "Executive Council", "status": ["in", ["Open", "In Progress"]]},
     )
     risks_open = frappe.db.count("RundiNova Risk", {"status": ["in", ["Open", "Monitoring"]]})
+    decisions = frappe.get_all(
+        "RundiNova Decision",
+        filters={"governance_scope": "Executive Council"},
+        fields=["name", "decision_title", "decision_date", "decision_owner", "follow_up_date", "status"],
+        order_by="decision_date desc",
+        limit_page_length=20,
+    )
+    risks = frappe.get_all(
+        "RundiNova Risk",
+        filters={"status": ["in", ["Open", "Monitoring"]]},
+        fields=["name", "risk_title", "area", "risk_owner", "impact", "review_date", "status"],
+        order_by="review_date asc, modified desc",
+        limit_page_length=20,
+    )
 
     events = []
     for meeting in meetings:
@@ -118,5 +132,9 @@ def get_direction_overview():
             "open_risks": risks_open,
         },
         "events": events,
+        "meetings": meetings,
+        "reports": reports,
         "reports_due_this_week": due_this_week,
+        "decisions": decisions,
+        "risks": risks,
     }

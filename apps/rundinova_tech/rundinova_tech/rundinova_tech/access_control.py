@@ -124,6 +124,7 @@ def get_custom_doctype_permissions():
     # The Council role is assigned only to the three approved members.
     grant(GOVERNANCE_DOCTYPES, (EXECUTIVE_ROLE,), WRITE)
     grant(("RundiNova Decision",), (EXECUTIVE_ROLE,), WRITE)
+    grant(("RundiNova Risk",), (EXECUTIVE_ROLE,), WRITE)
     grant(DOCUMENT_FOLDER_DOCTYPES, (EXECUTIVE_ROLE,), WRITE)
 
     # Budget and expense records are assigned to individual team members;
