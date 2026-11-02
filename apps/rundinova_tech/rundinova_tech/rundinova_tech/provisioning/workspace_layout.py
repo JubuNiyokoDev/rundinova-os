@@ -30,20 +30,12 @@ OPERATION_SECTIONS = (
         {
             "RundiNova Food Progress",
             "RundiNova Asset",
+            "RundiNova Decision",
+            "/desk/Workspaces/RundiNova%20Direction",
             "rundinova-document-library",
             "RundiNova KPI Definition",
             "RundiNova KPI Snapshot",
             "RundiNova Goal",
-        },
-    ),
-    (
-        "Direction & redevabilité",
-        {
-            "RundiNova Governance Meeting",
-            "RundiNova Weekly Management Report",
-            "RundiNova Decision",
-            "RundiNova Risk",
-            "/desk/Workspaces/RundiNova%20Direction",
         },
     ),
     ("Administration", {"/desk/rundinova-setup"}),

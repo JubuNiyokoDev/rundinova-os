@@ -432,6 +432,7 @@ def sync_workspaces(overview_charts=(), overview_number_cards=()):
         public=1,
     )
     governance_links = [
+        ("Page", "rundinova-direction-center", "Centre de direction", "dashboard"),
         ("DocType", "RundiNova Governance Meeting", "Lundi — réunion de direction", "calendar"),
         ("DocType", "RundiNova Weekly Management Report", "Vendredi — rapports à transmettre", "report"),
         ("DocType", "RundiNova Decision", "Décisions et actions", "note"),

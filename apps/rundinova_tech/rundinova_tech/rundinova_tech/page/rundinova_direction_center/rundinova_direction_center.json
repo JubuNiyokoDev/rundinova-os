@@ -1,0 +1,16 @@
+{
+  "content": null,
+  "doctype": "Page",
+  "module": "RundiNova Tech",
+  "name": "rundinova-direction-center",
+  "page_name": "rundinova-direction-center",
+  "roles": [
+    {"role": "RundiNova Executive Council"},
+    {"role": "System Manager"}
+  ],
+  "script": null,
+  "standard": "Yes",
+  "style": null,
+  "system_page": 0,
+  "title": "Centre de direction"
+}
