@@ -266,16 +266,16 @@ def add_item_to_food_budget(
         frappe.throw(_("Choose an existing budget line as the source."))
 
     spent_on_source = frappe.utils.flt(
-        frappe.db.get_value(
-            "RundiNova Food Expense",
-            {
-                "budget": budget,
-                "item": source_item,
-                "status": ["in", ["Submitted", "Approved", "Paid"]],
-            },
-            "sum(amount)",
-        )
-        or 0
+        frappe.db.sql(
+            """
+            SELECT COALESCE(SUM(amount), 0)
+            FROM `tabRundiNova Food Expense`
+            WHERE budget = %s
+              AND item = %s
+              AND status IN ('Submitted', 'Approved', 'Paid')
+            """,
+            (budget, source_item),
+        )[0][0]
     )
     available = frappe.utils.flt(source_row.monthly_amount) - spent_on_source
     if amount > available:
