@@ -1,5 +1,69 @@
 // One short purchase flow shared by budget lines, food progress, and list rows.
 frappe.listview_settings = frappe.listview_settings || {};
+
+function rnAddFoodItemToBudget({
+  budget,
+  budgetDoc,
+  item = null,
+  amount = 0,
+  quantity = 0,
+  onAdded,
+}) {
+  const sourceItems = (budgetDoc?.items || []).map((row) => row.item).filter(Boolean);
+  if (!budget || !sourceItems.length) {
+    frappe.msgprint(__("Sélectionnez d’abord le budget alimentaire du mois."));
+    return;
+  }
+  frappe.prompt(
+    [
+      {
+        fieldtype: "Link",
+        fieldname: "item",
+        label: __("Article à ajouter"),
+        options: "Item",
+        reqd: 1,
+        default: item,
+        read_only: Boolean(item),
+        get_query: () => ({ filters: { disabled: 0 } }),
+      },
+      {
+        fieldtype: "Link",
+        fieldname: "source_item",
+        label: __("Réduire le budget de"),
+        options: "Item",
+        reqd: 1,
+        get_query: () => ({ filters: { name: ["in", sourceItems] } }),
+      },
+      {
+        fieldtype: "Currency",
+        fieldname: "reallocated_amount",
+        label: __("Montant réalloué (FBu)"),
+        reqd: 1,
+        default: amount,
+        description: __("Le plafond mensuel ne change pas."),
+      },
+      {
+        fieldtype: "Float",
+        fieldname: "planned_quantity",
+        label: __("Quantité prévue"),
+        default: quantity,
+      },
+    ],
+    async (values) => {
+      const result = await frappe.call({
+        method: "rundinova_tech.rundinova_tech.doctype.rundinova_food_expense.rundinova_food_expense.add_item_to_food_budget",
+        args: { budget, ...values },
+      });
+      frappe.show_alert({
+        message: __("Article ajouté au budget mensuel."),
+        indicator: "green",
+      });
+      await onAdded?.(result.message);
+    },
+    __("Ajouter l’article au budget"),
+    __("Ajouter"),
+  );
+}
 window.rundinova_open_food_purchase = async function ({
   budget,
   item,
@@ -126,7 +190,7 @@ window.rundinova_open_food_purchase = async function ({
           options: "Item",
           reqd: 1,
           in_list_view: 1,
-          get_query: () => ({ filters: { name: ["in", allowed_items] } }),
+          get_query: () => ({ filters: { disabled: 0 } }),
         },
         {
           fieldtype: "Float",
@@ -192,6 +256,46 @@ window.rundinova_open_food_purchase = async function ({
     primary_action: async (values) => {
       dialog.disable_primary_action();
       try {
+        const outsideBudget = !item
+          ? (values.items || []).find(
+              (row) => row.item && !allowed_items.includes(row.item),
+            )
+          : null;
+        if (outsideBudget) {
+          dialog.enable_primary_action();
+          frappe.msgprint({
+            title: __("Article hors budget"),
+            message: __(
+              "{0} existe bien. Ajoutez-le d’abord au budget mensuel en réallouant son montant depuis un autre article.",
+              [outsideBudget.item],
+            ),
+            primary_action: {
+              label: __("Ajouter au budget"),
+              action: () =>
+                rnAddFoodItemToBudget({
+                  budget: budget || values.budget,
+                  budgetDoc: budget_doc,
+                  item: outsideBudget.item,
+                  amount:
+                    Number(outsideBudget.quantity || 0) *
+                    Number(outsideBudget.amount || 0),
+                  quantity: outsideBudget.quantity || 0,
+                  onAdded: async () => {
+                    budget_doc = await frappe.db.get_doc(
+                      "RundiNova Food Budget",
+                      budget || values.budget,
+                    );
+                    budget_lines = budget_doc?.items || [];
+                    allowed_items = budget_lines
+                      .map((line) => line.item)
+                      .filter(Boolean);
+                    dialog.get_field("items")?.grid?.refresh();
+                  },
+                }),
+            },
+          });
+          return;
+        }
         const args = item
           ? {
               ...values,
@@ -229,6 +333,24 @@ window.rundinova_open_food_purchase = async function ({
       }
     },
   });
+  if (!item) {
+    dialog.set_secondary_action(__("Ajouter un article au budget"), () => {
+      const selectedBudget = budget || dialog.get_value("budget");
+      rnAddFoodItemToBudget({
+        budget: selectedBudget,
+        budgetDoc: budget_doc,
+        onAdded: async () => {
+          budget_doc = await frappe.db.get_doc(
+            "RundiNova Food Budget",
+            selectedBudget,
+          );
+          budget_lines = budget_doc?.items || [];
+          allowed_items = budget_lines.map((line) => line.item).filter(Boolean);
+          dialog.get_field("items")?.grid?.refresh();
+        },
+      });
+    });
+  }
   dialog.show();
   if (!item) {
     dialog.set_value("items", [{ quantity: 1 }]);
