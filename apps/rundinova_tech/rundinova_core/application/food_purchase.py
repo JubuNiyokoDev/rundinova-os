@@ -44,6 +44,7 @@ class FoodPurchaseCommand:
     expense_date: str
     quantity: float
     amount: float
+    unit_price: float | None = None
     payment_method: str = "Cash"
     supplier: str | None = None
     receipt: str | None = None
@@ -114,11 +115,14 @@ def record_food_purchase(
             "quantity": command.quantity,
             "unit": line.unit or item.stock_unit,
             "amount": command.amount,
+            "unit_price": command.unit_price,
             "supplier": command.supplier,
             "payment_method": command.payment_method,
             "receipt": command.receipt,
             "notes": command.notes,
-            "status": "Submitted",
+            # A market purchase recorded in this short flow is already paid
+            # from the food cash envelope; it is not an approval request.
+            "status": "Paid",
         }
     )
 

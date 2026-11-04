@@ -42,6 +42,12 @@
       "in_list_view": 1
     },
     {
+      "fieldname": "unit_price",
+      "fieldtype": "Currency",
+      "label": "Prix unitaire (FBu)",
+      "description": "Le montant total est calculé automatiquement : quantité × prix unitaire."
+    },
+    {
       "fieldname": "unit",
       "fieldtype": "Data",
       "label": "Unité",
@@ -53,6 +59,7 @@
       "fieldtype": "Currency",
       "label": "Montant total (FBu)",
       "reqd": 1,
+      "read_only": 1,
       "in_list_view": 1
     },
     { "fieldname": "column_break_purchase", "fieldtype": "Column Break" },

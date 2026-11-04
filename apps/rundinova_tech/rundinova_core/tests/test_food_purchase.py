@@ -84,7 +84,19 @@ class TestFoodPurchaseUseCase(unittest.TestCase):
         self.assertNotIn(("create_progress", "budget-1", "rice"), port.calls)
         self.assertEqual(port.expense_values["unit"], "kg")
         self.assertEqual(port.expense_values["category"], "Cereals")
-        self.assertEqual(port.expense_values["status"], "Submitted")
+        self.assertEqual(port.expense_values["status"], "Paid")
+
+    def test_preserves_the_explicit_unit_price_with_the_computed_total(self):
+        port = FakeFoodPurchasePort(
+            FoodProgressRecord(name="progress-1", budget="budget-1", item="rice")
+        )
+
+        record_food_purchase(
+            self.command(quantity=20, amount=120000, unit_price=6000), port
+        )
+
+        self.assertEqual(port.expense_values["unit_price"], 6000)
+        self.assertEqual(port.expense_values["amount"], 120000)
 
     def test_creates_missing_progress_and_uses_item_stock_unit_fallback(self):
         port = FakeFoodPurchasePort()

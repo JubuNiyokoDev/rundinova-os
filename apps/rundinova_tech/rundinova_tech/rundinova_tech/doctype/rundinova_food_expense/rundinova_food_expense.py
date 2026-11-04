@@ -92,6 +92,8 @@ def validate_expense(doc, _method=None):
             {"parent": doc.budget, "item": doc.item},
             "unit",
         ) or frappe.db.get_value("Item", doc.item, "stock_uom")
+    if frappe.utils.flt(doc.unit_price):
+        doc.amount = frappe.utils.flt(doc.quantity) * frappe.utils.flt(doc.unit_price)
     set_expense_title(doc)
     violation = validate_food_expense(
         FoodExpenseCommand(
@@ -122,7 +124,8 @@ def record_food_purchase(
     item,
     expense_date,
     quantity,
-    amount,
+    amount=None,
+    unit_price=None,
     payment_method="Cash",
     supplier=None,
     receipt=None,
@@ -134,12 +137,22 @@ def record_food_purchase(
     The linked budget and item are revalidated on the server. The UI is only a
     shortcut; the existing expense controller still enforces dates and limits.
     """
+    quantity_value = frappe.utils.flt(quantity)
+    unit_price_value = (
+        frappe.utils.flt(unit_price) if unit_price not in (None, "") else None
+    )
+    amount_value = (
+        quantity_value * unit_price_value
+        if unit_price_value is not None
+        else frappe.utils.flt(amount)
+    )
     command = FoodPurchaseCommand(
         budget=budget,
         item=item,
         expense_date=expense_date,
-        quantity=frappe.utils.flt(quantity),
-        amount=frappe.utils.flt(amount),
+        quantity=quantity_value,
+        amount=amount_value,
+        unit_price=unit_price_value,
         payment_method=payment_method,
         supplier=supplier,
         receipt=receipt,
@@ -177,13 +190,25 @@ def record_food_purchases(
     for row in rows:
         if not isinstance(row, dict) or not row.get("item"):
             frappe.throw(_("Every purchase line needs an item."))
+        quantity_value = frappe.utils.flt(row.get("quantity"))
+        unit_price_value = (
+            frappe.utils.flt(row.get("unit_price"))
+            if row.get("unit_price") not in (None, "")
+            else None
+        )
+        amount_value = (
+            quantity_value * unit_price_value
+            if unit_price_value is not None
+            else frappe.utils.flt(row.get("amount"))
+        )
         commands.append(
             FoodPurchaseCommand(
                 budget=budget,
                 item=row["item"],
                 expense_date=expense_date,
-                quantity=frappe.utils.flt(row.get("quantity")),
-                amount=frappe.utils.flt(row.get("amount")),
+                quantity=quantity_value,
+                amount=amount_value,
+                unit_price=unit_price_value,
                 payment_method=payment_method,
                 supplier=supplier,
                 receipt=receipt,
@@ -347,6 +372,38 @@ def refresh_budget(budget_name):
     )
 
     refresh_budget_totals(budget_name)
+
+
+def backfill_unit_prices_for_market_visit(budget, expense_date):
+    """Correct one legacy market visit entered before unit prices were explicit.
+
+    Previous versions stored the entered price in ``amount`` as if it were a
+    total.  This controlled one-off repair preserves the entered price as the
+    unit price and recalculates every affected total as quantity × unit price.
+    """
+    expenses = frappe.get_all(
+        "RundiNova Food Expense",
+        filters={"budget": budget, "expense_date": expense_date},
+        fields=["name"],
+        order_by="creation asc",
+    )
+    corrected = []
+    for row in expenses:
+        expense = frappe.get_doc("RundiNova Food Expense", row.name)
+        if frappe.utils.flt(expense.unit_price):
+            continue
+        price = frappe.utils.flt(expense.amount)
+        expense.unit_price = price
+        expense.amount = frappe.utils.flt(expense.quantity) * price
+        expense.status = "Paid"
+        expense.notes = expense.notes or _(
+            "Correction contrôlée : le prix initialement saisi était un prix unitaire. "
+            "Le total est recalculé comme quantité × prix unitaire."
+        )
+        expense.save(ignore_permissions=True)
+        corrected.append(expense.name)
+    refresh_budget(budget)
+    return corrected
 
 
 def sync_purchase_invoice(doc, _method=None):
