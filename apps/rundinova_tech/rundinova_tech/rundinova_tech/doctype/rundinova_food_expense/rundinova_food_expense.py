@@ -204,6 +204,94 @@ def record_food_purchases(
     return [result.as_dict() for result in results]
 
 
+@frappe.whitelist()
+def add_item_to_food_budget(
+    budget,
+    item,
+    source_item,
+    reallocated_amount,
+    planned_quantity=0,
+    unit=None,
+):
+    """Add an existing catalogue item to a monthly food budget by reallocation.
+
+    The approved ceiling and total plan stay unchanged: the new line is funded
+    from the unspent plan of a current line.  This is intentionally separate
+    from recording the purchase so the financial change is visible and auditable.
+    """
+    budget_doc = frappe.get_doc("RundiNova Food Budget", budget)
+    budget_doc.check_permission("write")
+    if not frappe.db.exists("Item", item):
+        frappe.throw(_("The selected food item does not exist."))
+    if item == source_item:
+        frappe.throw(_("Choose a different budget line as the source."))
+
+    amount = frappe.utils.flt(reallocated_amount)
+    quantity = frappe.utils.flt(planned_quantity)
+    if amount <= 0:
+        frappe.throw(_("The amount to reallocate must be greater than zero."))
+    if quantity < 0:
+        frappe.throw(_("The planned quantity cannot be negative."))
+
+    current_items = {row.item: row for row in (budget_doc.items or [])}
+    if item in current_items:
+        frappe.throw(_("This item is already part of the selected food budget."))
+    source_row = current_items.get(source_item)
+    if not source_row:
+        frappe.throw(_("Choose an existing budget line as the source."))
+
+    spent_on_source = frappe.utils.flt(
+        frappe.db.get_value(
+            "RundiNova Food Expense",
+            {
+                "budget": budget,
+                "item": source_item,
+                "status": ["in", ["Submitted", "Approved", "Paid"]],
+            },
+            "sum(amount)",
+        )
+        or 0
+    )
+    available = frappe.utils.flt(source_row.monthly_amount) - spent_on_source
+    if amount > available:
+        frappe.throw(
+            _("Only {0} FBu remains available on {1} for reallocation.").format(
+                frappe.utils.fmt_money(available, currency="BIF"), source_item
+            )
+        )
+
+    item_unit = unit or frappe.db.get_value("Item", item, "stock_uom") or "Unit"
+    source_row.monthly_amount = frappe.utils.flt(source_row.monthly_amount) - amount
+    budget_doc.append(
+        "items",
+        {
+            "item": item,
+            "category": frappe.db.get_value("Item", item, "item_group"),
+            "quantity": quantity,
+            "unit": item_unit,
+            "monthly_amount": amount,
+        },
+    )
+    # A reallocation preserves the approved ceiling but needs to work while the
+    # monthly budget is submitted. The comment provides its visible audit trail.
+    budget_doc.flags.ignore_validate_update_after_submit = True
+    budget_doc.save()
+    budget_doc.add_comment(
+        "Info",
+        _("Budget reallocated: {0} FBu moved from {1} to {2}.").format(
+            frappe.utils.fmt_money(amount, currency="BIF"), source_item, item
+        ),
+    )
+    frappe.clear_document_cache("RundiNova Food Budget", budget_doc.name)
+    return {
+        "budget": budget_doc.name,
+        "item": item,
+        "unit": item_unit,
+        "source_item": source_item,
+        "reallocated_amount": amount,
+    }
+
+
 def ensure_cash_link_not_stale(doc, deleting=False):
     """Require linked cash movements to be cancelled before a purchase changes."""
     if not doc.name:

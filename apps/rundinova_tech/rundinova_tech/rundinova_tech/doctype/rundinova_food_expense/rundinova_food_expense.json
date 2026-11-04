@@ -38,13 +38,15 @@
       "fieldname": "quantity",
       "fieldtype": "Float",
       "label": "Quantité",
-      "reqd": 1
+      "reqd": 1,
+      "in_list_view": 1
     },
     {
       "fieldname": "unit",
       "fieldtype": "Data",
       "label": "Unité",
-      "read_only": 1
+      "read_only": 1,
+      "in_list_view": 1
     },
     {
       "fieldname": "amount",
