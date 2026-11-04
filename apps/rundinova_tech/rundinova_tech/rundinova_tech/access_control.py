@@ -185,7 +185,10 @@ def get_custom_doctype_permissions():
     )
     grant(DECISION_DOCTYPES, ("RundiNova Team Member",), READ)
 
-    # The role table marks shared documents as available to the full team.
+    # The shared library is a working area: developers and other RundiNova
+    # roles can create folders and documents. Executive Council scope is still
+    # enforced per record below, so locked material remains council-only.
+    grant(DOCUMENT_FOLDER_DOCTYPES, ROLES[1:], WRITE)
     grant(DOCUMENT_DOCTYPES, ROLES[1:], WRITE)
 
     # Each employee creates and manages only their own daily report. Leads
@@ -632,6 +635,11 @@ def has_permission(doc, user=None, ptype=None, permission_type=None, **kwargs):
     ) == "Executive Council":
         return has_governance_access(user)
     if doc.doctype in DOCUMENT_DOCTYPES:
+        roles = set(frappe.get_roles(user))
+        return permission_type in {"read", "select", "write", "create"} and bool(
+            roles.intersection(ROLES)
+        )
+    if doc.doctype in DOCUMENT_FOLDER_DOCTYPES:
         roles = set(frappe.get_roles(user))
         return permission_type in {"read", "select", "write", "create"} and bool(
             roles.intersection(ROLES)

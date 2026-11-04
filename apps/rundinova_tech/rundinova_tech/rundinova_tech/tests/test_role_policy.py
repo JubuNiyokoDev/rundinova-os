@@ -157,6 +157,26 @@ class TestRolePolicy(UnitTestCase):
                 has_permission(document, user="employee@example.test", ptype="read")
             )
 
+    def test_document_folders_are_available_to_developers_but_locked_folders_are_not(self):
+        folder = _dict(doctype="RundiNova Document Folder", access_scope="Standard")
+        with patch(
+            "rundinova_tech.rundinova_tech.access_control.frappe.get_roles",
+            return_value=["RundiNova Developer"],
+        ):
+            self.assertTrue(
+                has_permission(folder, user="developer@example.test", ptype="create")
+            )
+        locked_folder = _dict(
+            doctype="RundiNova Document Folder", access_scope="Executive Council"
+        )
+        with patch(
+            "rundinova_tech.rundinova_tech.access_control.has_governance_access",
+            return_value=False,
+        ):
+            self.assertFalse(
+                has_permission(locked_folder, user="developer@example.test", ptype="read")
+            )
+
     def test_workspace_list_filter_uses_role_rows_without_nonexistent_columns(self):
         with (
             patch(
