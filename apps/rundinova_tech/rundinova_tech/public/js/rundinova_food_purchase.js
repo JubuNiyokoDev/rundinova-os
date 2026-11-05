@@ -334,7 +334,7 @@ window.rundinova_open_food_purchase = async function ({
     },
   });
   if (!item) {
-    dialog.set_secondary_action(__("Ajouter un article au budget"), () => {
+    dialog.set_secondary_action(() => {
       const selectedBudget = budget || dialog.get_value("budget");
       rnAddFoodItemToBudget({
         budget: selectedBudget,
@@ -349,7 +349,7 @@ window.rundinova_open_food_purchase = async function ({
           dialog.get_field("items")?.grid?.refresh();
         },
       });
-    });
+    }, __("Ajouter un article au budget"));
   }
   dialog.show();
   if (!item) {
