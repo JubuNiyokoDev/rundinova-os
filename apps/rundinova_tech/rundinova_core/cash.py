@@ -2,7 +2,6 @@
 
 from collections.abc import Iterable
 
-MOVEMENTS_REQUIRING_EVIDENCE = frozenset(("Submitted", "Approved", "Reconciled"))
 BALANCE_STATUSES = ("Approved", "Reconciled")
 FOOD_EXPENSE_CASH_PROTECTED_FIELDS = (
     "expense_date",
@@ -35,8 +34,6 @@ def cash_movement_violation(
         return "transfer_requires_destination"
     if movement_type != "Transfer" and destination_account:
         return "destination_only_valid_for_transfer"
-    if status in MOVEMENTS_REQUIRING_EVIDENCE and not evidence_present:
-        return "evidence_required"
     return None
 
 

@@ -36,8 +36,6 @@ class RundiNovaCashMovement(Document):
             frappe.throw(_("A transfer requires a destination account."))
         if violation == "destination_only_valid_for_transfer":
             frappe.throw(_("Destination account is only used for transfers."))
-        if violation == "evidence_required":
-            frappe.throw(_("Evidence is required before submitting a movement."))
         if linked_expense:
             duplicate = frappe.db.exists(
                 "RundiNova Cash Movement",

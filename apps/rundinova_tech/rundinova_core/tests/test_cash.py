@@ -106,7 +106,7 @@ class TestCashDomain(unittest.TestCase):
             "destination_only_valid_for_transfer",
         )
 
-    def test_evidence_requirement_depends_on_status(self):
+    def test_evidence_is_optional_for_all_movement_statuses(self):
         base = {
             "amount": 10,
             "movement_type": "Expense",
@@ -114,15 +114,9 @@ class TestCashDomain(unittest.TestCase):
             "evidence_present": False,
         }
 
-        self.assertEqual(
-            cash_movement_violation(**base, status="Approved"), "evidence_required"
-        )
+        self.assertIsNone(cash_movement_violation(**base, status="Approved"))
         self.assertIsNone(cash_movement_violation(**base, status="Draft"))
-        self.assertIsNone(
-            cash_movement_violation(
-                **{**base, "evidence_present": True}, status="Reconciled"
-            )
-        )
+        self.assertIsNone(cash_movement_violation(**base, status="Reconciled"))
 
     def test_opening_balance_must_not_be_negative(self):
         self.assertEqual(
