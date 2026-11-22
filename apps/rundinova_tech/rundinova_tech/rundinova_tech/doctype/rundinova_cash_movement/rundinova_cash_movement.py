@@ -139,6 +139,9 @@ def sync_general_expense(doc):
             ).format(doc.name),
         }
     )
+    # The linked cash movement is the auditable source record.  A receipt may
+    # be added later, so its generated general expense must not reject it.
+    expense.flags.allow_missing_evidence = True
     expense.insert(ignore_permissions=True)
     doc.db_set("expense", expense.name, update_modified=False)
     return expense

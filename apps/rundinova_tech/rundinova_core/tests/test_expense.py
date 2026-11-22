@@ -30,6 +30,19 @@ class TestExpenseDomain(unittest.TestCase):
             ("evidence_required",),
         )
 
+    def test_cash_generated_expense_can_be_paid_before_evidence_is_added(self):
+        self.assertEqual(
+            expense_validation_actions(
+                amount=10,
+                status="Paid",
+                receipt_present=False,
+                approved_by_present=True,
+                payment_method="Cash",
+                allow_missing_evidence=True,
+            ),
+            (),
+        )
+
     def test_approval_stamps_approver_before_paid_method_validation(self):
         self.assertEqual(
             expense_validation_actions(

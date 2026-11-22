@@ -5,12 +5,22 @@ APPROVAL_STATUSES = frozenset(("Approved", "Paid"))
 
 
 def expense_validation_actions(
-    *, amount, status, receipt_present, approved_by_present, payment_method
+    *,
+    amount,
+    status,
+    receipt_present,
+    approved_by_present,
+    payment_method,
+    allow_missing_evidence=False,
 ):
     """Return validation errors and workflow actions in the existing order."""
     if amount <= 0:
         return ("amount_must_be_positive",)
-    if status in EVIDENCE_STATUSES and not receipt_present:
+    if (
+        status in EVIDENCE_STATUSES
+        and not receipt_present
+        and not allow_missing_evidence
+    ):
         return ("evidence_required",)
 
     actions = []

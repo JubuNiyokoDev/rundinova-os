@@ -22,6 +22,9 @@ class RundiNovaExpense(Document):
             receipt_present=bool(self.receipt),
             approved_by_present=bool(self.approved_by),
             payment_method=self.payment_method,
+            allow_missing_evidence=bool(
+                getattr(self.flags, "allow_missing_evidence", False)
+            ),
         )
         for action in actions:
             if action == "stamp_approver":
